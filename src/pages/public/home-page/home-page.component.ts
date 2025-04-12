@@ -63,19 +63,181 @@ export class HomeComponent implements OnInit {
     
     // Mock data for products - in a real app, these would come from a service
     this.featuredProducts = [
-      { id: 1, name: 'Samsung Galaxy A24', price: 499.99, oldPrice: 599.99, discount: 17, image: 'assets/images/products/phone1.jpg', category: 'Electronics', rating: 4.5, inStock: true, freeShipping: true },
-      { id: 2, name: 'Men\'s Casual T-Shirt', price: 19.99, oldPrice: 29.99, discount: 33, image: 'assets/images/products/tshirt1.jpg', category: 'Fashion', rating: 4.2, inStock: true },
-      { id: 3, name: 'Wireless Bluetooth Headphones', price: 79.99, oldPrice: 99.99, discount: 20, image: 'assets/images/products/headphones1.jpg', category: 'Electronics', rating: 4.7, inStock: true, freeShipping: true },
-      { id: 4, name: 'Non-stick Cooking Pan', price: 24.99, oldPrice: 34.99, discount: 29, image: 'assets/images/products/pan1.jpg', category: 'Home & Office', rating: 4.0, inStock: true }
+      {
+        product_id: 1,
+        name: 'Samsung Galaxy A24',
+        base_price: 599.99,
+        discount_percentage: 17,
+        final_price: 499.99,
+        average_rating: 4.5,
+        main_image_url: 'assets/images/products/phone1.jpg',
+        seller: {
+          seller_id: 101,
+          business_name: 'Samsung Official Store'
+        },
+        subcategory: {
+          subcategory_id: 5,
+          name: 'Electronics'
+        }
+      },
+      {
+        product_id: 2,
+        name: 'Men\'s Casual T-Shirt',
+        base_price: 29.99,
+        discount_percentage: 33,
+        final_price: 19.99,
+        average_rating: 4.2,
+        main_image_url: 'assets/images/products/tshirt1.jpg',
+        seller: {
+          seller_id: 102,
+          business_name: 'FashionHub'
+        },
+        subcategory: {
+          subcategory_id: 10,
+          name: 'Fashion'
+        }
+      },
+      {
+        product_id: 3,
+        name: 'Wireless Bluetooth Headphones',
+        base_price: 99.99,
+        discount_percentage: 20,
+        final_price: 79.99,
+        average_rating: 4.7,
+        main_image_url: 'assets/images/products/headphones1.jpg',
+        seller: {
+          seller_id: 103,
+          business_name: 'AudioTech'
+        },
+        subcategory: {
+          subcategory_id: 5,
+          name: 'Electronics'
+        }
+      },
+      {
+        product_id: 4,
+        name: 'Non-stick Cooking Pan',
+        base_price: 34.99,
+        discount_percentage: 29,
+        final_price: 24.99,
+        average_rating: 4.0,
+        main_image_url: 'assets/images/products/pan1.jpg',
+        seller: {
+          seller_id: 104,
+          business_name: 'KitchenPlus'
+        },
+        subcategory: {
+          subcategory_id: 15,
+          name: 'Home & Office'
+        }
+      },
+      {
+        product_id: 5,
+        name: 'Non-stick Cooking Pan',
+        base_price: 34.99,
+        discount_percentage: 29,
+        final_price: 24.99,
+        average_rating: 4.0,
+        main_image_url: 'assets/images/products/pan1.jpg',
+        seller: {
+          seller_id: 104,
+          business_name: 'KitchenPlus'
+        },
+        subcategory: {
+          subcategory_id: 15,
+          name: 'Home & Office'
+        }
+      },
+      {
+        product_id: 6,
+        name: 'Non-stick Cooking Pan',
+        base_price: 34.99,
+        discount_percentage: 29,
+        final_price: 24.99,
+        average_rating: 4.0,
+        main_image_url: 'assets/images/products/pan1.jpg',
+        seller: {
+          seller_id: 104,
+          business_name: 'KitchenPlus'
+        },
+        subcategory: {
+          subcategory_id: 15,
+          name: 'Home & Office'
+        }
+      }
     ];
 
     this.topDeals = [
-      { id: 5, name: 'Smart LED TV 43"', price: 299.99, oldPrice: 399.99, discount: 25, image: 'assets/images/products/tv1.jpg', category: 'Electronics', rating: 4.6, inStock: true, freeShipping: true },
-      { id: 6, name: 'Women\'s Running Shoes', price: 49.99, oldPrice: 69.99, discount: 29, image: 'assets/images/products/shoes1.jpg', category: 'Fashion', rating: 4.3, inStock: true },
-      { id: 7, name: 'Electric Blender', price: 39.99, oldPrice: 59.99, discount: 33, image: 'assets/images/products/blender1.jpg', category: 'Home & Office', rating: 4.4, inStock: true },
-      { id: 8, name: 'Skin Care Set', price: 44.99, oldPrice: 59.99, discount: 25, image: 'assets/images/products/skincare1.jpg', category: 'Health & Beauty', rating: 4.8, inStock: true }
+      {
+        product_id: 5,
+        name: 'Smart LED TV 43"',
+        base_price: 399.99,
+        discount_percentage: 25,
+        final_price: 299.99,
+        average_rating: 4.6,
+        main_image_url: 'assets/images/products/tv1.jpg',
+        seller: {
+          seller_id: 105,
+          business_name: 'ElectroWorld'
+        },
+        subcategory: {
+          subcategory_id: 5,
+          name: 'Electronics'
+        }
+      },
+      {
+        product_id: 6,
+        name: 'Women\'s Running Shoes',
+        base_price: 69.99,
+        discount_percentage: 29,
+        final_price: 49.99,
+        average_rating: 4.3,
+        main_image_url: 'assets/images/products/shoes1.jpg',
+        seller: {
+          seller_id: 102,
+          business_name: 'FashionHub'
+        },
+        subcategory: {
+          subcategory_id: 10,
+          name: 'Fashion'
+        }
+      },
+      {
+        product_id: 7,
+        name: 'Electric Blender',
+        base_price: 59.99,
+        discount_percentage: 33,
+        final_price: 39.99,
+        average_rating: 4.4,
+        main_image_url: 'assets/images/products/blender1.jpg',
+        seller: {
+          seller_id: 104,
+          business_name: 'KitchenPlus'
+        },
+        subcategory: {
+          subcategory_id: 15,
+          name: 'Home & Office'
+        }
+      },
+      {
+        product_id: 8,
+        name: 'Skin Care Set',
+        base_price: 59.99,
+        discount_percentage: 25,
+        final_price: 44.99,
+        average_rating: 4.8,
+        main_image_url: 'assets/images/products/skincare1.jpg',
+        seller: {
+          seller_id: 106,
+          business_name: 'BeautyEssentials'
+        },
+        subcategory: {
+          subcategory_id: 20,
+          name: 'Health & Beauty'
+        }
+      }
     ];
-
+    
     this.banners = [
       { image: 'assets/images/banners/banner1.jpg', link: '/promotions/sale' },
       { image: 'assets/images/banners/banner2.jpg', link: '/category/electronics' },
