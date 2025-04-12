@@ -1,1 +1,179 @@
-<p>customer-account works!</p>
+<app-header></app-header>
+
+<div class="container">
+  <h1>My Account</h1>
+  <div class="account-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <button class="hamburger" (click)="toggleSidebar()" aria-label="Toggle menu">☰</button>
+      <nav class="sidebar-nav">
+        <ul>
+          <li [class.active]="activeSection === 'orders'" (click)="setActiveSection('orders')" aria-current="page">Orders</li>
+          <li [class.active]="activeSection === 'inbox'" (click)="setActiveSection('inbox')">Inbox</li>
+          <li [class.active]="activeSection === 'address-book'" (click)="setActiveSection('address-book')">Address Book</li>
+          <li [class.active]="activeSection === 'account-management'" (click)="setActiveSection('account-management')">Account Management</li>
+          <li [class.active]="activeSection === 'wishlist'" (click)="setActiveSection('wishlist')">Saved Items</li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Orders Section -->
+      <div *ngIf="activeSection === 'orders'" class="section-content">
+        <h2>Your Orders</h2>
+        <table *ngIf="orders.length > 0">
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Date</th>
+              <th>Items</th>
+              <th>Total</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let order of orders">
+              <td>{{ order.orderId }}</td>
+              <td>{{ order.createdAt | date:'mediumDate' }}</td>
+              <td>{{ order.items }}</td>
+              <td>{{ order.finalAmount | currency }}</td>
+              <td>{{ order.status }}</td>
+              <td><a href="#" (click)="viewDetails(order.orderId)">View Details</a></td>
+            </tr>
+          </tbody>
+        </table>
+        <p *ngIf="orders.length === 0">You haven't placed any orders yet.</p>
+        <button class="continue-shopping" [routerLink]="['/']">Continue Shopping</button>
+      </div>
+
+      <!-- Inbox Section -->
+      <div *ngIf="activeSection === 'inbox'" class="section-content">
+        <h2>Inbox</h2>
+        <div *ngIf="messages.length > 0">
+          <div class="message" *ngFor="let message of messages">
+            <h3>{{ message.title }}</h3>
+            <p>{{ message.body }}</p>
+            <span>{{ message.date | date:'medium' }}</span>
+          </div>
+        </div>
+        <p *ngIf="messages.length === 0">No messages in your inbox.</p>
+        <button class="continue-shopping" [routerLink]="['/']">Continue Shopping</button>
+      </div>
+
+      <!-- Address Book Section -->
+      <div *ngIf="activeSection === 'address-book'" class="section-content">
+        <h2>Address Book</h2>
+        <div *ngIf="addresses.length > 0">
+          <div class="address" *ngFor="let address of addresses">
+            <p>{{ address.street }}, {{ address.city }}, {{ address.postalCode }}</p>
+            <button (click)="editAddress(address.id)">Edit</button>
+            <button (click)="deleteAddress(address.id)">Delete</button>
+          </div>
+        </div>
+        <p *ngIf="addresses.length === 0">No addresses saved.</p>
+        <form [formGroup]="addressForm" (ngSubmit)="addAddress()">
+          <div class="form-group">
+            <label for="street">Street</label>
+            <input id="street" type="text" formControlName="street" required>
+            <div *ngIf="addressForm.get('street')?.hasError('required') && addressForm.get('street')?.touched" class="error">
+              Street is required.
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="city">City</label>
+            <input id="city" type="text" formControlName="city" required>
+            <div *ngIf="addressForm.get('city')?.hasError('required') && addressForm.get('city')?.touched" class="error">
+              City is required.
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="postalCode">Postal Code</label>
+            <input id="postalCode" type="text" formControlName="postalCode" required>
+            <div *ngIf="addressForm.get('postalCode')?.hasError('required') && addressForm.get('postalCode')?.touched" class="error">
+              Postal code is required.
+            </div>
+          </div>
+          <button type="submit" [disabled]="addressForm.invalid">Add Address</button>
+        </form>
+        <button class="continue-shopping" [routerLink]="['/']">Continue Shopping</button>
+      </div>
+
+      <!-- Account Management Section -->
+      <div *ngIf="activeSection === 'account-management'" class="section-content">
+        <h2>Account Management</h2>
+        <form [formGroup]="profileForm" (ngSubmit)="updateProfile()">
+          <div class="form-group">
+            <label for="firstName">First Name</label>
+            <input id="firstName" type="text" formControlName="firstName" required>
+            <div *ngIf="profileForm.get('firstName')?.hasError('required') && profileForm.get('firstName')?.touched" class="error">
+              First name is required.
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="lastName">Last Name</label>
+            <input id="lastName" type="text" formControlName="lastName" required>
+            <div *ngIf="profileForm.get('lastName')?.hasError('required') && profileForm.get('lastName')?.touched" class="error">
+              Last name is required.
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="phoneNumber">Phone Number</label>
+            <input id="phoneNumber" type="text" formControlName="phoneNumber">
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input id="email" type="text" [value]="profile?.email || ''" disabled>
+          </div>
+          <button type="submit" [disabled]="profileForm.invalid">Update Profile</button>
+        </form>
+        <form [formGroup]="passwordForm" (ngSubmit)="changePassword()" class="password-form">
+          <div class="form-group">
+            <label for="oldPassword">Current Password</label>
+            <input id="oldPassword" type="password" formControlName="oldPassword" required>
+            <div *ngIf="passwordForm.get('oldPassword')?.hasError('required') && passwordForm.get('oldPassword')?.touched" class="error">
+              Current password is required.
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="newPassword">New Password</label>
+            <input id="newPassword" type="password" formControlName="newPassword" required>
+            <div *ngIf="passwordForm.get('newPassword')?.hasError('required') && passwordForm.get('newPassword')?.touched" class="error">
+              New password is required.
+            </div>
+            <div *ngIf="passwordForm.get('newPassword')?.hasError('minlength') && passwordForm.get('newPassword')?.touched" class="error">
+              Password must be at least 8 characters.
+            </div>
+          </div>
+          <button type="submit" [disabled]="passwordForm.invalid">Change Password</button>
+        </form>
+        <button class="continue-shopping" [routerLink]="['/']">Continue Shopping</button>
+      </div>
+
+      <!-- Wishlist/Favourites Section -->
+      <div *ngIf="activeSection === 'wishlist'" class="section-content">
+        <h2>Saved Items</h2>
+        <div *ngIf="wishlist.length > 0">
+          <div class="wishlist-item" *ngFor="let item of wishlist">
+            <img [src]="item.image" [alt]="item.name" class="wishlist-image">
+            <div class="wishlist-details">
+              <h3>{{ item.name }}</h3>
+              <p>{{ item.price | currency }}</p>
+              <button (click)="removeFromWishlist(item.id)">Remove</button>
+            </div>
+          </div>
+        </div>
+        <p *ngIf="wishlist.length === 0">No items in your wishlist.</p>
+        <button class="continue-shopping" [routerLink]="['/']">Continue Shopping</button>
+      </div>
+    </main>
+  </div>
+</div>
+
+<app-notification *ngIf="successMessage || errorMessage"
+                 [message]="successMessage || errorMessage"
+                 [type]="successMessage ? 'success' : 'error'">
+</app-notification>
+
+<app-footer></app-footer>
