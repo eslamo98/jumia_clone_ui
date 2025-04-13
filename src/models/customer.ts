@@ -17,11 +17,14 @@ export interface UserProfile {
     newPassword: string;
   }
   
+
   export interface Order {
     orderId: number;
     createdAt: string;
     finalAmount: number;
     status: string;
+    totalAmount:number;
+    orderDate:Date;
   }
   
   export interface ApiResponse<T> {
