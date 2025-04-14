@@ -1,95 +1,338 @@
-<div class="customer-account-container">
-  <!-- Sidebar -->
-  <div class="sidebar" [class.open]="isSidebarOpen">
-    <button (click)="isSidebarOpen = !isSidebarOpen" class="sidebar-toggle">☰</button>
-    <ul>
-      <li (click)="activeSection = 'orders'" [class.active]="activeSection === 'orders'">Orders</li>
-      <li (click)="activeSection = 'wishlist'" [class.active]="activeSection === 'wishlist'">Wishlist</li>
-      <li (click)="activeSection = 'messages'" [class.active]="activeSection === 'messages'">Messages</li>
-      <li (click)="activeSection = 'addresses'" [class.active]="activeSection === 'addresses'">Addresses</li>
-      <li (click)="activeSection = 'settings'" [class.active]="activeSection === 'settings'">Settings</li>
-    </ul>
+<div class="container-fluid">
+  <!-- Error/Success Messages -->
+  <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show">
+    {{ errorMessage }}
+    <button type="button" class="btn-close" (click)="errorMessage = null"></button>
+  </div>
+  <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show">
+    {{ successMessage }}
+    <button type="button" class="btn-close" (click)="successMessage = null"></button>
   </div>
 
-  <!-- Main Content -->
-  <div class="main-content">
-    <h2>My Account</h2>
-
-    <div *ngIf="successMessage" class="success">{{ successMessage }}</div>
-    <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
-
-    <!-- Orders -->
-    <div *ngIf="activeSection === 'orders'">
-      <h3>Orders</h3>
-      <div *ngIf="orders.length === 0">No orders found.</div>
-      <ul>
-        <li *ngFor="let order of orders">
-          Order #{{ order.orderId }} | ${{ order.totalAmount }} | {{ order.orderDate | date }}
-        </li>
-      </ul>
-    </div>p
-
-    <!-- Wishlist -->
-    <div *ngIf="activeSection === 'wishlist'">
-      <h3>Wishlist</h3>
-      <div *ngIf="wishlist.length === 0">Wishlist is empty.</div>
-      <ul class="wishlist">
-        <li *ngFor="let item of wishlist">
-          <img [src]="item.image" alt="{{ item.name }}" />
-          {{ item.name }} - ${{ item.price }}
-        </li>
-      </ul>
+  <div class="row">
+    <!-- Sidebar -->
+    <div class="col-md-3">
+      <div class="list-group">
+        <button class="list-group-item" [class.active]="activeSection === 'orders'" (click)="activeSection = 'orders'">
+          Orders
+        </button>
+        <button class="list-group-item" [class.active]="activeSection === 'addresses'" (click)="activeSection = 'addresses'">
+          Addresses
+        </button>
+        <button class="list-group-item" [class.active]="activeSection === 'wishlist'" (click)="activeSection = 'wishlist'">
+          Wishlist
+        </button>
+        <button class="list-group-item" [class.active]="activeSection === 'settings'" (click)="activeSection = 'settings'">
+          Settings
+        </button>
+        <button class="list-group-item" (click)="logout()">Logout</button>
+      </div>
     </div>
 
-    <!-- Messages -->
-    <div *ngIf="activeSection === 'messages'">
-      <h3>Messages</h3>
-      <div *ngIf="messages.length === 0">No messages.</div>
-      <ul>
-        <li *ngFor="let msg of messages">
-          <strong>{{ msg.title }}</strong> - {{ msg.date | date:'short' }}<br />
-          {{ msg.body }}
-        </li>
-      </ul>
-    </div>
+    <!-- Main Content -->
+    <div class="col-md-9">
+      <!-- Orders Section -->
+      <div *ngIf="activeSection === 'orders'">
+        <h4>Orders</h4>
+        <p *ngIf="orders.length === 0">No orders found.</p>
+        <div class="list-group mb-3">
+          <div class="list-group-item" *ngFor="let order of orders">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h6 class="mb-1">Order #{{ order.orderId }}</h6>
+                <p class="mb-1">Total: ${{ order.totalAmount }}</p>
+                <small>{{ order.orderDate | date }}</small>
+              </div>
+              <div class="text-end">
+                <span class="badge" [ngClass]="{
+                  'bg-success': order.status === 'Completed',
+                  'bg-warning': order.status === 'Pending',
+                  'bg-info': order.status === 'Processing',
+                  'bg-danger': order.status === 'Cancelled'
+                }">{{ order.status }}</span>
+                <p class="mb-0 small text-muted">Final Amount: ${{ order.finalAmount }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
 
-    <!-- Address Book -->
-    <div *ngIf="activeSection === 'addresses'">
-      <h3>Addresses</h3>
-      <ul>
-        <li *ngFor="let addr of addresses">
-          {{ addr.street }}, {{ addr.city }}, {{ addr.postalCode }}
-        </li>
-      </ul>
+        <!-- Orders Pagination -->
+        <nav *ngIf="orderTotalPages > 1" aria-label="Orders pagination">
+          <ul class="pagination justify-content-center">
+            <li class="page-item" [class.disabled]="orderCurrentPage === 1">
+              <button class="page-link" (click)="changeOrderPage(orderCurrentPage - 1)">Previous</button>
+            </li>
+            <li class="page-item" *ngFor="let page of [].constructor(orderTotalPages); let i = index"
+                [class.active]="orderCurrentPage === i + 1">
+              <button class="page-link" (click)="changeOrderPage(i + 1)">{{ i + 1 }}</button>
+            </li>
+            <li class="page-item" [class.disabled]="orderCurrentPage === orderTotalPages">
+              <button class="page-link" (click)="changeOrderPage(orderCurrentPage + 1)">Next</button>
+            </li>
+          </ul>
+        </nav>
+      </div>
 
-      <form [formGroup]="addressForm" (ngSubmit)="addAddress()">
-        <label>Street: <input formControlName="street" /></label>
-        <label>City: <input formControlName="city" /></label>
-        <label>Postal Code: <input formControlName="postalCode" /></label>
-        <button type="submit" [disabled]="addressForm.invalid">Add Address</button>
-      </form>
-    </div>
+      <!-- Addresses Section -->
+      <div *ngIf="activeSection === 'addresses'">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h4>My Addresses</h4>
+          <button class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#addAddressForm">
+            Add New Address
+          </button>
+        </div>
 
-    <!-- Settings -->
-    <div *ngIf="activeSection === 'settings'">
-      <h3>Settings</h3>
+        <!-- Add Address Form -->
+        <div class="collapse mb-4" id="addAddressForm">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Add New Address</h5>
+              <form [formGroup]="addressForm" (ngSubmit)="addAddress()">
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">Street Address*</label>
+                    <input type="text" class="form-control" formControlName="streetAddress"
+                           [class.is-invalid]="addressForm.get('streetAddress')?.invalid && addressForm.get('streetAddress')?.touched">
+                    <div class="invalid-feedback">Street address is required</div>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">City*</label>
+                    <input type="text" class="form-control" formControlName="city"
+                           [class.is-invalid]="addressForm.get('city')?.invalid && addressForm.get('city')?.touched">
+                    <div class="invalid-feedback">City is required</div>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">State</label>
+                    <input type="text" class="form-control" formControlName="state">
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">Postal Code*</label>
+                    <input type="text" class="form-control" formControlName="postalCode"
+                           [class.is-invalid]="addressForm.get('postalCode')?.invalid && addressForm.get('postalCode')?.touched">
+                    <div class="invalid-feedback">Postal code is required</div>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">Country*</label>
+                    <input type="text" class="form-control" formControlName="country"
+                           [class.is-invalid]="addressForm.get('country')?.invalid && addressForm.get('country')?.touched">
+                    <div class="invalid-feedback">Country is required</div>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">Phone Number*</label>
+                    <input type="tel" class="form-control" formControlName="phoneNumber"
+                           [class.is-invalid]="addressForm.get('phoneNumber')?.invalid && addressForm.get('phoneNumber')?.touched">
+                    <div class="invalid-feedback">
+                      Please enter a valid phone number (9-15 digits)
+                    </div>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">Address Name</label>
+                    <input type="text" class="form-control" formControlName="addressName"
+                           placeholder="e.g., Home, Work, etc.">
+                  </div>
+                  <div class="col-12 mb-3">
+                    <div class="form-check">
+                      <input type="checkbox" class="form-check-input" formControlName="isDefault" id="isDefault">
+                      <label class="form-check-label" for="isDefault">Set as default address</label>
+                    </div>
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-primary" [disabled]="addressForm.invalid">Save Address</button>
+              </form>
+            </div>
+          </div>
+        </div>
 
-      <form [formGroup]="profileForm" (ngSubmit)="updateProfile()">
-        <h4>Update Profile</h4>
-        <label>First Name: <input formControlName="firstName" /></label>
-        <label>Last Name: <input formControlName="lastName" /></label>
-        <label>Phone: <input formControlName="phoneNumber" /></label>
-        <button type="submit" [disabled]="profileForm.invalid">Save Changes</button>
-      </form>
+        <!-- Address List -->
+        <div class="row">
+          <div class="col-md-6 mb-4" *ngFor="let address of addresses">
+            <div class="card">
+              <div class="card-body">
+                <h6 class="card-title">{{ address.addressName || 'Address' }}
+                  <span *ngIf="address.isDefault" class="badge bg-success ms-2">Default</span>
+                </h6>
+                <p class="card-text">
+                  {{ address.streetAddress }}<br>
+                  {{ address.city }}, {{ address.state || '' }}<br>
+                  {{ address.postalCode }}, {{ address.country }}<br>
+                  {{ address.phoneNumber }}
+                </p>
+                <button class="btn btn-danger btn-sm" (click)="deleteAddress(address.addressId)">Delete</button>
+              </div>
+            </div>
+          </div>
+        </div>
 
-      <form [formGroup]="passwordForm" (ngSubmit)="changePassword()">
-        <h4>Change Password</h4>
-        <label>Old Password: <input type="password" formControlName="oldPassword" /></label>
-        <label>New Password: <input type="password" formControlName="newPassword" /></label>
-        <label>Confirm Password: <input type="password" formControlName="confirmPassword" /></label>
-        <div *ngIf="passwordForm.errors?.['mismatch']" class="error">Passwords do not match.</div>
-        <button type="submit" [disabled]="passwordForm.invalid">Change Password</button>
-      </form>
+        <!-- Address Pagination -->
+        <nav *ngIf="totalPages > 1" aria-label="Address pagination">
+          <ul class="pagination justify-content-center">
+            <li class="page-item" [class.disabled]="currentPage === 1">
+              <button class="page-link" (click)="changePage(currentPage - 1)">Previous</button>
+            </li>
+            <li class="page-item" *ngFor="let page of [].constructor(totalPages); let i = index"
+                [class.active]="currentPage === i + 1">
+              <button class="page-link" (click)="changePage(i + 1)">{{ i + 1 }}</button>
+            </li>
+            <li class="page-item" [class.disabled]="currentPage === totalPages">
+              <button class="page-link" (click)="changePage(currentPage + 1)">Next</button>
+            </li>
+          </ul>
+        </nav>
+      </div>
+
+      <!-- Settings Section -->
+      <div *ngIf="activeSection === 'settings'">
+        <h4 class="mb-4">Profile Settings</h4>
+        <div class="card mb-4">
+          <div class="card-body">
+            <div class="d-flex align-items-center mb-4">
+              <div class="profile-image me-3">
+                <img [src]="profile?.profileImageUrl || 'assets/images/default-avatar.png'" alt="Profile" class="rounded-circle">
+              </div>
+              <div>
+                <h5 class="card-title mb-1">{{profile?.firstName}} {{profile?.lastName}}</h5>
+                <p class="text-muted mb-0">{{profile?.email}}</p>
+              </div>
+            </div>
+            <form [formGroup]="profileForm" (ngSubmit)="updateProfile()">
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">First Name</label>
+                  <input type="text" class="form-control" formControlName="firstName"
+                         [class.is-invalid]="profileForm.get('firstName')?.invalid && profileForm.get('firstName')?.touched">
+                  <div class="invalid-feedback">First name is required</div>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Last Name</label>
+                  <input type="text" class="form-control" formControlName="lastName"
+                         [class.is-invalid]="profileForm.get('lastName')?.invalid && profileForm.get('lastName')?.touched">
+                  <div class="invalid-feedback">Last name is required</div>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Phone Number</label>
+                  <input type="tel" class="form-control" formControlName="phoneNumber"
+                         [class.is-invalid]="profileForm.get('phoneNumber')?.invalid && profileForm.get('phoneNumber')?.touched">
+                  <div class="invalid-feedback">Please enter a valid phone number (9-15 digits)</div>
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary" [disabled]="profileForm.invalid">
+                Save Changes
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Change Password Section -->
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title mb-4">Change Password</h5>
+            <form [formGroup]="passwordForm" (ngSubmit)="changePassword()">
+              <div class="mb-3">
+                <label class="form-label">Current Password</label>
+                <div class="input-group">
+                  <input [type]="showCurrentPassword ? 'text' : 'password'" class="form-control" formControlName="oldPassword"
+                         [class.is-invalid]="passwordForm.get('oldPassword')?.invalid && passwordForm.get('oldPassword')?.touched">
+                  <button class="btn btn-outline-secondary" type="button" (click)="showCurrentPassword = !showCurrentPassword">
+                    <i class="fas" [class.fa-eye]="!showCurrentPassword" [class.fa-eye-slash]="showCurrentPassword"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">New Password</label>
+                <div class="input-group">
+                  <input [type]="showNewPassword ? 'text' : 'password'" class="form-control" formControlName="newPassword"
+                         [class.is-invalid]="passwordForm.get('newPassword')?.invalid && passwordForm.get('newPassword')?.touched">
+                  <button class="btn btn-outline-secondary" type="button" (click)="showNewPassword = !showNewPassword">
+                    <i class="fas" [class.fa-eye]="!showNewPassword" [class.fa-eye-slash]="showNewPassword"></i>
+                  </button>
+                </div>
+                <div class="progress mt-2" style="height: 4px;">
+                  <div class="progress-bar" [style.width.%]="passwordStrength"
+                      [class.bg-danger]="passwordStrength <= 25"
+                      [class.bg-warning]="passwordStrength > 25 && passwordStrength <= 50"
+                      [class.bg-info]="passwordStrength > 50 && passwordStrength <= 75"
+                      [class.bg-success]="passwordStrength > 75">
+                  </div>
+                </div>
+                <small class="text-muted">Password strength: {{getPasswordStrengthLabel()}}</small>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Confirm Password</label>
+                <div class="input-group">
+                  <input [type]="showConfirmPassword ? 'text' : 'password'" class="form-control" formControlName="confirmPassword"
+                         [class.is-invalid]="passwordForm.get('confirmPassword')?.invalid && passwordForm.get('confirmPassword')?.touched">
+                  <button class="btn btn-outline-secondary" type="button" (click)="showConfirmPassword = !showConfirmPassword">
+                    <i class="fas" [class.fa-eye]="!showConfirmPassword" [class.fa-eye-slash]="showConfirmPassword"></i>
+                  </button>
+                </div>
+                <div class="invalid-feedback" *ngIf="passwordForm.hasError('mismatch')">
+                  Passwords do not match
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary" [disabled]="passwordForm.invalid">
+                Change Password
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Wishlist Section -->
+      <div *ngIf="activeSection === 'wishlist'">
+        <h4 class="mb-4">My Wishlist</h4>
+        <p *ngIf="wishlist.length === 0" class="text-muted">Your wishlist is empty.</p>
+        <div class="row">
+          <div class="col-md-4 col-sm-6 mb-4" *ngFor="let item of wishlist">
+            <div class="card h-100">
+              <div class="position-relative">
+                <img [src]="item.product.imageUrl" class="card-img-top" [alt]="item.product.name"
+                     style="height: 200px; object-fit: cover;">
+                <span class="position-absolute top-0 end-0 m-2 badge rounded-pill bg-light text-dark">
+                  Added {{ item.addedDate | date:'shortDate' }}
+                </span>
+              </div>
+              <div class="card-body d-flex flex-column">
+                <h5 class="card-title text-truncate">{{ item.product.name }}</h5>
+                <p class="card-text small text-muted text-truncate">{{ item.product.description }}</p>
+                <p class="card-text"><strong>${{ item.product.price | number:'1.2-2' }}</strong></p>
+                <div class="mt-auto">
+                  <button class="btn btn-primary w-100 mb-2" (click)="moveToCart(item.wishlistId)">
+                    Move to Cart
+                  </button>
+                  <button class="btn btn-outline-danger w-100" (click)="removeFromWishlist(item.wishlistId)">
+                    Remove
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Wishlist Pagination -->
+        <nav *ngIf="wishlistTotalPages > 1" aria-label="Wishlist pagination" class="mt-4">
+          <ul class="pagination justify-content-center">
+            <li class="page-item" [class.disabled]="wishlistCurrentPage === 1">
+              <button class="page-link" (click)="changeWishlistPage(wishlistCurrentPage - 1)">
+                <i class="fas fa-chevron-left"></i>
+              </button>
+            </li>
+            <li class="page-item" *ngFor="let page of [].constructor(wishlistTotalPages); let i = index"
+                [class.active]="wishlistCurrentPage === i + 1">
+              <button class="page-link" (click)="changeWishlistPage(i + 1)">{{ i + 1 }}</button>
+            </li>
+            <li class="page-item" [class.disabled]="wishlistCurrentPage === wishlistTotalPages">
+              <button class="page-link" (click)="changeWishlistPage(wishlistCurrentPage + 1)">
+                <i class="fas fa-chevron-right"></i>
+              </button>
+            </li>
+          </ul>
+          <p class="text-center text-muted small mt-2">
+            Showing {{ (wishlistCurrentPage - 1) * wishlistPageSize + 1 }} - 
+            {{ Math.min(wishlistCurrentPage * wishlistPageSize, wishlistTotalCount) }}
+            of {{ wishlistTotalCount }} items
+          </p>
+        </nav>
+      </div>
     </div>
   </div>
 </div>
