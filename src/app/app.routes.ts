@@ -9,6 +9,8 @@ import { CartComponent } from '../pages/customer/cart/cart.component';
 import { SellerDashboardComponent } from '../pages/seller/seller-dashboard/seller-dashboard.component';
 import { SellerProductsComponent } from '../pages/seller/seller-products/seller-products.component';
 import { AdminDashboardComponent } from '../pages/admin/admin-dashboard/admin-dashboard.component';
+import { ProductCardComponent } from '../pages/product-card/product-card.component';
+import { ProductDetailsComponent } from '../pages/product-details/product-details.component';
 
 export const routes: Routes = [
   // Public routes
@@ -55,6 +57,14 @@ export const routes: Routes = [
     data: { role: 'admin' },
     component: AdminDashboardComponent
   },
+    //product routes
+    {
+      path: 'product-card',
+      component: ProductCardComponent,  
+    },
+    { path: 'products/:id',
+      component: ProductDetailsComponent 
+    },
   
   // Utility routes
   {
@@ -65,4 +75,5 @@ export const routes: Routes = [
     path: '**',
     redirectTo: ''
   }
+
 ];

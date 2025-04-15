@@ -1,0 +1,248 @@
+
+
+<div class="container mt-5 pt-5" *ngIf="product">
+  <div class="row">
+    <div class="col-md-6 text-center">
+      <!-- Main Image -->
+      <div class="image-container mb-3">
+        <img [src]="selectedImage || product.MainImageUrl" 
+             alt="Product Image" 
+             class="product-image">
+      </div>
+      
+      <!-- Thumbnail Gallery -->
+      <div class="thumbnail-gallery d-flex justify-content-center flex-wrap">
+        <!-- Main image thumbnail -->
+        <div class="thumbnail-container" (click)="selectedImage = product.MainImageUrl">
+          <img [src]="product.MainImageUrl" 
+               alt="Thumbnail" 
+               class="thumbnail"
+               [class.active]="selectedImage === product.MainImageUrl || !selectedImage">
+        </div>
+        
+        <!-- Additional images thumbnails -->
+        <div class="thumbnail-container" 
+             *ngFor="let img of product.AdditionalImages"
+             (click)="selectedImage = img">
+          <img [src]="img" 
+               alt="Thumbnail" 
+               class="thumbnail"
+               [class.active]="selectedImage === img">
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 product-details">
+    
+      <span class="d-inline-block rounded-3 bg-black text-white fw-bold fs-6 py-1 px-2 mb-2">{{ product.Name }}</span>
+      <h2>{{ product.Name}}</h2>
+      <p class="price">${{ product.BasePrice}}</p>
+      <p class="stock fw-bold text-black-50">Stock: {{ product.StockQuantity}}</p>
+      <p class="description">{{ product.Description }}</p>
+      
+      <button class="btn btn-primary btn-add-to-cart" [disabled]="product.StockQuantity === 0">Add to cart</button>
+      <span class="outStock bg-black text-light fw-bold px-3 py-2" *ngIf="product.StockQuantity === 0">Out Of Stock</span>
+      <p class="free-delivery">Free delivery on orders over $50.00</p>
+    </div>
+  </div>
+</div>
+
+
+
+
+<!-- *****************************************************************************-->
+ <!-- product-details.component.html -->
+<!-- <div class="container mt-5 pt-5" *ngIf="product">
+  <div class="row">
+    <div class="col-md-6 text-center">
+      <div class="image-container mb-3">
+        <img [src]="selectedImage || product.MainImageUrl" 
+             alt="Product Image" 
+             class="product-image">
+      </div>
+      
+      <div class="thumbnail-gallery d-flex justify-content-center flex-wrap">
+        <div class="thumbnail-container" 
+             (click)="selectedImage = product.MainImageUrl">
+          <img [src]="product.MainImageUrl" 
+               alt="Thumbnail" 
+               class="thumbnail"
+               [class.active]="selectedImage === product.MainImageUrl || !selectedImage">
+        </div>
+        
+        <div class="thumbnail-container" 
+             *ngFor="let img of product.MainImageUrl"
+             (click)="selectedImage = img">
+          <img [src]="img" 
+               alt="Thumbnail" 
+               class="thumbnail"
+               [class.active]="selectedImage === img">
+        </div>
+      </div>
+    </div> -->
+
+    <!-- Product Details Column -->
+    <div class="col-md-6 product-details">
+      <h1 class="mb-3">{{ product.Name }}</h1>
+
+      <!-- Price Section -->
+      <div class="mb-4">
+        <span class="text-danger fs-4 fw-bold">EGP {{ product.BasePrice| number }}</span>
+        <span *ngIf="product.BasePrice" 
+              class="text-muted text-decoration-line-through ms-2">
+          EGP {{ product.BasePrice | number }}
+        </span>
+        <span *ngIf="product.DiscountPercentage" 
+              class="ms-2 text-danger">
+              -{{ product.DiscountPercentage }}%
+        </span>
+      </div>
+
+     
+      <!-- Delivery Options -->
+      <div class="card mb-4">
+        <div class="card-body">
+          <h5 class="card-title mb-3">DELIVERY & RETURNS</h5>
+          
+          <div class="mb-3">
+            <label class="form-label">Choose your location</label>
+            <select class="form-select" [(ngModel)]="selectedLocation">
+              <option *ngFor="let location of deliveryLocations" 
+                      [value]="location.id">
+                {{ location.name }}
+              </option>
+            </select>
+          </div>
+
+          <div *ngFor="let option of deliveryOptions" 
+               class="delivery-option mb-3">
+            <div class="d-flex justify-content-between">
+              <div>
+                <h6>{{ option.type }}</h6>
+                <small class="text-muted">
+                  Ready between {{ getDeliveryDates(option.leadDays) }}
+                </small>
+              </div>
+              <div>
+                <span class="fw-bold">EGP {{ option.fee | number }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-3 text-muted small">
+            <p class="mb-1">{{ returnPolicy }}</p>
+            <p class="mb-0">Report visible defects within {{ defectReportDays }} days</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Seller Information -->
+      <div class="card mb-4">
+        <div class="card-body">
+          <h5 class="card-title mb-3">SELLER INFORMATION</h5>
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <h6>{{ sellername }}</h6>
+              <div class="small">
+                <span class="me-2">{{score }}% Seller Score</span>
+                <span>{{ followers | number }} Followers</span>
+              </div>
+            </div>
+            <button class="btn btn-outline-primary btn-sm"
+                    (click)="toggleFollow()"
+                    [class.following]="isFollowing">
+              {{ isFollowing ? 'Following' : 'Follow' }}
+            </button>
+          </div>
+
+          <div class="seller-performance">
+            <div class="d-flex flex-wrap gap-3 mb-2">
+              <span>🚚 {{ shippingSpeed }} Shipping</span>
+              <span>⭐ {{ qualityScore }} Quality</span>
+              <span>👍 {{ rating }} Rating</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add to Cart Section -->
+      <div class="mb-4">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <input type="number" 
+                 class="form-control" 
+                 style="width: 100px"
+                 min="1" 
+                 [(ngModel)]="quantity"
+                 [max]="product.StockQuantity">
+          <button class="btn btn-primary w-100 btn-lg" 
+                  [disabled]="product.StockQuantity === 0"
+                  (click)="addToCart()">
+            Add to cart
+          </button>
+        </div>
+        
+        <div *ngIf="product.StockQuantity === 0" 
+             class="text-center text-danger fw-bold">
+          Out Of Stock
+        </div>
+        <p class="stock fw-bold text-black-50 mt-2">
+          Stock: {{ product.StockQuantity | number }}
+        </p>
+        <div class="text-center small text-muted">
+          Free delivery on orders over EGP {{ freeDeliveryThreshold | number }}
+        </div>
+      </div>
+
+      <!-- Product Details Navigation -->
+      <div class="nav nav-tabs">
+        <a class="nav-link active" 
+           (click)="setActiveTab('details')"
+           [class.active]="activeTab === 'details'">
+           Product details
+        </a>
+        <a class="nav-link" 
+           (click)="setActiveTab('specs')"
+           [class.active]="activeTab === 'specs'">
+           Specifications
+        </a>
+        <a class="nav-link" 
+           (click)="setActiveTab('reviews')"
+           [class.active]="activeTab === 'reviews'">
+           Verified Feedback ({{ length }})
+        </a>
+      </div>
+
+      <!-- Tab Content -->
+      <div class="tab-content mt-3">
+        <div *ngIf="activeTab === 'details'" class="tab-pane active">
+          <p>{{ product.Description }}</p>
+        </div>
+        
+        <div *ngIf="activeTab === 'specs'" class="tab-pane">
+          <dl class="row">
+            <dt class="col-sm-3" *ngFor="let spec of specifications">
+              {{ spec.name }}
+            </dt>
+            <dd class="col-sm-9" *ngFor="let spec of specifications">
+              {{ spec.value }}
+            </dd>
+          </dl>
+        </div>
+        
+        <div *ngIf="activeTab === 'reviews'" class="tab-pane">
+          <div *ngFor="let review of reviews" class="card mb-3">
+            <div class="card-body">
+              <div class="d-flex justify-content-between">
+                <h5>{{ review.reviewer }}</h5>
+                <div class="rating">
+                  ★{{ review.rating }}/5
+                </div>
+              </div>
+              <p class="mb-0">{{ review.comment }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  <!-- </div>
+</div> -->
