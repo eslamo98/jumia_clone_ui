@@ -1,0 +1,285 @@
+<!-- src/app/pages/admin/admin-products/admin-products.component.html -->
+<div class="admin-products-container">
+    <div class="row g-0">
+      <!-- Sidebar -->
+      <div class="col-md-2 bg-dark min-vh-100">
+        <app-admin-sidebar></app-admin-sidebar>
+      </div>
+      
+      <!-- Main content -->
+      <div class="col-md-10">
+        <app-admin-header></app-admin-header>
+        
+        <div class="container mt-4">
+          <div class="row mb-4">
+            <div class="col">
+              <h2>Products Management</h2>
+              <p class="text-muted">Manage all products in your store</p>
+            </div>
+            <div class="col-auto">
+              <a routerLink="/admin/products/add" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-2"></i>Add New Product
+              </a>
+            </div>
+          </div>
+          
+          <!-- Filters and search -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <div class="input-group">
+                    <span class="input-group-text bg-light">
+                      <i class="bi bi-search"></i>
+                    </span>
+                    <input 
+                      type="text" 
+                      class="form-control" 
+                      placeholder="Search products..." 
+                      [(ngModel)]="searchTerm" 
+                      (keyup.enter)="onSearch()"
+                    >
+                    <button 
+                      class="btn btn-primary" 
+                      type="button" 
+                      (click)="onSearch()"
+                    >
+                      Search
+                    </button>
+                  </div>
+                </div>
+                
+                <div class="col-md-3">
+                  <select 
+                    class="form-select" 
+                    [(ngModel)]="categoryFilter" 
+                    (change)="onFilterChange()"
+                  >
+                    <option value="">All Categories</option>
+                    <option value="CAT-1">Electronics</option>
+                    <option value="CAT-2">Accessories</option>
+                    <option value="CAT-3">Computer Hardware</option>
+                    <option value="CAT-4">Fashion</option>
+                    <option value="CAT-5">Home & Kitchen</option>
+                    <option value="CAT-6">Beauty & Health</option>
+                  </select>
+                </div>
+                
+                <div class="col-md-3">
+                  <select 
+                    class="form-select" 
+                    [(ngModel)]="statusFilter" 
+                    (change)="onFilterChange()"
+                  >
+                    <option value="">All Statuses</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                    <option value="draft">Draft</option>
+                  </select>
+                </div>
+                
+                <div class="col-md-2">
+                  <button 
+                    class="btn btn-outline-secondary w-100" 
+                    (click)="searchTerm = ''; categoryFilter = ''; statusFilter = ''; onFilterChange()"
+                  >
+                    Clear Filters
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Loading spinner -->
+          <div *ngIf="isLoading" class="d-flex justify-content-center my-5">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </div>
+          
+          <!-- Products table -->
+          <div class="card" *ngIf="!isLoading">
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                  <thead class="bg-light">
+                    <tr>
+                      <th class="border-0">
+                        <div class="d-flex align-items-center">
+                          <span>Product</span>
+                          <a href="javascript:void(0)" class="ms-2" (click)="onSort('name')">
+                            <i class="bi" [ngClass]="{
+                              'bi-arrow-up': sortField === 'name' && sortDirection === 'asc',
+                              'bi-arrow-down': sortField === 'name' && sortDirection === 'desc',
+                              'bi-arrow-down-up': sortField !== 'name'
+                            }"></i>
+                          </a>
+                        </div>
+                      </th>
+                      <th class="border-0">Category</th>
+                      <th class="border-0">
+                        <div class="d-flex align-items-center">
+                          <span>Price</span>
+                          <a href="javascript:void(0)" class="ms-2" (click)="onSort('price')">
+                            <i class="bi" [ngClass]="{
+                              'bi-arrow-up': sortField === 'price' && sortDirection === 'asc',
+                              'bi-arrow-down': sortField === 'price' && sortDirection === 'desc',
+                              'bi-arrow-down-up': sortField !== 'price'
+                            }"></i>
+                          </a>
+                        </div>
+                      </th>
+                      <th class="border-0">
+                        <div class="d-flex align-items-center">
+                          <span>Stock</span>
+                          <a href="javascript:void(0)" class="ms-2" (click)="onSort('stock')">
+                            <i class="bi" [ngClass]="{
+                              'bi-arrow-up': sortField === 'stock' && sortDirection === 'asc',
+                              'bi-arrow-down': sortField === 'stock' && sortDirection === 'desc',
+                              'bi-arrow-down-up': sortField !== 'stock'
+                            }"></i>
+                          </a>
+                        </div>
+                      </th>
+                      <th class="border-0">Status</th>
+                      <th class="border-0">Featured</th>
+                      <th class="border-0">
+                        <div class="d-flex align-items-center">
+                          <span>Created</span>
+                          <a href="javascript:void(0)" class="ms-2" (click)="onSort('createdAt')">
+                            <i class="bi" [ngClass]="{
+                              'bi-arrow-up': sortField === 'createdAt' && sortDirection === 'asc',
+                              'bi-arrow-down': sortField === 'createdAt' && sortDirection === 'desc',
+                              'bi-arrow-down-up': sortField !== 'createdAt'
+                            }"></i>
+                          </a>
+                        </div>
+                      </th>
+                      <th class="border-0 text-end">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let product of products">
+                      <td>
+                        <div class="d-flex align-items-center">
+                          <img 
+                            [src]="product.image" 
+                            class="img-thumbnail me-3" 
+                            width="50" 
+                            [alt]="product.name"
+                          >
+                          <div>
+                            <h6 class="mb-0">{{product.name}}</h6>
+                            <small class="text-muted">ID: {{product.id}}</small>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <span class="badge bg-secondary">
+                          {{product.categoryId === 'CAT-1' ? 'Electronics' : 
+                             product.categoryId === 'CAT-2' ? 'Accessories' : 
+                             product.categoryId === 'CAT-3' ? 'Computer Hardware' : 
+                             product.categoryId === 'CAT-4' ? 'Fashion' : 
+                             product.categoryId === 'CAT-5' ? 'Home & Kitchen' : 
+                             product.categoryId === 'CAT-6' ? 'Beauty & Health' : 'Unknown'}}
+                        </span>
+                      </td>
+                      <td>₦{{product.price.toLocaleString()}}</td>
+                      <td>
+                        <span [ngClass]="{
+                          'text-success': product.stock > 50,
+                          'text-warning': product.stock > 10 && product.stock <= 50,
+                          'text-danger': product.stock <= 10
+                        }">
+                          {{product.stock}}
+                        </span>
+                      </td>
+                      <td>
+                        <div class="dropdown">
+                          <button 
+                            class="btn btn-sm dropdown-toggle" 
+                            type="button" 
+                            [ngClass]="{
+                              'btn-success': product.status === 'active',
+                              'btn-secondary': product.status === 'inactive',
+                              'btn-warning': product.status === 'draft'
+                            }"
+                            data-bs-toggle="dropdown" 
+                            aria-expanded="false"
+                          >
+                            {{product.status | titlecase}}
+                          </button>
+                          <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="javascript:void(0)" (click)="updateProductStatus(product.id, 'active')">Active</a></li>
+                            <li><a class="dropdown-item" href="javascript:void(0)" (click)="updateProductStatus(product.id, 'inactive')">Inactive</a></li>
+                            <li><a class="dropdown-item" href="javascript:void(0)" (click)="updateProductStatus(product.id, 'draft')">Draft</a></li>
+                          </ul>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="form-check form-switch">
+                          <input 
+                            class="form-check-input" 
+                            type="checkbox" 
+                            role="switch" 
+                            [checked]="product.featured" 
+                            (change)="featuredToggle(product.id, !product.featured)"
+                          >
+                        </div>
+                      </td>
+                      <td>{{product.createdAt | date:'short'}}</td>
+                      <td>
+                        <div class="d-flex justify-content-end">
+                          <a [routerLink]="['/admin/products/edit', product.id]" class="btn btn-sm btn-outline-primary me-2">
+                            <i class="bi bi-pencil"></i>
+                          </a>
+                          <button type="button" class="btn btn-sm btn-outline-danger" (click)="deleteProduct(product.id)">
+                            <i class="bi bi-trash"></i>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                    
+                    <!-- Empty state -->
+                    <tr *ngIf="products.length === 0">
+                      <td colspan="8" class="text-center py-4">
+                        <div class="py-5">
+                          <i class="bi bi-inbox fs-1 text-muted d-block mb-3"></i>
+                          <h5>No products found</h5>
+                          <p class="text-muted">Try changing your search or filter criteria</p>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            
+            <!-- Pagination -->
+            <div class="card-footer bg-white d-flex justify-content-between align-items-center" *ngIf="totalItems > 0">
+              <div>
+                Showing {{(currentPage - 1) * pageSize + 1}} to {{Math.min(currentPage * pageSize, totalItems)}} of {{totalItems}} entries
+              </div>
+              <nav aria-label="Page navigation">
+                <ul class="pagination mb-0">
+                  <li class="page-item" [class.disabled]="currentPage === 1">
+                    <a class="page-link" href="javascript:void(0)" (click)="onPageChange(currentPage - 1)" aria-label="Previous">
+                      <span aria-hidden="true">&laquo;</span>
+                    </a>
+                  </li>
+                  <li class="page-item" *ngFor="let page of pages" [class.active]="page === currentPage">
+                    <a class="page-link" href="javascript:void(0)" (click)="onPageChange(page)">{{page}}</a>
+                  </li>
+                  <li class="page-item" [class.disabled]="currentPage === totalPages">
+                    <a class="page-link" href="javascript:void(0)" (click)="onPageChange(currentPage + 1)" aria-label="Next">
+                      <span aria-hidden="true">&raquo;</span>
+                    </a>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

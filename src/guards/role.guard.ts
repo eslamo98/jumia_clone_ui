@@ -25,7 +25,7 @@ export const roleGuard: CanActivateFn = (route, state) => {
   // Check if the user has the required role
   const userType = authService.currentUserValue?.userType;
   
-  if (userType === requiredRole) {
+  if (userType?.toLowerCase() === requiredRole.toLowerCase()) {
     return true;
   }
   

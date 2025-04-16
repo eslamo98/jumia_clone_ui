@@ -3,6 +3,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Category } from '../../../models/category';
 import { CategoryService } from '../../../services/categories/categories.service';
+import { ProductsService } from '../../../services/products/products.service';
+import { CartsService } from '../../../services/cart/carts.service';
 
 @Component({
   selector: 'app-products',
@@ -100,12 +102,45 @@ export class ProductsComponent implements OnInit {
   pageSize = 4;
   placeholderImage = 'assets/images/placeholder.png';
   
-  constructor(private categoryService: CategoryService) {}
+  constructor(private categoryService: CategoryService,private productsService: ProductsService, private cartsService: CartsService) {}
   
   ngOnInit(): void {
     this.loadCategories();
+    this.loadProduct(1011, true); 
+    this.cartsService.addItemToCart().subscribe({
+      next: (response) => {
+        if (response.success) {
+          console.log('Item added to cart successfully:', response.data);
+        } else {
+          this.error = response.message || 'Failed to add item to cart';
+        }
+      },
+      error: (err) => {
+        this.error = 'Error adding item to cart. Please try again later.';
+        console.error('Error adding item to cart:', err);
+      }
+    });
   }
   
+
+  loadProduct(id: number, includeDetails: boolean): void {
+   
+    
+    this.productsService.getProductById(id, includeDetails).subscribe({
+      next: (response) => {
+        if (response.success) {
+          console.log('Product loaded successfully:', response.data);
+        } else {
+          this.error = response.message || 'Failed to load categories';
+        }
+      },
+      error: (err) => {
+        this.error = 'Error loading categories. Please try again later.';
+        console.error('Error fetching categories:', err);
+      }
+    });
+  }
+
   loadCategories(): void {
     this.loading = true;
     this.error = '';
