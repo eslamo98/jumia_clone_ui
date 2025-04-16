@@ -1,3 +1,119 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<div class="jumia-container">
+  <!-- Left Sidebar Navigation -->
+  <div class="sidebar">
+    <ul class="category-list">
+      <li><i class="category-icon fashion-icon"></i> Fashion</li>
+      <li><i class="category-icon phone-icon"></i> Phones & Tablets</li>
+      <li><i class="category-icon health-icon"></i> Health & Beauty</li>
+      <li><i class="category-icon home-icon"></i> Home & Furniture</li>
+      <li><i class="category-icon appliance-icon"></i> Appliances</li>
+      <li><i class="category-icon tv-icon"></i> Televisions & Audio</li>
+      <li><i class="category-icon baby-icon"></i> Baby Products</li>
+      <li><i class="category-icon supermarket-icon"></i> Supermarket</li>
+      <li><i class="category-icon computing-icon"></i> Computing</li>
+      <li><i class="category-icon sporting-icon"></i> Sporting Goods</li>
+      <li><i class="category-icon gaming-icon"></i> Gaming</li>
+      <li><i class="category-icon other-icon"></i> Other categories</li>
+    </ul>
+  </div>
+
+  <!-- Main Content Area -->
+  <div class="main-content">
+    <!-- Banner Slider -->
+    <div class="banner-slider">
+      <div class="banner easter-sale">
+        <div class="banner-content">
+          <h1 class="banner-title">EASTER SALE</h1>
+          <div class="brand-logos">
+            <img src="assets/images/brands/parkville-logo.png" alt="Parkville" class="brand-logo">
+            <img src="assets/images/brands/seropipe-logo.png" alt="Seropipe" class="brand-logo">
+            <img src="assets/images/brands/glamylab-logo.png" alt="GlamyLab" class="brand-logo">
+            <img src="assets/images/brands/clary-logo.png" alt="Clary" class="brand-logo">
+            <img src="assets/images/brands/borai-logo.png" alt="Borai" class="brand-logo">
+          </div>
+          <div class="price-tag">
+            <span>Starting 35 EGP</span>
+          </div>
+          <div class="banner-features">
+            <div class="feature">
+              <i class="feature-icon shipping-icon"></i>
+              Free Shipping
+            </div>
+            <div class="feature">
+              <i class="feature-icon assortment-icon"></i>
+              Wide Assortment
+            </div>
+          </div>
+        </div>
+        <div class="product-showcase">
+          <img src="assets/images/products/strongville-cream.png" alt="StrongVille Nourishing Cream" class="product-image">
+          <img src="assets/images/products/glamylab-eye-contour.png" alt="GlamyLab Eye Contour" class="product-image">
+        </div>
+        <div class="cta-button">
+          <button>BUY NOW</button>
+        </div>
+        <!-- Slider Navigation Dots -->
+        <div class="slider-dots">
+          <span class="dot active"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Sidebar -->
+  <div class="right-sidebar">
+    <!-- Join Jumia Section -->
+    <div class="sidebar-section join-jumia">
+      <div class="icon-container">
+        <img src="/images/header/star.png" alt="Join Jumia Icon" width="30" height="30">
+      </div>
+      <div class="section-content">
+        <h3>Join Jumia</h3>
+        <p>as a Sales Consultant</p>
+      </div>
+    </div>
+
+    <!-- Sell on Jumia Section -->
+    <div class="sidebar-section sell-jumia">
+      <div class="icon-container">
+        <img src="/images/header/money.png" alt="Sell on Jumia Icon" width="30" height="30">
+      </div>
+      <div class="section-content">
+        <h3>Sell on JUMIA</h3>
+        <p>And Grow Your Business</p>
+      </div>
+    </div>
+
+    <!-- Warranty Section -->
+    <div class="sidebar-section warranty">
+      <div class="icon-container">
+        <img src="/images/header/warrenty.png" alt="Warranty Icon" width="30" height="30">
+      </div>
+      <div class="section-content">
+        <h3>Warranty</h3>
+        <p>On Your Purchases</p>
+      </div>
+    </div>
+
+    <!-- Buy Now Pay Later Banner -->
+    <div class="sidebar-banner">
+      <img src="/images/header/buyNow.PNG" alt="Buy Now Pay Later" class="banner-image">
+    </div>
+  </div>
+</div>
+
+
+<app-promo-slider></app-promo-slider>
+
+<app-static-container></app-static-container>
+
 <!-- pages/home/home.component.html -->
 <div class="jumia-home-container">
     <!-- Main Carousel -->
@@ -54,7 +170,7 @@
     <!-- Mid Banner -->
     <section class="mid-banner">
       <app-banner 
-        [image]="'assets/images/banners/mid-banner.jpg'"
+        [image]="'/images/home/slider1.png'"
         [link]="'/promotions/clearance'">
       </app-banner>
     </section>

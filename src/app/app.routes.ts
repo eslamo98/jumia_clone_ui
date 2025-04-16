@@ -10,6 +10,7 @@ import { SellerDashboardComponent } from '../pages/seller/seller-dashboard/selle
 import { SellerProductsComponent } from '../pages/seller/seller-products/seller-products.component';
 import { AdminDashboardComponent } from '../pages/admin/admin-dashboard/admin-dashboard.component';
 
+
 export const routes: Routes = [
   // Public routes
   {

@@ -1,29 +1,3 @@
-// src/app/pages/public/home-page/home-page.component.ts
-// import { Component } from '@angular/core';
-// import { CommonModule } from '@angular/common';
-
-// @Component({
-//   selector: 'app-home-page',
-//   standalone: true,
-//   imports: [CommonModule],
-//   template: `
-//     <div class="container">
-//       <h1>Welcome to Jumia Clone</h1>
-//       <p>This is the home page.</p>
-//     </div>
-//   `,
-//   styles: [`
-//     .container {
-//       padding: 20px;
-//       max-width: 1200px;
-//       margin: 0 auto;
-//     }
-//   `]
-// })
-// export class HomePageComponent {}
-
-
-// pages/home/home.component.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Product } from '../../../models/product';
@@ -33,6 +7,9 @@ import { ProductCardComponent } from '../../../shared/product-card/product-card.
 import { CategoryCardComponent } from '../../../shared/category-card/category-card.component';
 import { BannerComponent } from '../../../shared/banner/banner.component';
 import { HttpClient } from '@angular/common/http';
+import { PromoSliderComponent } from "./homeComponents/promo-slider/promo-slider.component";
+import { StaticContainerComponent } from "./homeComponents/promo-slider/staticContainer/static-container/static-container.component";
+
 
 @Component({
   selector: 'app-home',
@@ -42,11 +19,14 @@ import { HttpClient } from '@angular/common/http';
     CarouselComponent,
     ProductCardComponent,
     CategoryCardComponent,
-    BannerComponent
-  ],
+    BannerComponent,
+    PromoSliderComponent,
+    StaticContainerComponent
+],
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.css'
 })
+
 export class HomeComponent implements OnInit {
   featuredProducts: Product[] = [];
   topDeals: Product[] = [];
@@ -54,6 +34,59 @@ export class HomeComponent implements OnInit {
   banners: {image: string, link: string}[] = [];
   isLoading = true;
   errorMessage = '';
+  
+  // Easter Sale banner data
+  easterSaleBanner = {
+    title: 'EASTER SALE',
+    startingPrice: '35 EGP',
+    brands: ['Parkville', 'Seropipe', 'GlamyLab', 'Clary', 'Borai'],
+    features: ['Free Shipping', 'Wide Assortment'],
+    products: [
+      { name: 'StrongVille Nourishing Cream', image: 'assets/images/products/strongville-cream.png' },
+      { name: 'GlamyLab Eye Contour', image: 'assets/images/products/glamylab-eye-contour.png' }
+    ]
+  };
+  
+  
+  // Side menu categories
+  sidebarCategories = [
+    { name: 'Fashion', icon: 'fashion-icon' },
+    { name: 'Phones & Tablets', icon: 'phone-icon' },
+    { name: 'Health & Beauty', icon: 'health-icon' },
+    { name: 'Home & Furniture', icon: 'home-icon' },
+    { name: 'Appliances', icon: 'appliance-icon' },
+    { name: 'Televisions & Audio', icon: 'tv-icon' },
+    { name: 'Baby Products', icon: 'baby-icon' },
+    { name: 'Supermarket', icon: 'supermarket-icon' },
+    { name: 'Computing', icon: 'computing-icon' },
+    { name: 'Sporting Goods', icon: 'sporting-icon' },
+    { name: 'Gaming', icon: 'gaming-icon' },
+    { name: 'Other categories', icon: 'other-icon' }
+  ];
+  
+  // Right sidebar options
+  sidebarOptions = [
+    { 
+      title: 'Join Jumia', 
+      subtitle: 'as a Sales Consultant', 
+      icon: 'star-icon' 
+    },
+    { 
+      title: 'Sell on JUMIA', 
+      subtitle: 'And Grow Your Business', 
+      icon: 'money-icon' 
+    },
+    { 
+      title: 'Warranty', 
+      subtitle: 'On Your Purchases', 
+      icon: 'warranty-icon' 
+    }
+  ];
+
+  
+  
+  // Main banner carousel current slide index
+  currentSlide: number = 0;
 
   constructor(private http: HttpClient) { }
 
@@ -243,6 +276,9 @@ export class HomeComponent implements OnInit {
       { image: 'assets/images/banners/banner2.jpg', link: '/category/electronics' },
       { image: 'assets/images/banners/banner3.jpg', link: '/flash-sale' }
     ];
+    
+    // Start automatic banner slider
+    this.startSlideShow();
   }
 
   fetchCategories(): void {
@@ -322,5 +358,15 @@ export class HomeComponent implements OnInit {
         subcategoryCount: 9 
       }
     ];
+  }
+  
+  startSlideShow(): void {
+    setInterval(() => {
+      this.currentSlide = (this.currentSlide + 1) % 7; // Assuming 7 slides based on the dots in the UI
+    }, 5000); // Change slide every 5 seconds
+  }
+
+  setCurrentSlide(index: number): void {
+    this.currentSlide = index;
   }
 }

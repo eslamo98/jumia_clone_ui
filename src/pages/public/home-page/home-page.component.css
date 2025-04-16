@@ -1,3 +1,240 @@
+.jumia-container {
+  display: flex;
+  width: 100%;
+  font-family: Arial, sans-serif;
+}
+
+/* Left Sidebar Styles */
+.sidebar {
+  width: 250px;
+  height: 480px;
+  background-color: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  padding: 10px 0;
+}
+
+.category-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.category-list li {
+  display: flex;
+  align-items: center;
+  padding: 8px 20px;
+  cursor: pointer;
+  color: #333;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.category-list li:hover {
+  background-color: #f5f5f5;
+}
+
+.category-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+  opacity: 0.7;
+}
+
+/* Main Content Styles */
+.main-content {
+  flex: 1;
+  padding: 0 15px;
+}
+
+/* Banner Slider Styles */
+.banner-slider {
+  position: relative;
+  margin-top: 15px;
+}
+
+.banner {
+  display: flex;
+  position: relative;
+  width: 100%;
+  height: 350px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.easter-sale {
+  background: linear-gradient(90deg, #FF9800 0%, #FFD180 100%);
+  color: white;
+  padding: 20px;
+}
+
+.banner-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.banner-title {
+  font-size: 48px;
+  font-weight: bold;
+  margin: 0;
+  line-height: 1;
+}
+
+.brand-logos {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 15px;
+}
+
+.brand-logo {
+  height: 30px;
+  margin-right: 15px;
+  margin-bottom: 10px;
+}
+
+.price-tag {
+  background-color: white;
+  color: #FF6F00;
+  font-weight: bold;
+  padding: 10px 20px;
+  border-radius: 30px;
+  display: inline-block;
+  margin-top: 15px;
+  font-size: 20px;
+}
+
+.banner-features {
+  display: flex;
+  margin-top: 20px;
+}
+
+.feature {
+  display: flex;
+  align-items: center;
+  margin-right: 20px;
+  font-weight: 500;
+}
+
+.feature-icon {
+  margin-right: 8px;
+}
+
+.product-showcase {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 20px;
+}
+
+.product-image {
+  height: 280px;
+  margin-left: 10px;
+}
+
+.cta-button {
+  position: absolute;
+  bottom: 40px;
+  right: 30px;
+}
+
+.cta-button button {
+  background-color: #333;
+  color: white;
+  border: none;
+  padding: 10px 30px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.cta-button button:hover {
+  background-color: #555;
+}
+
+.slider-dots {
+  position: absolute;
+  bottom: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: center;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.5);
+  margin: 0 3px;
+  cursor: pointer;
+}
+
+.dot.active {
+  background-color: white;
+}
+
+/* Right Sidebar Styles */
+.right-sidebar {
+  width: 280px;
+  padding: 15px;
+}
+
+.sidebar-section {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  background-color: #fff;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.icon-container {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #FFF8E1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 15px;
+}
+
+.star-icon, .money-icon, .warranty-icon {
+  font-size: 20px;
+  color: #FF6F00;
+}
+
+.section-content h3 {
+  margin: 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.section-content p {
+  margin: 3px 0 0;
+  font-size: 12px;
+  color: #777;
+}
+
+.sidebar-banner {
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.banner-image {
+  width: 100%;
+  display: block;
+}
+
+
+
 /* pages/home/home.component.css */
 .jumia-home-container {
   width: 100%;

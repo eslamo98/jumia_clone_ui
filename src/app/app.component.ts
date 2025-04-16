@@ -9,6 +9,7 @@ import { HeaderComponent } from '../shared/header/header.component';
 import { NotificationComponent } from '../shared/notification/notification.component';
 import { FooterComponent } from '../shared/footer/footer.component';
 
+
 @Component({
   selector: 'app-root',
   standalone: true,

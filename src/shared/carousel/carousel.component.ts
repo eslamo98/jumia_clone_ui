@@ -12,7 +12,7 @@ import { RouterModule } from '@angular/router';
       <div class="carousel-track" [style.transform]="'translateX(' + translateValue + 'px)'">
         <div *ngFor="let image of images" class="carousel-slide">
           <a [routerLink]="image.link">
-            <img [src]="image.image" alt="Promo banner">
+            <img [src]="'/images/home/slider1.png'" alt="Promo banner">
           </a>
         </div>
       </div>
