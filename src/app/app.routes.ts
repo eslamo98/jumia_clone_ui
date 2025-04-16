@@ -10,6 +10,10 @@ import { SellerDashboardComponent } from '../pages/seller/seller-dashboard/selle
 import { SellerProductsComponent } from '../pages/seller/seller-products/seller-products.component';
 import { AdminDashboardComponent } from '../pages/admin/admin-dashboard/admin-dashboard.component';
 import { ProductDetailsComponent } from '../pages/product-details/product-details.component';
+import { PaymentStepComponent } from '../pages/checkout/payment-step/payment-step.component';
+import { AddressStepComponent } from '../pages/checkout/address-step/address-step.component';
+import { DeliveryStepComponent } from '../pages/checkout/delivery-step/delivery-step.component';
+import { CheckoutComponent } from '../pages/checkout/checkout/checkout.component';
 
 export const routes: Routes = [
   // Public routes
@@ -55,13 +59,21 @@ export const routes: Routes = [
     canActivate: [roleGuard],
     data: { role: 'admin' },
     component: AdminDashboardComponent
+    
   },
     //product routes
     
     { path: 'products/:id',
       component: ProductDetailsComponent 
     },
+    // Checkout routes
+   
+      {
+        path: 'checkout',
+        component: CheckoutComponent,
+      },
   
+
   // Utility routes
   {
     path: 'unauthorized',

@@ -1,0 +1,24 @@
+<div class="step" [ngClass]="{'active': currentStep === 2}">
+  <h2>
+    <span class="checkmark">✅</span>
+    <span class="step-title">
+      Delivery
+      <i class="fa fa-truck truck-icon"></i>
+    </span>
+    <button class="change-btn" (click)="editDeliveryOption()">
+      {{ isEditingDelivery ? 'Save' : 'Change' }}
+    </button>
+  </h2>
+
+  <div class="step-content">
+    <div class="delivery-options">
+      <p>Select Delivery Option:</p>
+      <select class="delivery-select"
+              [(ngModel)]="selectedDeliveryOption"
+              (ngModelChange)="onDeliveryOptionChange()">
+        <option>Standard Delivery</option>
+        <option>Express Delivery</option>
+      </select>
+    </div>
+  </div>
+</div>

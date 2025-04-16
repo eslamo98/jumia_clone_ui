@@ -1,0 +1,26 @@
+<div class="checkout-container">
+  <div class="checkout-steps">
+    <!-- Shipping Address Step -->
+    <app-address-step
+      [currentStep]="currentStep"
+      (nextStep)="goToNextStep()">
+    </app-address-step>
+
+    <!-- Delivery Step -->
+    <app-delivery-step 
+      [currentStep]="currentStep" 
+      (nextStep)="goToNextStep()">
+    </app-delivery-step>
+
+    <!-- Payment Step -->
+    <app-payment-step 
+      [currentStep]="currentStep" 
+      (nextStep)="goToNextStep()">
+    </app-payment-step>
+  </div>
+
+  <!-- Order Summary on the right side -->
+  <div class="order-summary">
+    <app-order-summary></app-order-summary>
+  </div>
+</div>
