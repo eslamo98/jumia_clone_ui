@@ -3,71 +3,32 @@
   <!-- Left Sidebar Navigation -->
   <div class="sidebar">
     <ul class="category-list">
-      <li><i class="category-icon fashion-icon"></i> Fashion</li>
-      <li><i class="category-icon phone-icon"></i> Phones & Tablets</li>
-      <li><i class="category-icon health-icon"></i> Health & Beauty</li>
-      <li><i class="category-icon home-icon"></i> Home & Furniture</li>
-      <li><i class="category-icon appliance-icon"></i> Appliances</li>
-      <li><i class="category-icon tv-icon"></i> Televisions & Audio</li>
-      <li><i class="category-icon baby-icon"></i> Baby Products</li>
-      <li><i class="category-icon supermarket-icon"></i> Supermarket</li>
-      <li><i class="category-icon computing-icon"></i> Computing</li>
-      <li><i class="category-icon sporting-icon"></i> Sporting Goods</li>
-      <li><i class="category-icon gaming-icon"></i> Gaming</li>
-      <li><i class="category-icon other-icon"></i> Other categories</li>
+      <li><i class="fas fa-tshirt"></i>&nbsp; Fashion</li>
+      <li><i class="fas fa-mobile-alt"></i>&nbsp; Phones & Tablets</li>
+      <li><i class="fas fa-heartbeat"></i>&nbsp; Health & Beauty</li>
+      <li><i class="fas fa-couch"></i>&nbsp; Home & Furniture</li>
+      <li><i class="fas fa-blender"></i>&nbsp; Appliances</li>
+      <li><i class="fas fa-tv"></i>&nbsp; Televisions & Audio</li>
+      <li><i class="fas fa-baby"></i>&nbsp; Baby Products</li>
+      <li><i class="fas fa-shopping-basket"></i>&nbsp; Supermarket</li>
+      <li><i class="fas fa-laptop"></i>&nbsp; Computing</li>
+      <li><i class="fas fa-running"></i>&nbsp; Sporting Goods</li>
+      <li><i class="fas fa-gamepad"></i>&nbsp; Gaming</li>
+      <li><i class="fas fa-ellipsis-h"></i>&nbsp; Other categories</li>
     </ul>
   </div>
 
   <!-- Main Content Area -->
   <div class="main-content">
     <!-- Banner Slider -->
-    <div class="banner-slider">
-      <div class="banner easter-sale">
-        <div class="banner-content">
-          <h1 class="banner-title">EASTER SALE</h1>
-          <div class="brand-logos">
-            <img src="assets/images/brands/parkville-logo.png" alt="Parkville" class="brand-logo">
-            <img src="assets/images/brands/seropipe-logo.png" alt="Seropipe" class="brand-logo">
-            <img src="assets/images/brands/glamylab-logo.png" alt="GlamyLab" class="brand-logo">
-            <img src="assets/images/brands/clary-logo.png" alt="Clary" class="brand-logo">
-            <img src="assets/images/brands/borai-logo.png" alt="Borai" class="brand-logo">
-          </div>
-          <div class="price-tag">
-            <span>Starting 35 EGP</span>
-          </div>
-          <div class="banner-features">
-            <div class="feature">
-              <i class="feature-icon shipping-icon"></i>
-              Free Shipping
-            </div>
-            <div class="feature">
-              <i class="feature-icon assortment-icon"></i>
-              Wide Assortment
-            </div>
-          </div>
-        </div>
-        <div class="product-showcase">
-          <img src="assets/images/products/strongville-cream.png" alt="StrongVille Nourishing Cream" class="product-image">
-          <img src="assets/images/products/glamylab-eye-contour.png" alt="GlamyLab Eye Contour" class="product-image">
-        </div>
-        <div class="cta-button">
-          <button>BUY NOW</button>
-        </div>
-        <!-- Slider Navigation Dots -->
-        <div class="slider-dots">
-          <span class="dot active"></span>
-          <span class="dot"></span>
-          <span class="dot"></span>
-          <span class="dot"></span>
-          <span class="dot"></span>
-          <span class="dot"></span>
-          <span class="dot"></span>
-        </div>
-      </div>
-    </div>
+    <section class="slider-section">   
+      <app-center-slider></app-center-slider>
+    </section>
+
   </div>
 
   <!-- Right Sidebar -->
+   <div class="wrapper-right-sidebar">
   <div class="right-sidebar">
     <!-- Join Jumia Section -->
     <div class="sidebar-section join-jumia">
@@ -103,10 +64,11 @@
     </div>
 
     <!-- Buy Now Pay Later Banner -->
-    <div class="sidebar-banner">
+    <div class="sidebar-banner mt-4">
       <img src="/images/header/buyNow.PNG" alt="Buy Now Pay Later" class="banner-image">
     </div>
   </div>
+</div>
 </div>
 
 
@@ -120,6 +82,7 @@
     <section class="main-carousel">
       <app-carousel [images]="banners"></app-carousel>
     </section>
+
   
     <!-- Categories Section -->
     <section class="categories-section">

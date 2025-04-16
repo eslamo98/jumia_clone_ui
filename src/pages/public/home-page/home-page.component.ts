@@ -9,6 +9,7 @@ import { BannerComponent } from '../../../shared/banner/banner.component';
 import { HttpClient } from '@angular/common/http';
 import { PromoSliderComponent } from "./homeComponents/promo-slider/promo-slider.component";
 import { StaticContainerComponent } from "./homeComponents/promo-slider/staticContainer/static-container/static-container.component";
+import { CenterSliderComponent } from "./homeComponents/promo-slider/centerSlider/center-slider/center-slider.component";
 
 
 @Component({
@@ -21,7 +22,8 @@ import { StaticContainerComponent } from "./homeComponents/promo-slider/staticCo
     CategoryCardComponent,
     BannerComponent,
     PromoSliderComponent,
-    StaticContainerComponent
+    StaticContainerComponent,
+    CenterSliderComponent
 ],
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.css'
