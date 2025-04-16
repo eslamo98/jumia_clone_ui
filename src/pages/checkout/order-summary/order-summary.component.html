@@ -1,0 +1,9 @@
+<div class="order-summary">
+  <h3>Order Summary</h3>
+  <div class="order-items">
+    <p>Items Total: <span>EGP {{ itemsTotal.toFixed(2) }}</span></p>
+    <p>Delivery Fee: <span>EGP {{ deliveryFee.toFixed(2) }}</span></p>
+    <p>Total: <span>EGP {{ total.toFixed(2) }}</span></p>
+  </div>
+  <button class="confirm-btn" (click)="confirmOrder()">Confirm Order</button>
+</div>

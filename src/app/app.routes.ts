@@ -9,6 +9,7 @@ import { CartComponent } from '../pages/customer/cart/cart.component';
 import { SellerDashboardComponent } from '../pages/seller/seller-dashboard/seller-dashboard.component';
 import { SellerProductsComponent } from '../pages/seller/seller-products/seller-products.component';
 import { AdminDashboardComponent } from '../pages/admin/admin-dashboard/admin-dashboard.component';
+
 import { AdminProductsComponent } from '../pages/admin/components/admin-products/admin-products.component';
 import { AdminProductFormComponent } from '../pages/admin/components/admin-product-form/admin-product-form.component';
 import { AdminCategoriesComponent } from '../pages/admin/components/admin-categories/admin-categories.component';
@@ -21,6 +22,13 @@ import { AdminCustomerDetailsComponent } from '../pages/admin/components/admin-c
 import { AdminSellersComponent } from '../pages/admin/components/admin-sellers/admin-sellers.component';
 import { AdminSellerDetailsComponent } from '../pages/admin/components/admin-seller-details/admin-seller-details.component';
 import { AdminReviewsComponent } from '../pages/admin/components/admin-reviews/admin-reviews.component';
+
+import { ProductDetailsComponent } from '../pages/product-details/product-details.component';
+import { PaymentStepComponent } from '../pages/checkout/payment-step/payment-step.component';
+import { AddressStepComponent } from '../pages/checkout/address-step/address-step.component';
+import { DeliveryStepComponent } from '../pages/checkout/delivery-step/delivery-step.component';
+import { CheckoutComponent } from '../pages/checkout/checkout/checkout.component';
+
 
 export const routes: Routes = [
   // Public routes
@@ -65,6 +73,7 @@ export const routes: Routes = [
     path: 'admin',
     canActivate: [roleGuard],
     data: { role: 'admin' },
+
     children: [
       { path: '', component: AdminDashboardComponent },
       { path: 'products', component: AdminProductsComponent },
@@ -82,8 +91,23 @@ export const routes: Routes = [
       { path: 'reviews', component: AdminReviewsComponent },
       { path: 'settings', component: AdminSettingsComponent },
     ]
+
+    component: AdminDashboardComponent
+    
   },
+    //product routes
+    
+    { path: 'products/:id',
+      component: ProductDetailsComponent 
+    },
+    // Checkout routes
+   
+      {
+        path: 'checkout',
+        component: CheckoutComponent,
+      },
   
+
   // Utility routes
   {
     path: 'unauthorized',
@@ -93,4 +117,5 @@ export const routes: Routes = [
     path: '**',
     redirectTo: ''
   }
+
 ];
