@@ -90,7 +90,7 @@ export const routes: Routes = [
       { path: 'sellers/:id', component: AdminSellerDetailsComponent },
       { path: 'reviews', component: AdminReviewsComponent },
       { path: 'settings', component: AdminSettingsComponent },
-    ]
+    ],
 
     component: AdminDashboardComponent
     

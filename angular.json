@@ -48,7 +48,8 @@
             "assets": [
               {
                 "glob": "**/*",
-                "input": "public"
+                "input":  "src/pages/public"
+              
               }
             ],
             "styles": [

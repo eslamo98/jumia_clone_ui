@@ -49,7 +49,7 @@ import { CommonModule } from '@angular/common';
             <p class="mb-0">&copy; 2025 Jumia Clone. All rights reserved.</p>
           </div>
           <div class="col-md-6 text-md-end">
-            <img src="assets/images/payment-methods.png" alt="Payment Methods" height="30">
+          <img src="assets/images/payment-methods.png" alt="Payment Methods" height="30">
           </div>
         </div>
       </div>

@@ -14,29 +14,11 @@ import { FormsModule } from '@angular/forms';
   styleUrls: ['./product-details.component.css']
 })
 export class ProductDetailsComponent implements OnInit {
-  //  // Static data as default
-   product: Product = {
-    ProductId: 1,
-    Name: 'Backpack',
-    SellerId: 1,
-    SubcategoryId: 1,
-    IsAvailable: true,
-    StockQuantity: 100,
-    AverageRating: 4.5,
-    // ApprovalStatus: 'Approved',
-    BasePrice: 49.99,
-    DiscountPercentage: 10,
-    Description: 'A durable and stylish backpack suitable for all occasions.',
-    MainImageUrl:'https://th.bing.com/th/id/OIP.uzuY7KTchO1_WCWMH3JPDAHaHa?cb=iwp&pid=ImgDet&w=178&h=178&c=7&dpr=1.5',
-    AdditionalImages: [
-      'https://th.bing.com/th/id/OIP.uzuY7KTchO1_WCWMH3JPDAHaHa?cb=iwp&pid=ImgDet&w=178&h=178&c=7&dpr=1.5',
-      'https://th.bing.com/th/id/OIP.uzuY7KTchO1_WCWMH3JPDAHaHa?cb=iwp&pid=ImgDet&w=178&h=178&c=7&dpr=1.5',
-      'https://th.bing.com/th/id/OIP.uzuY7KTchO1_WCWMH3JPDAHaHa?cb=iwp&pid=ImgDet&w=178&h=178&c=7&dpr=1.5',
-      'https://th.bing.com/th/id/OIP.uzuY7KTchO1_WCWMH3JPDAHaHa?cb=iwp&pid=ImgDet&w=178&h=178&c=7&dpr=1.5',
-    ]
-  };
+
+  isLoading = true;
+  errorMessage = '';
   
-  // product!: Product;
+ product!: Product;
 selectedImage: string = '';
   constructor(private route: ActivatedRoute, private productService: ProductService) {
 
@@ -81,19 +63,34 @@ selectedImage: string = '';
     qualityScore: string= 'High';
     rating: string= '4.5/5';
 
-  ngOnInit(): void {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
-    if (id) {
-      this.productService.getProductById(id).subscribe({
-        next: (res) => {
-          this.product = res;
-        },
-        error: (err) => {
-          console.error('Error fetching product details', err);
+   
+
+      ngOnInit(): void {
+        const id = Number(this.route.snapshot.paramMap.get('id'));
+        
+        if (isNaN(id)) {
+          this.errorMessage = 'Invalid product ID';
+          this.isLoading = false;
+          return;
         }
-      });
-    }
-  }
+    
+        this.productService.getProductById(id, true).subscribe({
+          next: (res) => {
+            this.product = res;
+            this.isLoading = false;
+          },
+          error: (err) => {
+            console.error('API Error:', err);
+            this.isLoading = false;
+            this.errorMessage = err.status === 0 
+              ? 'Cannot connect to server' 
+              : 'Failed to load product details';
+          }
+        });
+      }
+    
+   
+  
   
   selectImage(imageUrl: string): void {
     this.selectedImage = imageUrl;

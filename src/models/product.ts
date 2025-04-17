@@ -12,7 +12,7 @@ export interface Product {
     // UpdatedAt: Date;
      StockQuantity: number;
     MainImageUrl: string;
-    AdditionalImages?: string[]; // Add this line for multiple images
+    
 
     AverageRating: number;
   }

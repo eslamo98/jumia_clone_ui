@@ -4,7 +4,7 @@
   <div class="row">
     <div class="col-md-6 text-center">
       <!-- Main Image -->
-      <div class="image-container mb-3">
+      <div class="image-container mb-3" {{product.MainImageUrl }}>
         <img [src]="selectedImage || product.MainImageUrl" 
              alt="Product Image" 
              class="product-image">
@@ -21,22 +21,22 @@
         </div>
         
         <!-- Additional images thumbnails -->
-        <div class="thumbnail-container" 
-             *ngFor="let img of product.AdditionalImages"
+        <!-- <div class="thumbnail-container" 
+             *ngFor="let img of product.MainImageUrl"
              (click)="selectedImage = img">
           <img [src]="img" 
                alt="Thumbnail" 
                class="thumbnail"
                [class.active]="selectedImage === img">
-        </div>
+        </div> -->
       </div>
     </div>
 
     <div class="col-md-6 product-details">
     
       <span class="d-inline-block rounded-3 bg-black text-white fw-bold fs-6 py-1 px-2 mb-2">{{ product.Name }}</span>
-      <h2>{{ product.Name}}</h2>
-      <p class="price">${{ product.BasePrice}}</p>
+      <h2 *ngIf="product?.Name">{{ product.Name}}</h2>
+      <p  *ngIf="product?.BasePrice" class="price">${{ product.BasePrice}}</p>
       <p class="stock fw-bold text-black-50">Stock: {{ product.StockQuantity}}</p>
       <p class="description">{{ product.Description }}</p>
       
@@ -83,16 +83,16 @@
 
     <!-- Product Details Column -->
     <div class="col-md-6 product-details">
-      <h1 class="mb-3">{{ product.Name }}</h1>
+      <h1 class="mb-3" *ngIf="product?.Name">{{ product.Name}}</h1>
 
       <!-- Price Section -->
       <div class="mb-4">
-        <span class="text-danger fs-4 fw-bold">EGP {{ product.BasePrice| number }}</span>
-        <span *ngIf="product.BasePrice" 
+        <span class="text-danger fs-4 fw-bold" *ngIf="product?.BasePrice">EGP {{ product.BasePrice| number }}</span>
+        <span *ngIf="product?.BasePrice" 
               class="text-muted text-decoration-line-through ms-2">
           EGP {{ product.BasePrice | number }}
         </span>
-        <span *ngIf="product.DiscountPercentage" 
+        <span *ngIf="product?.DiscountPercentage" 
               class="ms-2 text-danger">
               -{{ product.DiscountPercentage }}%
         </span>
@@ -173,19 +173,22 @@
                  style="width: 100px"
                  min="1" 
                  [(ngModel)]="quantity"
+                 *ngIf="product?.StockQuantity "
                  [max]="product.StockQuantity">
           <button class="btn btn-primary w-100 btn-lg" 
+          *ngIf="product?.StockQuantity"
                   [disabled]="product.StockQuantity === 0"
                   (click)="addToCart()">
             Add to cart
           </button>
         </div>
         
-        <div *ngIf="product.StockQuantity === 0" 
+        <div *ngIf="product?.StockQuantity === 0" 
              class="text-center text-danger fw-bold">
           Out Of Stock
         </div>
-        <p class="stock fw-bold text-black-50 mt-2">
+        <p class="stock fw-bold text-black-50 mt-2" *ngIf="product?.StockQuantity">
+          
           Stock: {{ product.StockQuantity | number }}
         </p>
         <div class="text-center small text-muted">
@@ -215,7 +218,7 @@
       <!-- Tab Content -->
       <div class="tab-content mt-3">
         <div *ngIf="activeTab === 'details'" class="tab-pane active">
-          <p>{{ product.Description }}</p>
+          <p *ngIf="product?.Description">{{ product.Description }}</p>
         </div>
         
         <div *ngIf="activeTab === 'specs'" class="tab-pane">
