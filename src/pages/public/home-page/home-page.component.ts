@@ -7,9 +7,10 @@ import { ProductCardComponent } from '../../../shared/product-card/product-card.
 import { CategoryCardComponent } from '../../../shared/category-card/category-card.component';
 import { BannerComponent } from '../../../shared/banner/banner.component';
 import { HttpClient } from '@angular/common/http';
-import { PromoSliderComponent } from "./homeComponents/promo-slider/promo-slider.component";
-import { StaticContainerComponent } from "./homeComponents/promo-slider/staticContainer/static-container/static-container.component";
-import { CenterSliderComponent } from "./homeComponents/promo-slider/centerSlider/center-slider/center-slider.component";
+import { PromoSliderComponent } from "./homeComponents/promoSlider/promo-slider.component";
+import { StaticContainerComponent } from "./homeComponents/static-container/static-container.component";
+import { CenterSliderComponent } from "./homeComponents/center-slider/center-slider.component";
+import { TwoImagesBannarComponent } from "./homeComponents/twoImagesBannar/two-images-bannar/two-images-bannar.component";
 
 
 @Component({
@@ -23,7 +24,8 @@ import { CenterSliderComponent } from "./homeComponents/promo-slider/centerSlide
     BannerComponent,
     PromoSliderComponent,
     StaticContainerComponent,
-    CenterSliderComponent
+    CenterSliderComponent,
+    TwoImagesBannarComponent
 ],
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.css'
