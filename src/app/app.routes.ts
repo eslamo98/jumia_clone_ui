@@ -9,6 +9,18 @@ import { CartComponent } from '../pages/customer/cart/cart.component';
 import { SellerDashboardComponent } from '../pages/seller/seller-dashboard/seller-dashboard.component';
 import { SellerProductsComponent } from '../pages/seller/seller-products/seller-products.component';
 import { AdminDashboardComponent } from '../pages/admin/admin-dashboard/admin-dashboard.component';
+import { AdminProductsComponent } from '../pages/admin/components/admin-products/admin-products.component';
+import { AdminProductFormComponent } from '../pages/admin/components/admin-product-form/admin-product-form.component';
+import { AdminCategoriesComponent } from '../pages/admin/components/admin-categories/admin-categories.component';
+import { AdminCategoryFormComponent } from '../pages/admin/components/admin-category-form/admin-category-form.component';
+import { AdminOrdersComponent } from '../pages/admin/components/admin-orders/admin-orders.component';
+import { AdminSettingsComponent } from '../pages/admin/components/admin-settings/admin-settings.component';
+import { AdminOrderDetailsComponent } from '../pages/admin/components/admin-order-details/admin-order-details.component';
+import { AdminCustomersComponent } from '../pages/admin/components/admin-customers/admin-customers.component';
+import { AdminCustomerDetailsComponent } from '../pages/admin/components/admin-customer-details/admin-customer-details.component';
+import { AdminSellersComponent } from '../pages/admin/components/admin-sellers/admin-sellers.component';
+import { AdminSellerDetailsComponent } from '../pages/admin/components/admin-seller-details/admin-seller-details.component';
+import { AdminReviewsComponent } from '../pages/admin/components/admin-reviews/admin-reviews.component';
 
 export const routes: Routes = [
   // Public routes
@@ -36,7 +48,7 @@ export const routes: Routes = [
     component: CartComponent,
     canActivate: [authGuard]
   },
-  
+
   // Seller routes
   {
     path: 'seller',
@@ -53,7 +65,23 @@ export const routes: Routes = [
     path: 'admin',
     canActivate: [roleGuard],
     data: { role: 'admin' },
-    component: AdminDashboardComponent
+    children: [
+      { path: '', component: AdminDashboardComponent },
+      { path: 'products', component: AdminProductsComponent },
+      { path: 'products/add', component: AdminProductFormComponent },
+      { path: 'products/edit/:id', component: AdminProductFormComponent },
+      { path: 'categories', component: AdminCategoriesComponent },
+      { path: 'categories/add', component: AdminCategoryFormComponent },
+      { path: 'categories/edit/:id', component: AdminCategoryFormComponent },
+      { path: 'orders', component: AdminOrdersComponent },
+      { path: 'orders/:id', component: AdminOrderDetailsComponent },
+      { path: 'customers', component: AdminCustomersComponent },
+      { path: 'customers/:id', component: AdminCustomerDetailsComponent },
+      { path: 'sellers', component: AdminSellersComponent },
+      { path: 'sellers/:id', component: AdminSellerDetailsComponent },
+      { path: 'reviews', component: AdminReviewsComponent },
+      { path: 'settings', component: AdminSettingsComponent },
+    ]
   },
   
   // Utility routes

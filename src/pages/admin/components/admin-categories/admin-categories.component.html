@@ -1,0 +1,169 @@
+<!-- src/app/pages/admin/admin-categories/admin-categories.component.html -->
+<div class="admin-categories-container">
+    <div class="row g-0">
+      <!-- Sidebar -->
+      <div class="col-md-2 bg-dark min-vh-100">
+        <app-admin-sidebar></app-admin-sidebar>
+      </div>
+      
+      <!-- Main content -->
+      <div class="col-md-10">
+        <app-admin-header></app-admin-header>
+        
+        <div class="container mt-4">
+          <div class="row mb-4">
+            <div class="col">
+              <h2>Categories Management</h2>
+              <p class="text-muted">Manage product categories</p>
+            </div>
+            <div class="col-auto">
+              <a routerLink="/admin/categories/add" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-2"></i>Add New Category
+              </a>
+            </div>
+          </div>
+          
+          <!-- Filters and search -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <div class="input-group">
+                    <span class="input-group-text bg-light">
+                      <i class="bi bi-search"></i>
+                    </span>
+                    <input 
+                      type="text" 
+                      class="form-control" 
+                      placeholder="Search categories..." 
+                      [(ngModel)]="searchTerm" 
+                      (keyup.enter)="onSearch()"
+                    >
+                    <button 
+                      class="btn btn-primary" 
+                      type="button" 
+                      (click)="onSearch()"
+                    >
+                      Search
+                    </button>
+                  </div>
+                </div>
+                
+                <div class="col-md-4">
+                  <select 
+                    class="form-select" 
+                    [(ngModel)]="statusFilter" 
+                    (change)="onFilterChange()"
+                  >
+                    <option value="">All Statuses</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                  </select>
+                </div>
+                
+                <div class="col-md-2">
+                  <button 
+                    class="btn btn-outline-secondary w-100" 
+                    (click)="searchTerm = ''; statusFilter = ''; onFilterChange()"
+                  >
+                    Clear Filters
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Loading spinner -->
+          <div *ngIf="isLoading" class="d-flex justify-content-center my-5">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </div>
+          
+          <!-- Categories table -->
+          <div class="card" *ngIf="!isLoading">
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                  <thead class="bg-light">
+                    <tr>
+                      <th class="border-0">Category</th>
+                      <th class="border-0">Parent Category</th>
+                      <th class="border-0">Products</th>
+                      <th class="border-0">Status</th>
+                      <th class="border-0">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let category of categories">
+                      <td>
+                        <div class="d-flex align-items-center">
+                          <img 
+                            [src]="category.image || 'assets/images/categories/placeholder.jpg'" 
+                            class="img-thumbnail me-3" 
+                            width="50" 
+                            [alt]="category.name"
+                          >
+                          <div>
+                            <h6 class="mb-0">{{category.name}}</h6>
+                            <small class="text-muted">{{category.description || 'No description'}}</small>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <span>{{getParentCategoryName(category.parentId)}}</span>
+                      </td>
+                      <td>
+                        <span class="badge bg-info">{{category.productCount || 0}} products</span>
+                      </td>
+                      <td>
+                        <div class="dropdown">
+                          <button 
+                            class="btn btn-sm dropdown-toggle" 
+                            type="button" 
+                            [ngClass]="{
+                              'btn-success': category.status === 'active',
+                              'btn-secondary': category.status === 'inactive'
+                            }"
+                            data-bs-toggle="dropdown" 
+                            aria-expanded="false"
+                          >
+                            {{category.status | titlecase}}
+                          </button>
+                          <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="javascript:void(0)" (click)="updateCategoryStatus(category.id, 'active')">Active</a></li>
+                            <li><a class="dropdown-item" href="javascript:void(0)" (click)="updateCategoryStatus(category.id, 'inactive')">Inactive</a></li>
+                          </ul>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="d-flex">
+                          <a [routerLink]="['/admin/categories/edit', category.id]" class="btn btn-sm btn-outline-primary me-2">
+                            <i class="bi bi-pencil"></i>
+                          </a>
+                          <button type="button" class="btn btn-sm btn-outline-danger" (click)="deleteCategory(category.id)">
+                            <i class="bi bi-trash"></i>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                    
+                    <!-- Empty state -->
+                    <tr *ngIf="categories.length === 0">
+                      <td colspan="5" class="text-center py-4">
+                        <div class="py-5">
+                          <i class="bi bi-tags fs-1 text-muted d-block mb-3"></i>
+                          <h5>No categories found</h5>
+                          <p class="text-muted">Try changing your search or filter criteria</p>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
