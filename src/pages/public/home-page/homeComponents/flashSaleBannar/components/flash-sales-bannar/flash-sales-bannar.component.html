@@ -1,0 +1,70 @@
+<!-- flash-sales-banner.component.html -->
+<div class="flash-sales-container">
+    <!-- Top banner with timer -->
+    <div class="flash-sales-header">
+      <div class="flash-sales-title">
+        <i class="flash-icon"></i>
+        <span>Flash Sales Don't Miss !!</span>
+      </div>
+      <div class="timer">
+        <span>Time Left: {{ timeLeft }}</span>
+      </div>
+      <div class="see-all">
+        <a href="/flash-sales">See All <i class="arrow-right-icon"></i></a>
+      </div>
+    </div>
+    
+    <!-- Products carousel -->
+    <div class="products-carousel-container">
+      <!-- Left scroll arrow -->
+      <button 
+        *ngIf="showLeftArrow" 
+        class="scroll-arrow left-arrow"
+        (click)="scrollLeft()">
+        <i class="arrow-left-icon"></i>
+      </button>
+      
+      <!-- Products container -->
+      <div #productContainer class="products-container" (scroll)="checkScrollArrows()">
+        <div 
+          *ngFor="let product of products" 
+          class="product-card"
+          (click)="navigateToProductDetails(product.productId)">
+          <!-- Discount badge -->
+          <div class="discount-badge" *ngIf="product.discountPercentage > 0">
+            -{{ product.discountPercentage }}%
+          </div>
+          
+          <!-- Product image -->
+          <div class="product-image">
+            <img [src]="product.mainImageUrl" [alt]="product.name">
+          </div>
+          
+          <!-- Product info -->
+          <div class="product-info">
+            <h3 class="product-name">{{ product.name }}</h3>
+            <div class="product-price">
+              <span class="final-price">EGP {{ product.finalPrice }}</span>
+              <span class="base-price">EGP {{ product.basePrice }}</span>
+            </div>
+            
+            <!-- Stock indicator -->
+            <div class="stock-info">
+              <span class="items-left">{{ product.stockQuantity }} items left</span>
+              <div class="progress-bar">
+                <div class="progress" [style.width]="calculateProgressBarWidth(product.stockQuantity)"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Right scroll arrow -->
+      <button 
+        *ngIf="showRightArrow" 
+        class="scroll-arrow right-arrow"
+        (click)="scrollRight()">
+        <i class="arrow-right-icon"></i>
+      </button>
+    </div>
+  </div>
