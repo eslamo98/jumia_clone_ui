@@ -1,1 +1,95 @@
-<p>customer-account works!</p>
+<div class="customer-account-container">
+  <!-- Sidebar -->
+  <div class="sidebar" [class.open]="isSidebarOpen">
+    <button (click)="isSidebarOpen = !isSidebarOpen" class="sidebar-toggle">☰</button>
+    <ul>
+      <li (click)="activeSection = 'orders'" [class.active]="activeSection === 'orders'">Orders</li>
+      <li (click)="activeSection = 'wishlist'" [class.active]="activeSection === 'wishlist'">Wishlist</li>
+      <li (click)="activeSection = 'messages'" [class.active]="activeSection === 'messages'">Messages</li>
+      <li (click)="activeSection = 'addresses'" [class.active]="activeSection === 'addresses'">Addresses</li>
+      <li (click)="activeSection = 'settings'" [class.active]="activeSection === 'settings'">Settings</li>
+    </ul>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <h2>My Account</h2>
+
+    <div *ngIf="successMessage" class="success">{{ successMessage }}</div>
+    <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+
+    <!-- Orders -->
+    <div *ngIf="activeSection === 'orders'">
+      <h3>Orders</h3>
+      <div *ngIf="orders.length === 0">No orders found.</div>
+      <ul>
+        <li *ngFor="let order of orders">
+          Order #{{ order.orderId }} | ${{ order.totalAmount }} | {{ order.orderDate | date }}
+        </li>
+      </ul>
+    </div>p
+
+    <!-- Wishlist -->
+    <div *ngIf="activeSection === 'wishlist'">
+      <h3>Wishlist</h3>
+      <div *ngIf="wishlist.length === 0">Wishlist is empty.</div>
+      <ul class="wishlist">
+        <li *ngFor="let item of wishlist">
+          <img [src]="item.image" alt="{{ item.name }}" />
+          {{ item.name }} - ${{ item.price }}
+        </li>
+      </ul>
+    </div>
+
+    <!-- Messages -->
+    <div *ngIf="activeSection === 'messages'">
+      <h3>Messages</h3>
+      <div *ngIf="messages.length === 0">No messages.</div>
+      <ul>
+        <li *ngFor="let msg of messages">
+          <strong>{{ msg.title }}</strong> - {{ msg.date | date:'short' }}<br />
+          {{ msg.body }}
+        </li>
+      </ul>
+    </div>
+
+    <!-- Address Book -->
+    <div *ngIf="activeSection === 'addresses'">
+      <h3>Addresses</h3>
+      <ul>
+        <li *ngFor="let addr of addresses">
+          {{ addr.street }}, {{ addr.city }}, {{ addr.postalCode }}
+        </li>
+      </ul>
+
+      <form [formGroup]="addressForm" (ngSubmit)="addAddress()">
+        <label>Street: <input formControlName="street" /></label>
+        <label>City: <input formControlName="city" /></label>
+        <label>Postal Code: <input formControlName="postalCode" /></label>
+        <button type="submit" [disabled]="addressForm.invalid">Add Address</button>
+      </form>
+    </div>
+
+    <!-- Settings -->
+    <div *ngIf="activeSection === 'settings'">
+      <h3>Settings</h3>
+
+      <form [formGroup]="profileForm" (ngSubmit)="updateProfile()">
+        <h4>Update Profile</h4>
+        <label>First Name: <input formControlName="firstName" /></label>
+        <label>Last Name: <input formControlName="lastName" /></label>
+        <label>Phone: <input formControlName="phoneNumber" /></label>
+        <button type="submit" [disabled]="profileForm.invalid">Save Changes</button>
+      </form>
+
+      <form [formGroup]="passwordForm" (ngSubmit)="changePassword()">
+        <h4>Change Password</h4>
+        <label>Old Password: <input type="password" formControlName="oldPassword" /></label>
+        <label>New Password: <input type="password" formControlName="newPassword" /></label>
+        <label>Confirm Password: <input type="password" formControlName="confirmPassword" /></label>
+        <div *ngIf="passwordForm.errors?.['mismatch']" class="error">Passwords do not match.</div>
+        <button type="submit" [disabled]="passwordForm.invalid">Change Password</button>
+      </form>
+    </div>
+  </div>
+</div>
