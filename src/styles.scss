@@ -1,0 +1,206 @@
+// Custom Theming for Angular Material
+@use 'sass:color' as color;
+@use 'sass:map'   as map;
+@use 'sass:math'  as math;
+@use '@angular/material' as mat;
+@use 'variables' as v;
+@use 'mixins' as m;
+@include mat.core();
+// Define the custom palette
+ 
+
+// Define the palettes using the custom palette
+$_base-orange:    mat.$m2-orange-palette;
+$_jumia-orange:   map.merge($_base-orange, (500: v.$primary));
+
+// 6) Define your three palettes via the M2 API
+$jumia-primary: mat.m2-define-palette($_jumia-orange);
+$jumia-accent:  mat.m2-define-palette(mat.$m2-blue-palette);
+$jumia-warn:    mat.m2-define-palette(mat.$m2-red-palette);
+
+// 7) Build the M2 light theme object
+$jumia-theme: mat.m2-define-light-theme((
+  color: (
+    primary: $jumia-primary,
+    accent:  $jumia-accent,
+    warn:    $jumia-warn,
+  )
+));
+
+// 8) Apply it to all Material components
+@include mat.all-component-themes($jumia-theme);
+
+// Global Reset and Base Styles
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  height: 100%;
+}
+
+body {
+  font-family: v.$font-family-base;
+  font-size: v.$font-size-md;
+  line-height: 1.5;
+  color: v.$text-dark;
+  background-color: v.$border-light;
+  min-height: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// Common utility classes
+.container {
+  width: 100%;
+  max-width: v.$container-max-width;
+  margin: 0 auto;
+  padding: 0 v.$container-padding;
+}
+
+// Common animations
+.fade-in {
+  @include m.fade-in;
+}
+
+.slide-in {
+  @include m.slide-in;
+}
+
+// Accessibility
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  margin: 0 0 v.$spacing-md;
+  font-weight: v.$font-weight-bold;
+  line-height: 1.2;
+}
+
+h1 { font-size: v.$font-size-4xl; }
+h2 { font-size: v.$font-size-3xl; }
+h3 { font-size: v.$font-size-2xl; }
+h4 { font-size: v.$font-size-xl; }
+h5 { font-size: v.$font-size-lg; }
+h6 { font-size: v.$font-size-md; }
+
+p {
+  margin: 0 0 v.$spacing-md;
+}
+
+a {
+  color: v.$primary;
+  text-decoration: none;
+  transition: v.$transition-fast;
+
+  &:hover {
+    color: color.adjust(v.$primary, $lightness: -10%);
+  }
+}
+
+/* Lists */
+ul, ol {
+  padding-left: v.$spacing-lg;
+  margin: 0 0 v.$spacing-md;
+}
+
+/* Global Form Styles */
+input,
+textarea,
+select {
+  @include m.form-control;
+}
+
+/* Global Button Styles */
+button {
+  @include m.button-base;
+}
+
+.btn {
+  @include m.button-base;
+
+  &-primary {
+    @include m.button-variant(v.$primary, v.$white);
+  }
+
+  &-secondary {
+    @include m.button-variant(v.$secondary, v.$white);
+  }
+
+  &-outline {
+    @include m.button-outline(v.$primary);
+  }
+
+  &-danger {
+    @include m.button-variant(v.$danger, v.$white);
+  }
+}
+
+/* Utility Classes */
+.text {
+  &-center { text-align: center; }
+  &-left { text-align: left; }
+  &-right { text-align: right; }
+}
+
+.mt {
+  &-xs { margin-top: v.$spacing-xs; }
+  &-sm { margin-top: v.$spacing-sm; }
+  &-md { margin-top: v.$spacing-md; }
+  &-lg { margin-top: v.$spacing-lg; }
+  &-xl { margin-top: v.$spacing-xl; }
+}
+
+.mb {
+  &-xs { margin-bottom: v.$spacing-xs; }
+  &-sm { margin-bottom: v.$spacing-sm; }
+  &-md { margin-bottom: v.$spacing-md; }
+  &-lg { margin-bottom: v.$spacing-lg; }
+  &-xl { margin-bottom: v.$spacing-xl; }
+}
+
+.flex {
+  &-center { @include m.flex-center; }
+  &-between { @include m.flex-between; }
+  &-start { @include m.flex-start; }
+}
+
+/* Responsive Visibility */
+@include m.mobile {
+  .hide-mobile {
+    display: none !important;
+  }
+}
+
+@include m.tablet {
+  .hide-tablet {
+    display: none !important;
+  }
+}
+
+@include m.desktop {
+  .hide-desktop {
+    display: none !important;
+  }
+}
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

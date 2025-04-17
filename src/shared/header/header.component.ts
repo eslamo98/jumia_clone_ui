@@ -47,13 +47,13 @@ import { AuthService } from '../../services/auth/auth.service';
             <ng-container *ngIf="authService.currentUser$ | async as user">
               <li class="nav-item">
                 <a class="nav-link" routerLink="/cart" routerLinkActive="active">
-                  <i class="fas fa-shopping-cart"></i> Cart
+                  <span class="material-icons">shopping_cart</span>
                 </a>
               </li>
               
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                  <i class="fas fa-user"></i> My Account
+                  <span class="material-icons">account_circle</span>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end">
                   <li><a class="dropdown-item" routerLink="/account">Profile</a></li>
@@ -94,6 +94,11 @@ import { AuthService } from '../../services/auth/auth.service';
     
     .dropdown-item:active {
       background-color: #f68b1e;
+    }
+
+    .material-icons {
+      vertical-align: middle;
+      font-size: 24px;
     }
   `]
 })

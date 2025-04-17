@@ -3,14 +3,15 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "demo": {
+    "jumia_clone_ui": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:class": {
           "skipTests": true
         },
         "@schematics/angular:component": {
-          "skipTests": true
+          "skipTests": true,
+          "style": "scss"
         },
         "@schematics/angular:directive": {
           "skipTests": true
@@ -38,7 +39,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/demo",
+            "outputPath": "dist/jumia_clone_ui",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -54,8 +55,14 @@
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.min.css",
               "node_modules/font-awesome/css/font-awesome.min.css",
-              "src/styles.css"
+              "src/styles.scss"
             ],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "src/styles",
+    "node_modules"
+              ]
+            },
             "scripts": [
               "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
             ]
@@ -88,10 +95,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "demo:build:production"
+              "buildTarget": "jumia_clone_ui:build:production"
             },
             "development": {
-              "buildTarget": "demo:build:development"
+              "buildTarget": "jumia_clone_ui:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -114,7 +121,7 @@
               }
             ],
             "styles": [
-              "src/styles.css"
+              "src/styles.scss"
             ],
             "scripts": []
           }

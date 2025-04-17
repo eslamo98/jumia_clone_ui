@@ -1,338 +1,430 @@
-<div class="container-fluid">
+<div class="customer-account-container">
   <!-- Error/Success Messages -->
-  <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show">
-    {{ errorMessage }}
-    <button type="button" class="btn-close" (click)="errorMessage = null"></button>
-  </div>
-  <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show">
-    {{ successMessage }}
-    <button type="button" class="btn-close" (click)="successMessage = null"></button>
-  </div>
+  <div *ngIf="errorMessage" class="alert alert-danger" [@fadeInOut]>{{ errorMessage }}</div>
+  <div *ngIf="successMessage" class="alert alert-success" [@fadeInOut]>{{ successMessage }}</div>
 
-  <div class="row">
-    <!-- Sidebar -->
-    <div class="col-md-3">
-      <div class="list-group">
-        <button class="list-group-item" [class.active]="activeSection === 'orders'" (click)="activeSection = 'orders'">
-          Orders
-        </button>
-        <button class="list-group-item" [class.active]="activeSection === 'addresses'" (click)="activeSection = 'addresses'">
-          Addresses
-        </button>
-        <button class="list-group-item" [class.active]="activeSection === 'wishlist'" (click)="activeSection = 'wishlist'">
-          Wishlist
-        </button>
-        <button class="list-group-item" [class.active]="activeSection === 'settings'" (click)="activeSection = 'settings'">
-          Settings
-        </button>
-        <button class="list-group-item" (click)="logout()">Logout</button>
-      </div>
-    </div>
+  <div class="customer-account-layout">
+    <!-- Sidebar Navigation -->
+    <aside class="customer-sidebar" [class.active]="isMobileMenuOpen" [@slideIn]>
+      <nav class="sidebar-nav">
+        <!-- Profile Info -->
+        <mat-card *ngIf="!loading.profile; else profileSkeleton" class="profile-info" [@fadeInOut]>
+          <img
+            [src]="profile?.profileImageUrl || 'assets/images/default-avatar.png'"
+            alt="Profile Picture"
+            class="profile-avatar"
+            loading="lazy"
+          />
+          <div class="profile-details">
+            <h3>{{ profile?.firstName }} {{ profile?.lastName }}</h3>
+            <p>{{ profile?.email }}</p>
+          </div>
+        </mat-card>
+        
+        <ng-template #profileSkeleton>
+          <div class="profile-info-skeleton">
+            <div class="skeleton circle"></div>
+            <div class="profile-details-skeleton">
+              <div class="skeleton text-large"></div>
+              <div class="skeleton text"></div>
+            </div>
+          </div>
+        </ng-template>
 
-    <!-- Main Content -->
-    <div class="col-md-9">
-      <!-- Orders Section -->
-      <div *ngIf="activeSection === 'orders'">
-        <h4>Orders</h4>
-        <p *ngIf="orders.length === 0">No orders found.</p>
-        <div class="list-group mb-3">
-          <div class="list-group-item" *ngFor="let order of orders">
-            <div class="d-flex justify-content-between align-items-center">
-              <div>
-                <h6 class="mb-1">Order #{{ order.orderId }}</h6>
-                <p class="mb-1">Total: ${{ order.totalAmount }}</p>
-                <small>{{ order.orderDate | date }}</small>
+        <!-- Navigation List -->
+        <mat-nav-list class="nav-list">
+          <a mat-list-item *ngFor="let item of sidebarItems" 
+             (click)="switchSection(item.section)"
+             [class.active]="activeSection === item.section"
+             [@fadeInOut]>
+            <mat-icon [fontSet]="'fas'" [fontIcon]="item.icon"></mat-icon>
+            <span>{{ item.label }}</span>
+            <span class="nav-count" *ngIf="item.count && item.count > 0">({{ item.count }})</span>
+          </a>
+          <mat-divider></mat-divider>
+          <a mat-list-item (click)="logout()" class="logout">
+            <mat-icon>logout</mat-icon>
+            <span>Logout</span>
+          </a>
+        </mat-nav-list>
+      </nav>
+    </aside>
+
+    <!-- Mobile Menu Toggle -->
+    <button class="mobile-menu-toggle" (click)="toggleMobileMenu()" [@fadeInOut]>
+      <mat-icon>{{ isMobileMenuOpen ? 'close' : 'menu' }}</mat-icon>
+    </button>
+
+    <!-- Main Content Area -->
+    <main class="account-main-content" [@slideIn]>
+      <h2 class="section-title">{{ getSectionTitle(activeSection) }}</h2>
+      
+      <ng-container [ngSwitch]="activeSection">
+        <!-- Account Overview -->
+        <section *ngSwitchCase="sections.overview" class="section content-section" [@fadeInOut]>
+          <mat-card *ngIf="!loading.profile; else formSkeleton" class="profile-form-wrapper">
+            <form [formGroup]="profileForm" (ngSubmit)="updateProfile()">
+              <mat-form-field>
+                <mat-label>First Name</mat-label>
+                <input matInput formControlName="firstName">
+              </mat-form-field>
+              
+              <mat-form-field>
+                <mat-label>Last Name</mat-label>
+                <input matInput formControlName="lastName">
+              </mat-form-field>
+              
+              <mat-form-field>
+                <mat-label>Phone Number</mat-label>
+                <input matInput formControlName="phoneNumber">
+              </mat-form-field>
+
+              <button mat-raised-button color="primary" type="submit" [disabled]="!profileForm.valid || loading.profile">
+                {{ loading.profile ? 'Updating...' : 'Update Profile' }}
+              </button>
+            </form>
+          </mat-card>
+        </section>
+
+        <!-- Orders Section -->
+        <section *ngSwitchCase="sections.orders" class="section content-section" [@fadeInOut]>
+          <mat-card class="orders-list">
+            <ng-container *ngIf="orders.length; else ordersSkeleton">
+              <mat-card *ngFor="let order of orders" class="order-card">
+                <mat-card-header>
+                  <mat-card-title>Order #{{ order.orderId }}</mat-card-title>
+                  <mat-card-subtitle>{{ order.orderDate | date }}</mat-card-subtitle>
+                  <span class="order-status" [ngClass]="order.status.toLowerCase()">{{ order.status }}</span>
+                </mat-card-header>
+                <mat-card-content>
+                  <p>Total Amount: {{ order.totalAmount | currency }}</p>
+                </mat-card-content>
+                <mat-card-actions>
+                  <button mat-button color="primary" (click)="viewOrderDetails(order.orderId)">
+                    <mat-icon>visibility</mat-icon> View Details
+                  </button>
+                </mat-card-actions>
+              </mat-card>
+            </ng-container>
+          </mat-card>
+        </section>
+
+        <!-- Inbox Section -->
+        <section *ngSwitchCase="sections.inbox" class="section content-section" [@fadeInOut]>
+          <div class="messages-list">
+            <div class="message-card" *ngFor="let message of assumedFeatures.messages" [class.unread]="!message.read">
+              <div class="message-header">
+                <span class="message-subject">{{ message.subject }}</span>
+                <span class="message-date">{{ message.date | date }}</span>
               </div>
-              <div class="text-end">
-                <span class="badge" [ngClass]="{
-                  'bg-success': order.status === 'Completed',
-                  'bg-warning': order.status === 'Pending',
-                  'bg-info': order.status === 'Processing',
-                  'bg-danger': order.status === 'Cancelled'
-                }">{{ order.status }}</span>
-                <p class="mb-0 small text-muted">Final Amount: ${{ order.finalAmount }}</p>
+              <div class="message-preview">{{ message.content }}</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Pending Reviews Section -->
+        <section *ngSwitchCase="sections.pendingReviews" class="section content-section" [@fadeInOut]>
+          <div class="reviews-list">
+            <div class="review-card" *ngFor="let review of assumedFeatures.pendingReviews">
+              <img [src]="review.productImage" [alt]="review.productName" class="product-image" />
+              <div class="review-details">
+                <h4>{{ review.productName }}</h4>
+                <p>Purchased on {{ review.purchaseDate | date }}</p>
+                <button class="btn btn-primary" (click)="writeReview(review)">
+                  <i class="fas fa-pen"></i> Write Review
+                </button>
               </div>
             </div>
           </div>
-        </div>
+        </section>
 
-        <!-- Orders Pagination -->
-        <nav *ngIf="orderTotalPages > 1" aria-label="Orders pagination">
-          <ul class="pagination justify-content-center">
-            <li class="page-item" [class.disabled]="orderCurrentPage === 1">
-              <button class="page-link" (click)="changeOrderPage(orderCurrentPage - 1)">Previous</button>
-            </li>
-            <li class="page-item" *ngFor="let page of [].constructor(orderTotalPages); let i = index"
-                [class.active]="orderCurrentPage === i + 1">
-              <button class="page-link" (click)="changeOrderPage(i + 1)">{{ i + 1 }}</button>
-            </li>
-            <li class="page-item" [class.disabled]="orderCurrentPage === orderTotalPages">
-              <button class="page-link" (click)="changeOrderPage(orderCurrentPage + 1)">Next</button>
-            </li>
-          </ul>
-        </nav>
-      </div>
+        <!-- Vouchers Section -->
+        <section *ngSwitchCase="sections.vouchers" class="section content-section" [@fadeInOut]>
+          <div class="vouchers-list">
+            <div class="voucher-card" *ngFor="let voucher of assumedFeatures.vouchers">
+              <div class="voucher-code">{{ voucher.code }}</div>
+              <div class="voucher-details">
+                <p>{{ voucher.description }}</p>
+                <p class="expiry">Valid until {{ voucher.endDate | date }}</p>
+              </div>
+            </div>
+          </div>
+        </section>
 
-      <!-- Addresses Section -->
-      <div *ngIf="activeSection === 'addresses'">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-          <h4>My Addresses</h4>
-          <button class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#addAddressForm">
-            Add New Address
-          </button>
-        </div>
+        <!-- Wishlist Section -->
+        <section *ngSwitchCase="sections.wishlist" class="section content-section" [@fadeInOut]>
+          <div class="wishlist-grid">
+            <div class="product-card" *ngFor="let item of wishlist">
+              <img [src]="item.product.imageUrl" [alt]="item.product.name" />
+              <div class="product-info">
+                <h4>{{ item.product.name }}</h4>
+                <p class="price">{{ item.product.price | currency }}</p>
+                <div class="product-actions">
+                  <button class="btn btn-outline" (click)="moveToCart(item.wishlistId)">
+                    <i class="fas fa-shopping-cart"></i> Move to Cart
+                  </button>
+                  <button class="btn btn-danger" (click)="removeFromWishlist(item.wishlistId)">
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <nav class="pagination" role="navigation" aria-label="Pagination Navigation">
+            <button 
+              class="btn btn-outline" 
+              (click)="changeWishlistPage(wishlistCurrentPage - 1)" 
+              [disabled]="wishlistCurrentPage === 1"
+              aria-label="Go to previous page"
+              (keydown.enter)="changeWishlistPage(wishlistCurrentPage - 1)"
+              [attr.aria-disabled]="wishlistCurrentPage === 1">
+              <i class="fas fa-chevron-left" aria-hidden="true"></i>
+              <span>Previous</span>
+            </button>
+            
+            <span aria-current="page" role="status">
+              Page {{ wishlistCurrentPage }} of {{ wishlistTotalPages }}
+            </span>
+            
+            <button 
+              class="btn btn-outline" 
+              (click)="changeWishlistPage(wishlistCurrentPage + 1)" 
+              [disabled]="wishlistCurrentPage === wishlistTotalPages"
+              aria-label="Go to next page"
+              (keydown.enter)="changeWishlistPage(wishlistCurrentPage + 1)"
+              [attr.aria-disabled]="wishlistCurrentPage === wishlistTotalPages">
+              <span>Next</span>
+              <i class="fas fa-chevron-right" aria-hidden="true"></i>
+            </button>
+          </nav>
+        </section>
 
-        <!-- Add Address Form -->
-        <div class="collapse mb-4" id="addAddressForm">
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">Add New Address</h5>
+        <!-- Address Book Section -->
+        <section *ngSwitchCase="sections.addressBook" class="section content-section" [@fadeInOut]>
+          <div class="address-section">
+            <div class="address-form">
+              <h3>Add New Address</h3>
               <form [formGroup]="addressForm" (ngSubmit)="addAddress()">
-                <div class="row">
-                  <div class="col-md-6 mb-3">
-                    <label class="form-label">Street Address*</label>
-                    <input type="text" class="form-control" formControlName="streetAddress"
-                           [class.is-invalid]="addressForm.get('streetAddress')?.invalid && addressForm.get('streetAddress')?.touched">
-                    <div class="invalid-feedback">Street address is required</div>
+                <div class="form-group">
+                  <label for="addressName">Address Name</label>
+                  <input id="addressName" type="text" formControlName="addressName" class="form-control" />
+                </div>
+                <div class="form-group">
+                  <label for="streetAddress">Street Address</label>
+                  <input id="streetAddress" type="text" formControlName="streetAddress" class="form-control" />
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="city">City</label>
+                    <input id="city" type="text" formControlName="city" class="form-control" />
                   </div>
-                  <div class="col-md-6 mb-3">
-                    <label class="form-label">City*</label>
-                    <input type="text" class="form-control" formControlName="city"
-                           [class.is-invalid]="addressForm.get('city')?.invalid && addressForm.get('city')?.touched">
-                    <div class="invalid-feedback">City is required</div>
-                  </div>
-                  <div class="col-md-6 mb-3">
-                    <label class="form-label">State</label>
-                    <input type="text" class="form-control" formControlName="state">
-                  </div>
-                  <div class="col-md-6 mb-3">
-                    <label class="form-label">Postal Code*</label>
-                    <input type="text" class="form-control" formControlName="postalCode"
-                           [class.is-invalid]="addressForm.get('postalCode')?.invalid && addressForm.get('postalCode')?.touched">
-                    <div class="invalid-feedback">Postal code is required</div>
-                  </div>
-                  <div class="col-md-6 mb-3">
-                    <label class="form-label">Country*</label>
-                    <input type="text" class="form-control" formControlName="country"
-                           [class.is-invalid]="addressForm.get('country')?.invalid && addressForm.get('country')?.touched">
-                    <div class="invalid-feedback">Country is required</div>
-                  </div>
-                  <div class="col-md-6 mb-3">
-                    <label class="form-label">Phone Number*</label>
-                    <input type="tel" class="form-control" formControlName="phoneNumber"
-                           [class.is-invalid]="addressForm.get('phoneNumber')?.invalid && addressForm.get('phoneNumber')?.touched">
-                    <div class="invalid-feedback">
-                      Please enter a valid phone number (9-15 digits)
-                    </div>
-                  </div>
-                  <div class="col-md-6 mb-3">
-                    <label class="form-label">Address Name</label>
-                    <input type="text" class="form-control" formControlName="addressName"
-                           placeholder="e.g., Home, Work, etc.">
-                  </div>
-                  <div class="col-12 mb-3">
-                    <div class="form-check">
-                      <input type="checkbox" class="form-check-input" formControlName="isDefault" id="isDefault">
-                      <label class="form-check-label" for="isDefault">Set as default address</label>
-                    </div>
+                  <div class="form-group">
+                    <label for="state">State</label>
+                    <input id="state" type="text" formControlName="state" class="form-control" />
                   </div>
                 </div>
-                <button type="submit" class="btn btn-primary" [disabled]="addressForm.invalid">Save Address</button>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="postalCode">Postal Code</label>
+                    <input id="postalCode" type="text" formControlName="postalCode" class="form-control" />
+                  </div>
+                  <div class="form-group">
+                    <label for="country">Country</label>
+                    <input id="country" type="text" formControlName="country" class="form-control" />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="addressPhone">Phone Number</label>
+                  <input id="addressPhone" type="tel" formControlName="phoneNumber" class="form-control" />
+                </div>
+                <div class="form-check">
+                  <input id="isDefault" type="checkbox" formControlName="isDefault" />
+                  <label for="isDefault">Set as default address</label>
+                </div>
+                <button type="submit" [disabled]="!addressForm.valid || loading.addresses" class="btn btn-primary">
+                  {{ loading.addresses ? 'Adding...' : 'Add Address' }}
+                </button>
               </form>
             </div>
-          </div>
-        </div>
-
-        <!-- Address List -->
-        <div class="row">
-          <div class="col-md-6 mb-4" *ngFor="let address of addresses">
-            <div class="card">
-              <div class="card-body">
-                <h6 class="card-title">{{ address.addressName || 'Address' }}
-                  <span *ngIf="address.isDefault" class="badge bg-success ms-2">Default</span>
-                </h6>
-                <p class="card-text">
-                  {{ address.streetAddress }}<br>
-                  {{ address.city }}, {{ address.state || '' }}<br>
-                  {{ address.postalCode }}, {{ address.country }}<br>
-                  {{ address.phoneNumber }}
-                </p>
-                <button class="btn btn-danger btn-sm" (click)="deleteAddress(address.addressId)">Delete</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Address Pagination -->
-        <nav *ngIf="totalPages > 1" aria-label="Address pagination">
-          <ul class="pagination justify-content-center">
-            <li class="page-item" [class.disabled]="currentPage === 1">
-              <button class="page-link" (click)="changePage(currentPage - 1)">Previous</button>
-            </li>
-            <li class="page-item" *ngFor="let page of [].constructor(totalPages); let i = index"
-                [class.active]="currentPage === i + 1">
-              <button class="page-link" (click)="changePage(i + 1)">{{ i + 1 }}</button>
-            </li>
-            <li class="page-item" [class.disabled]="currentPage === totalPages">
-              <button class="page-link" (click)="changePage(currentPage + 1)">Next</button>
-            </li>
-          </ul>
-        </nav>
-      </div>
-
-      <!-- Settings Section -->
-      <div *ngIf="activeSection === 'settings'">
-        <h4 class="mb-4">Profile Settings</h4>
-        <div class="card mb-4">
-          <div class="card-body">
-            <div class="d-flex align-items-center mb-4">
-              <div class="profile-image me-3">
-                <img [src]="profile?.profileImageUrl || 'assets/images/default-avatar.png'" alt="Profile" class="rounded-circle">
-              </div>
-              <div>
-                <h5 class="card-title mb-1">{{profile?.firstName}} {{profile?.lastName}}</h5>
-                <p class="text-muted mb-0">{{profile?.email}}</p>
-              </div>
-            </div>
-            <form [formGroup]="profileForm" (ngSubmit)="updateProfile()">
-              <div class="row">
-                <div class="col-md-6 mb-3">
-                  <label class="form-label">First Name</label>
-                  <input type="text" class="form-control" formControlName="firstName"
-                         [class.is-invalid]="profileForm.get('firstName')?.invalid && profileForm.get('firstName')?.touched">
-                  <div class="invalid-feedback">First name is required</div>
+            <div class="addresses-list">
+              <div class="address-card" *ngFor="let address of addresses" [class.default]="address.isDefault">
+                <div class="address-header">
+                  <h4>{{ address.addressName }}</h4>
+                  <span *ngIf="address.isDefault" class="default-badge">Default</span>
                 </div>
-                <div class="col-md-6 mb-3">
-                  <label class="form-label">Last Name</label>
-                  <input type="text" class="form-control" formControlName="lastName"
-                         [class.is-invalid]="profileForm.get('lastName')?.invalid && profileForm.get('lastName')?.touched">
-                  <div class="invalid-feedback">Last name is required</div>
+                <div class="address-details">
+                  <p>{{ address.streetAddress }}</p>
+                  <p>{{ address.city }}, {{ address.state }} {{ address.postalCode }}</p>
+                  <p>{{ address.country }}</p>
+                  <p>{{ address.phoneNumber }}</p>
                 </div>
-                <div class="col-md-6 mb-3">
-                  <label class="form-label">Phone Number</label>
-                  <input type="tel" class="form-control" formControlName="phoneNumber"
-                         [class.is-invalid]="profileForm.get('phoneNumber')?.invalid && profileForm.get('phoneNumber')?.touched">
-                  <div class="invalid-feedback">Please enter a valid phone number (9-15 digits)</div>
-                </div>
-              </div>
-              <button type="submit" class="btn btn-primary" [disabled]="profileForm.invalid">
-                Save Changes
-              </button>
-            </form>
-          </div>
-        </div>
-
-        <!-- Change Password Section -->
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title mb-4">Change Password</h5>
-            <form [formGroup]="passwordForm" (ngSubmit)="changePassword()">
-              <div class="mb-3">
-                <label class="form-label">Current Password</label>
-                <div class="input-group">
-                  <input [type]="showCurrentPassword ? 'text' : 'password'" class="form-control" formControlName="oldPassword"
-                         [class.is-invalid]="passwordForm.get('oldPassword')?.invalid && passwordForm.get('oldPassword')?.touched">
-                  <button class="btn btn-outline-secondary" type="button" (click)="showCurrentPassword = !showCurrentPassword">
-                    <i class="fas" [class.fa-eye]="!showCurrentPassword" [class.fa-eye-slash]="showCurrentPassword"></i>
+                <div class="address-actions">
+                  <button class="btn btn-outline" (click)="editAddress(address)">
+                    <i class="fas fa-edit"></i> Edit
                   </button>
-                </div>
-              </div>
-              <div class="mb-3">
-                <label class="form-label">New Password</label>
-                <div class="input-group">
-                  <input [type]="showNewPassword ? 'text' : 'password'" class="form-control" formControlName="newPassword"
-                         [class.is-invalid]="passwordForm.get('newPassword')?.invalid && passwordForm.get('newPassword')?.touched">
-                  <button class="btn btn-outline-secondary" type="button" (click)="showNewPassword = !showNewPassword">
-                    <i class="fas" [class.fa-eye]="!showNewPassword" [class.fa-eye-slash]="showNewPassword"></i>
-                  </button>
-                </div>
-                <div class="progress mt-2" style="height: 4px;">
-                  <div class="progress-bar" [style.width.%]="passwordStrength"
-                      [class.bg-danger]="passwordStrength <= 25"
-                      [class.bg-warning]="passwordStrength > 25 && passwordStrength <= 50"
-                      [class.bg-info]="passwordStrength > 50 && passwordStrength <= 75"
-                      [class.bg-success]="passwordStrength > 75">
-                  </div>
-                </div>
-                <small class="text-muted">Password strength: {{getPasswordStrengthLabel()}}</small>
-              </div>
-              <div class="mb-3">
-                <label class="form-label">Confirm Password</label>
-                <div class="input-group">
-                  <input [type]="showConfirmPassword ? 'text' : 'password'" class="form-control" formControlName="confirmPassword"
-                         [class.is-invalid]="passwordForm.get('confirmPassword')?.invalid && passwordForm.get('confirmPassword')?.touched">
-                  <button class="btn btn-outline-secondary" type="button" (click)="showConfirmPassword = !showConfirmPassword">
-                    <i class="fas" [class.fa-eye]="!showConfirmPassword" [class.fa-eye-slash]="showConfirmPassword"></i>
-                  </button>
-                </div>
-                <div class="invalid-feedback" *ngIf="passwordForm.hasError('mismatch')">
-                  Passwords do not match
-                </div>
-              </div>
-              <button type="submit" class="btn btn-primary" [disabled]="passwordForm.invalid">
-                Change Password
-              </button>
-            </form>
-          </div>
-        </div>
-      </div>
-
-      <!-- Wishlist Section -->
-      <div *ngIf="activeSection === 'wishlist'">
-        <h4 class="mb-4">My Wishlist</h4>
-        <p *ngIf="wishlist.length === 0" class="text-muted">Your wishlist is empty.</p>
-        <div class="row">
-          <div class="col-md-4 col-sm-6 mb-4" *ngFor="let item of wishlist">
-            <div class="card h-100">
-              <div class="position-relative">
-                <img [src]="item.product.imageUrl" class="card-img-top" [alt]="item.product.name"
-                     style="height: 200px; object-fit: cover;">
-                <span class="position-absolute top-0 end-0 m-2 badge rounded-pill bg-light text-dark">
-                  Added {{ item.addedDate | date:'shortDate' }}
-                </span>
-              </div>
-              <div class="card-body d-flex flex-column">
-                <h5 class="card-title text-truncate">{{ item.product.name }}</h5>
-                <p class="card-text small text-muted text-truncate">{{ item.product.description }}</p>
-                <p class="card-text"><strong>${{ item.product.price | number:'1.2-2' }}</strong></p>
-                <div class="mt-auto">
-                  <button class="btn btn-primary w-100 mb-2" (click)="moveToCart(item.wishlistId)">
-                    Move to Cart
-                  </button>
-                  <button class="btn btn-outline-danger w-100" (click)="removeFromWishlist(item.wishlistId)">
-                    Remove
+                  <button class="btn btn-danger" (click)="deleteAddress(address.addressId)">
+                    <i class="fas fa-trash-alt"></i> Delete
                   </button>
                 </div>
               </div>
             </div>
+            <nav class="pagination" role="navigation" aria-label="Pagination Navigation">
+              <button 
+                class="btn btn-outline" 
+                (click)="changePage(currentPage - 1)" 
+                [disabled]="currentPage === 1"
+                aria-label="Go to previous page"
+                (keydown.enter)="changePage(currentPage - 1)"
+                [attr.aria-disabled]="currentPage === 1">
+                <i class="fas fa-chevron-left" aria-hidden="true"></i>
+                <span>Previous</span>
+              </button>
+              
+              <span aria-current="page" role="status">
+                Page {{ currentPage }} of {{ totalPages }}
+              </span>
+              
+              <button 
+                class="btn btn-outline" 
+                (click)="changePage(currentPage + 1)" 
+                [disabled]="currentPage === totalPages"
+                aria-label="Go to next page"
+                (keydown.enter)="changePage(currentPage + 1)"
+                [attr.aria-disabled]="currentPage === totalPages">
+                <span>Next</span>
+                <i class="fas fa-chevron-right" aria-hidden="true"></i>
+              </button>
+            </nav>
+          </div>
+        </section>
+
+        <!-- Newsletter Preferences Section -->
+        <section *ngSwitchCase="sections.newsletter" class="section content-section" [@fadeInOut]>
+          <div class="newsletter-preferences">
+            <h3>Email Preferences</h3>
+            <div class="subscription-toggle">
+              <label>
+                <input type="checkbox" [checked]="assumedFeatures.newsletter.subscribed" (change)="toggleNewsletter($event)" />
+                Receive email notifications
+              </label>
+            </div>
+            <div class="preferences-form" *ngIf="assumedFeatures.newsletter.subscribed">
+              <h4>I want to receive emails about:</h4>
+              <div class="checkbox-group">
+                <label>
+                  <input type="checkbox" [checked]="true" />
+                  Deals and Promotions
+                </label>
+                <label>
+                  <input type="checkbox" [checked]="true" />
+                  New Arrivals
+                </label>
+                <label>
+                  <input type="checkbox" [checked]="true" />
+                  My Orders
+                </label>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Close Account Section -->
+        <section *ngSwitchCase="sections.closeAccount" class="section content-section" [@fadeInOut]>
+          <div class="close-account-section">
+            <h3>Close Your Account</h3>
+            <div class="warning-message">
+              <i class="fas fa-exclamation-triangle"></i>
+              <p>Warning: This action cannot be undone. Once you close your account:</p>
+              <ul>
+                <li>You will lose access to your order history</li>
+                <li>Your wishlist will be deleted</li>
+                <li>Your saved addresses will be removed</li>
+                <li>You won't be able to use this email to create a new account</li>
+              </ul>
+            </div>
+            <button class="btn btn-danger" (click)="requestAccountClosure()">
+              <i class="fas fa-user-slash"></i> Close Account Permanently
+            </button>
+          </div>
+        </section>
+
+        <!-- Recently Viewed Section -->
+        <section *ngSwitchCase="'recentlyViewed'" class="section content-section" [@fadeInOut]>
+          <div class="products-grid">
+            <div class="product-card" *ngFor="let product of assumedFeatures.recentlyViewed">
+              <img [src]="product.imageUrl" [alt]="product.name" loading="lazy" />
+              <div class="product-info">
+                <h4>{{ product.name }}</h4>
+                <p class="price">{{ product.price | currency }}</p>
+                <p class="viewed-at">Viewed {{ product.viewedAt | date:'shortDate' }}</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Followed Sellers Section -->
+        <section *ngSwitchCase="'followedSellers'" class="section content-section" [@fadeInOut]>
+          <div class="sellers-grid">
+            <div class="seller-card" *ngFor="let seller of assumedFeatures.followedSellers">
+              <img [src]="seller.businessLogo" [alt]="seller.businessName" class="seller-logo" loading="lazy" />
+              <div class="seller-info">
+                <h4>{{ seller.businessName }}</h4>
+                <div class="seller-stats">
+                  <span class="rating">
+                    <i class="fas fa-star"></i> {{ seller.rating }}
+                  </span>
+                  <span class="products">{{ seller.productCount }} Products</span>
+                </div>
+                <p class="following-since">Following since {{ seller.followedSince | date:'mediumDate' }}</p>
+                <button class="btn btn-outline-danger" (click)="unfollowSeller(seller.sellerId)">
+                  <i class="fas fa-user-minus"></i> Unfollow
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Fallback Content (Optional) -->
+        <ng-container *ngSwitchDefault>
+          <!-- Optionally display default or empty state content -->
+        </ng-container>
+      </ng-container>
+
+      <!-- Skeleton Templates -->
+      <ng-template #formSkeleton>
+        <div class="form-skeleton">
+          <div class="skeleton form-field"></div>
+          <div class="skeleton form-field"></div>
+          <div class="skeleton form-field"></div>
+          <div class="skeleton button"></div>
+        </div>
+      </ng-template>
+
+      <ng-template #ordersSkeleton>
+        <div class="orders-skeleton">
+          <div class="skeleton card"></div>
+          <div class="skeleton card"></div>
+          <div class="skeleton card"></div>
+        </div>
+      </ng-template>
+
+      <ng-template #addressesSkeleton>
+        <div class="addresses-skeleton">
+          <div class="skeleton card"></div>
+          <div class="skeleton card"></div>
+          <div class="skeleton card"></div>
+        </div>
+      </ng-template>
+
+      <ng-template #profileSkeleton>
+        <div class="profile-info-skeleton">
+          <div class="skeleton circle"></div>
+          <div class="profile-details-skeleton">
+            <div class="skeleton text-large"></div>
+            <div class="skeleton text"></div>
           </div>
         </div>
-
-        <!-- Wishlist Pagination -->
-        <nav *ngIf="wishlistTotalPages > 1" aria-label="Wishlist pagination" class="mt-4">
-          <ul class="pagination justify-content-center">
-            <li class="page-item" [class.disabled]="wishlistCurrentPage === 1">
-              <button class="page-link" (click)="changeWishlistPage(wishlistCurrentPage - 1)">
-                <i class="fas fa-chevron-left"></i>
-              </button>
-            </li>
-            <li class="page-item" *ngFor="let page of [].constructor(wishlistTotalPages); let i = index"
-                [class.active]="wishlistCurrentPage === i + 1">
-              <button class="page-link" (click)="changeWishlistPage(i + 1)">{{ i + 1 }}</button>
-            </li>
-            <li class="page-item" [class.disabled]="wishlistCurrentPage === wishlistTotalPages">
-              <button class="page-link" (click)="changeWishlistPage(wishlistCurrentPage + 1)">
-                <i class="fas fa-chevron-right"></i>
-              </button>
-            </li>
-          </ul>
-          <p class="text-center text-muted small mt-2">
-            Showing {{ (wishlistCurrentPage - 1) * wishlistPageSize + 1 }} - 
-            {{ Math.min(wishlistCurrentPage * wishlistPageSize, wishlistTotalCount) }}
-            of {{ wishlistTotalCount }} items
-          </p>
-        </nav>
-      </div>
-    </div>
+      </ng-template>
+    </main>
   </div>
 </div>

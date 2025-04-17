@@ -2,6 +2,7 @@
 
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { 
@@ -23,7 +24,7 @@ export class AuthService {
   private currentUserSubject = new BehaviorSubject<UserData | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
   
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient,private router:Router) {
     this.loadUserFromStorage();
   }
   
@@ -113,6 +114,7 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem('currentUser');
     this.currentUserSubject.next(null);
+    this.router.navigate(['/auth/login']);
     // You might want to redirect to login page here
     // You would need to inject Router for this
   }

@@ -14,31 +14,48 @@ import { CommonModule } from '@angular/common';
           <div class="col-md-4 mb-4">
             <h5 class="text-orange mb-3">About Us</h5>
             <p>Jumia Clone - A demo e-commerce application showcasing a modern online shopping experience.</p>
-            <div class="mt-3">
-              <a href="#" class="me-2 text-light"><i class="fab fa-facebook-f"></i></a>
-              <a href="#" class="me-2 text-light"><i class="fab fa-twitter"></i></a>
-              <a href="#" class="me-2 text-light"><i class="fab fa-instagram"></i></a>
-              <a href="#" class="text-light"><i class="fab fa-linkedin-in"></i></a>
+            <div class="mt-3 social-icons">
+              <a href="#" class="me-3 text-light"><span class="material-icons">facebook</span></a>
+              <a href="#" class="me-3 text-light"><span class="material-icons">tag</span></a>
+              <a href="#" class="me-3 text-light"><span class="material-icons">photo_camera</span></a>
+              <a href="#" class="text-light"><span class="material-icons">business</span></a>
             </div>
           </div>
           
           <div class="col-md-4 mb-4">
             <h5 class="text-orange mb-3">Quick Links</h5>
             <ul class="list-unstyled">
-              <li class="mb-2"><a class="text-light text-decoration-none" routerLink="/"><i class="fas fa-chevron-right me-1"></i> Home</a></li>
-              <li class="mb-2"><a class="text-light text-decoration-none" routerLink="/products"><i class="fas fa-chevron-right me-1"></i> Products</a></li>
-              <li class="mb-2"><a class="text-light text-decoration-none" routerLink="/auth/register-seller"><i class="fas fa-chevron-right me-1"></i> Sell on Jumia Clone</a></li>
-              <li class="mb-2"><a class="text-light text-decoration-none" href="#"><i class="fas fa-chevron-right me-1"></i> Terms & Conditions</a></li>
-              <li class="mb-2"><a class="text-light text-decoration-none" href="#"><i class="fas fa-chevron-right me-1"></i> Privacy Policy</a></li>
+              <li class="mb-2">
+                <a class="text-light text-decoration-none" routerLink="/">
+                  <span class="material-icons">chevron_right</span> Home
+                </a>
+              </li>
+              <li class="mb-2">
+                <a class="text-light text-decoration-none" routerLink="/products">
+                  <span class="material-icons">chevron_right</span> Products
+                </a>
+              </li>
+              <li class="mb-2">
+                <a class="text-light text-decoration-none" routerLink="/auth/register-seller">
+                  <span class="material-icons">chevron_right</span> Sell on Jumia Clone
+                </a>
+              </li>
+              <li class="mb-2"><a class="text-light text-decoration-none" href="#"><span class="material-icons">chevron_right</span> Terms & Conditions</a></li>
+              <li class="mb-2"><a class="text-light text-decoration-none" href="#"><span class="material-icons">chevron_right</span> Privacy Policy</a></li>
             </ul>
           </div>
           
           <div class="col-md-4 mb-4">
-            <h5 class="text-orange mb-3">Contact</h5>
-            <p class="mb-2"><i class="fas fa-map-marker-alt me-2"></i> 123 E-Commerce St, Digital City</p>
-            <p class="mb-2"><i class="fas fa-envelope me-2"></i> support&#64;jumiaclone.com</p>
-            <p class="mb-2"><i class="fas fa-phone me-2"></i> +123 456 7890</p>
-            <p class="mb-2"><i class="fas fa-clock me-2"></i> Mon-Fri: 9AM - 5PM</p>
+            <h5 class="text-orange mb-3">Contact Info</h5>
+            <p class="mb-2">
+              <span class="material-icons me-2">email</span> support&#64;jumiaclone.com
+            </p>
+            <p class="mb-2">
+              <span class="material-icons me-2">phone</span> +123 456 7890
+            </p>
+            <p class="mb-2">
+              <span class="material-icons me-2">schedule</span> Mon-Fri: 9AM - 5PM
+            </p>
           </div>
         </div>
         
@@ -63,6 +80,15 @@ import { CommonModule } from '@angular/common';
     footer a:hover {
       color: #f68b1e !important;
       text-decoration: underline !important;
+    }
+
+    .material-icons {
+      vertical-align: middle;
+      font-size: 20px;
+    }
+
+    .social-icons .material-icons {
+      font-size: 24px;
     }
   `]
 })

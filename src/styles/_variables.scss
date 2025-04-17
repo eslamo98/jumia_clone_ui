@@ -1,0 +1,130 @@
+  // Brand Colors
+  $primary: #FF6600;   // Jumia orange
+  $primary-light: rgba($primary, 0.1);
+  $primary-dark: darken($primary, 20%);
+  $secondary: #4A4A4A; // Slate gray
+  $success: #28a745;
+  $success-dark: #2e7d32;
+  $success-light: #81c784;
+  $danger: #dc3545;
+  $warning: #f1c40f;
+  $info: #3498db;
+  $danger-dark: #a94442;
+  $danger-light: #f8d7da;
+  $warning-light: rgba($warning, 0.1);
+  $warning-dark: darken($warning, 20%);
+  $info-light: rgba($info, 0.1);
+  $info-dark: darken($info, 20%);
+  $text-muted: #6c757d;
+
+  // Base Colors
+  $white: #ffffff;
+  $black: #000000;
+
+  // Gray Scale
+  $color-gray-100: #f7fafc;
+  $color-gray-200: #edf2f7;
+  $color-gray-300: #e2e8f0;
+  $color-gray-400: #cbd5e0;
+  $color-gray-500: #a0aec0;
+  $color-gray-600: #718096;
+  $color-gray-700: #4a5568;
+  $color-gray-800: #2d3748;
+  $color-gray-900: #1a202c;
+
+  // UI Colors
+  $color-primary: $primary;
+  $color-primary-light: $primary-light;
+  $color-secondary: $secondary;
+  $color-warning: $warning;
+  $color-white: $white;
+  $background-light: $color-gray-100;
+
+  // Text Colors
+  $text-dark: rgba(0, 0, 0, 0.87);
+  $text-medium: #666666;
+  $text-light: #999999;
+
+  // Border Colors
+  $border: #e5e5e5;
+  $border-light: #f0f0f0;
+
+  // Status Colors Map
+  $status-colors: (
+    'processing': #3498db,
+    'shipped': #9b59b6,
+    'delivered': #2ecc71,
+    'cancelled': #e74c3c
+  );
+
+  $status-bg-colors: (
+    'processing': rgba(#3498db, 0.1),
+    'shipped': rgba(#9b59b6, 0.1),
+    'delivered': rgba(#2ecc71, 0.1),
+    'cancelled': rgba(#e74c3c, 0.1)
+  );
+
+  // Typography
+  $font-family-base: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Oxygen, Ubuntu, Cantarell, sans-serif;
+  $font-size-xs: 0.75rem;    // 12px
+  $font-size-sm: 0.875rem;   // 14px
+  $font-size-md: 1rem;       // 16px
+  $font-size-lg: 1.125rem;   // 18px
+  $font-size-xl: 1.25rem;    // 20px
+  $font-size-2xl: 1.5rem;    // 24px
+  $font-size-3xl: 1.875rem;  // 30px
+  $font-size-4xl: 2.25rem;   // 36px
+
+  $font-weight-light: 300;
+  $font-weight-regular: 400;
+  $font-weight-medium: 500;
+  $font-weight-bold: 700;
+
+  // Spacing
+  $spacing-unit: 8px;
+  $spacing-xxs: 0.125rem;  // 2px
+  $spacing-xs: 0.25rem;    // 4px
+  $spacing-sm: $spacing-unit;
+  $spacing-md: $spacing-unit * 2;
+  $spacing-lg: $spacing-unit * 3;
+  $spacing-xl: 2rem;      // 32px
+  $spacing-2xl: 2.5rem;   // 40px
+  $spacing-3xl: 3rem;     // 48px
+
+  // Layout
+  $header-height: 64px;
+  $sidebar-width: 280px;
+  $container-max-width: 1200px;
+  $container-padding: $spacing-md;
+
+  // Border Radius
+  $border-radius-xs: 2px;
+  $border-radius-sm: 4px;
+  $border-radius-md: 6px;
+  $border-radius-lg: 8px;
+  $border-radius-xl: 12px;
+  $border-radius-round: 50%;
+  $border-radius: $border-radius-sm;
+
+  // Box Shadow
+  $shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  $shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05);
+  $shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.05);
+
+  // Z-index
+  $z-index-overlay: 1000;
+  $z-index-dropdown: 900;
+  $z-index-sticky: 1020;
+  $z-index-fixed: 1030;
+  $z-index-modal: 1100;
+
+  // Transitions
+  $transition-fast: 0.2s ease;
+  $transition-normal: 0.3s ease;
+  $transition-slow: 0.5s ease;
+
+  // Breakpoints
+  $breakpoint-sm: 576px;
+  $breakpoint-md: 768px;
+  $breakpoint-lg: 992px;
+  $breakpoint-xl: 1200px;

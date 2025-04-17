@@ -62,13 +62,13 @@ import { CategoryService } from '../../../services/categories/categories.service
                 [disabled]="currentPage === 0"
                 (click)="loadPage(currentPage - 1)"
               >
-                <i class="fas fa-chevron-left"></i> Previous
+                <i class="fa fa-chevron-left"></i> Previous
               </button>
               <button 
                 class="btn btn-outline-primary" 
                 (click)="loadPage(currentPage + 1)"
               >
-                Next <i class="fas fa-chevron-right"></i>
+                Next <i class="fa fa-chevron-right"></i>
               </button>
             </div>
           </div>

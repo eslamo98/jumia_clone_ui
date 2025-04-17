@@ -94,3 +94,64 @@ export interface WishlistItem {
         imageUrl: string;
     };
 }
+
+export interface InboxMessage {
+    id: number;
+    subject: string;
+    content: string;
+    date: Date;
+    read: boolean;
+    type: 'order' | 'promotion' | 'system';
+}
+
+export interface PendingReview {
+    id: number;
+    orderId: number;
+    productId: number;
+    productName: string;
+    productImage: string;
+    purchaseDate: Date;
+    orderStatus: string;
+}
+
+export interface Voucher {
+    id: number;
+    code: string;
+    description: string;
+    discountType: 'percentage' | 'fixed';
+    discountAmount: number;
+    minimumPurchase?: number;
+    startDate: Date;
+    endDate: Date;
+    isUsed: boolean;
+    terms?: string[];
+}
+
+export interface FollowedSeller {
+    sellerId: number;
+    businessName: string;
+    businessLogo: string;
+    rating: number;
+    productCount: number;
+    followedSince: Date;
+}
+
+export interface RecentlyViewedProduct {
+    productId: number;
+    name: string;
+    price: number;
+    imageUrl: string;
+    viewedAt: Date;
+}
+
+export interface NewsletterPreferences {
+    subscribed: boolean;
+    categories: {
+        deals: boolean;
+        newArrivals: boolean;
+        recommendations: boolean;
+        events: boolean;
+    };
+    frequency: 'daily' | 'weekly' | 'monthly';
+    lastUpdated: Date;
+}

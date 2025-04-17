@@ -29,8 +29,21 @@ export class LoginComponent implements OnInit {
   ) {
     // Redirect if already logged in
     if (this.authService.isAuthenticated() && !this.authService.isTokenExpired()) {
-      this.router.navigate(['/']);
-    }
+      const userType = this.authService.currentUserValue?.userType;
+      switch(userType) {
+          case 'admin':
+              this.router.navigate(['/admin']);
+              break;
+          case 'seller':
+              this.router.navigate(['/seller']);
+              break;
+          case 'customer':
+              this.router.navigate(['/account']);
+              break;
+          default:
+              this.router.navigate(['/']);
+      }
+  }
   }
 
   ngOnInit(): void {
