@@ -1,1 +1,169 @@
-<p>home-page works!</p>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<div class="jumia-container">
+  <!-- Left Sidebar Navigation -->
+  <div class="sidebar">
+    <ul class="category-list">
+      <li><i class="fas fa-tshirt"></i>&nbsp; Fashion</li>
+      <li><i class="fas fa-mobile-alt"></i>&nbsp; Phones & Tablets</li>
+      <li><i class="fas fa-heartbeat"></i>&nbsp; Health & Beauty</li>
+      <li><i class="fas fa-couch"></i>&nbsp; Home & Furniture</li>
+      <li><i class="fas fa-blender"></i>&nbsp; Appliances</li>
+      <li><i class="fas fa-tv"></i>&nbsp; Televisions & Audio</li>
+      <li><i class="fas fa-baby"></i>&nbsp; Baby Products</li>
+      <li><i class="fas fa-shopping-basket"></i>&nbsp; Supermarket</li>
+      <li><i class="fas fa-laptop"></i>&nbsp; Computing</li>
+      <li><i class="fas fa-running"></i>&nbsp; Sporting Goods</li>
+      <li><i class="fas fa-gamepad"></i>&nbsp; Gaming</li>
+      <li><i class="fas fa-ellipsis-h"></i>&nbsp; Other categories</li>
+    </ul>
+  </div>
+
+  <!-- Main Content Area -->
+  <div class="main-content">
+    <!-- Banner Slider -->
+    <section class="slider-section">   
+      <app-center-slider></app-center-slider>
+    </section>
+
+  </div>
+
+  <!-- Right Sidebar -->
+   <div class="wrapper-right-sidebar">
+  <div class="right-sidebar">
+    <!-- Join Jumia Section -->
+    <div class="sidebar-section join-jumia">
+      <div class="icon-container">
+        <img src="/images/header/star.png" alt="Join Jumia Icon" width="30" height="30">
+      </div>
+      <div class="section-content">
+        <h3>Join Jumia</h3>
+        <p>as a Sales Consultant</p>
+      </div>
+    </div>
+
+    <!-- Sell on Jumia Section -->
+    <div class="sidebar-section sell-jumia">
+      <div class="icon-container">
+        <img src="/images/header/money.png" alt="Sell on Jumia Icon" width="30" height="30">
+      </div>
+      <div class="section-content">
+        <h3>Sell on JUMIA</h3>
+        <p>And Grow Your Business</p>
+      </div>
+    </div>
+
+    <!-- Warranty Section -->
+    <div class="sidebar-section warranty">
+      <div class="icon-container">
+        <img src="/images/header/warrenty.png" alt="Warranty Icon" width="30" height="30">
+      </div>
+      <div class="section-content">
+        <h3>Warranty</h3>
+        <p>On Your Purchases</p>
+      </div>
+    </div>
+
+    <!-- Buy Now Pay Later Banner -->
+    <div class="sidebar-banner mt-4">
+      <img src="/images/header/buyNow.PNG" alt="Buy Now Pay Later" class="banner-image">
+    </div>
+  </div>
+</div>
+</div>
+
+
+<app-promo-slider></app-promo-slider>
+
+<app-static-container></app-static-container>
+
+<app-flash-sales-bannar></app-flash-sales-bannar>
+
+<app-two-images-bannar></app-two-images-bannar>
+
+<!-- pages/home/home.component.html -->
+<div class="jumia-home-container">
+    <!-- Main Carousel -->
+    <section class="main-carousel">
+      <app-carousel [images]="banners"></app-carousel>
+    </section>
+
+  
+    <!-- Categories Section -->
+    <section class="categories-section">
+      <div class="section-title">
+        <h2>Shop Our Top Categories</h2>
+      </div>
+      
+      <!-- Loading state -->
+      <div *ngIf="isLoading" class="loading-container">
+        <div class="loading-spinner"></div>
+        <p>Loading categories...</p>
+      </div>
+      
+      <!-- Error state -->
+      <div *ngIf="!isLoading && errorMessage" class="error-container">
+        <p>{{ errorMessage }}</p>
+        <button (click)="fetchCategories()" class="retry-button">Retry</button>
+      </div>
+      
+      <!-- Categories grid -->
+      <div *ngIf="!isLoading && !errorMessage" class="categories-grid">
+        <app-category-card 
+          *ngFor="let category of categories" 
+          [category]="category">
+        </app-category-card>
+      </div>
+    </section>
+  
+    <!-- Flash Sales Section -->
+    <section class="flash-sales-section">
+      <div class="section-title">
+        <h2>Flash Sales</h2>
+        <div class="timer">
+          <span>Ends in:</span>
+          <div class="countdown">
+            <span>10</span>:<span>45</span>:<span>30</span>
+          </div>
+        </div>
+      </div>
+      <div class="products-grid">
+        <app-product-card 
+          *ngFor="let product of featuredProducts" 
+          [product]="product">
+        </app-product-card>
+      </div>
+    </section>
+  
+    <!-- Mid Banner -->
+    <section class="mid-banner">
+      <app-banner 
+        [image]="'/images/home/slider1.png'"
+        [link]="'/promotions/clearance'">
+      </app-banner>
+    </section>
+  
+    <!-- Top Deals Section -->
+    <section class="top-deals-section">
+      <div class="section-title">
+        <h2>Top Deals</h2>
+      </div>
+      <div class="products-grid">
+        <app-product-card 
+          *ngFor="let product of topDeals" 
+          [product]="product">
+        </app-product-card>
+      </div>
+    </section>
+  
+    <!-- Newsletter Subscription -->
+    <section class="newsletter-section">
+      <div class="newsletter-container">
+        <h3>Subscribe to our Newsletter</h3>
+        <p>Get updates on our latest offers!</p>
+        <div class="subscription-form">
+          <input type="email" placeholder="Enter your email">
+          <button>Subscribe</button>
+        </div>
+      </div>
+    </section>
+</div>
