@@ -46,10 +46,11 @@
     padding: 0 20px;
     pointer-events: none; /* Allow clicking on links behind controls */
   }
-  
+
   /* Make the buttons themselves clickable */
   .center-slider-control {
-    background-color: rgba(255, 255, 255, 0.5);
+    background-color: rgba(0, 0, 0, 0.3);
+    color: white;
     border: none;
     width: 40px;
     height: 40px;
@@ -59,15 +60,15 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    opacity: 0.7;
-    transition: opacity 0.3s;
+    opacity: 0;
+    transition: opacity 0.3s ease;
     pointer-events: auto; /* Restore clickability to buttons */
     z-index: 10; /* Ensure buttons are above images */
   }
   
   .center-slider-control:hover {
     opacity: 1;
-    background-color: rgba(255, 255, 255, 0.8);
+    background-color: rgba(0, 0, 0, 0.5);
   }
   
   .center-slider-indicators {
