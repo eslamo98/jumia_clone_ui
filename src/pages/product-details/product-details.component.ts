@@ -68,6 +68,7 @@ export class ProductDetailsComponent implements OnInit {
       next: (response) => {
         if (response.success) {
           // Map the camelCase response to PascalCase interface
+          console.log(response);
           this.product = {
             ProductId: response.data.productId,
             SellerId: response.data.sellerId,
@@ -124,7 +125,6 @@ export class ProductDetailsComponent implements OnInit {
             }
           }
           
-          console.log('Product mapped successfully:', this.product);
           this.isLoading = false;
         } else {
           this.errorMessage = response.message || 'Failed to load product';
