@@ -1,251 +1,222 @@
-
-
-<div class="container mt-5 pt-5" *ngIf="product">
-  <div class="row">
-    <div class="col-md-6 text-center">
-      <!-- Main Image -->
-      <div class="image-container mb-3" {{product.MainImageUrl }}>
-        <img [src]="selectedImage || product.MainImageUrl" 
-             alt="Product Image" 
-             class="product-image">
-      </div>
-      
-      <!-- Thumbnail Gallery -->
-      <div class="thumbnail-gallery d-flex justify-content-center flex-wrap">
-        <!-- Main image thumbnail -->
-        <div class="thumbnail-container" (click)="selectedImage = product.MainImageUrl">
-          <img [src]="product.MainImageUrl" 
-               alt="Thumbnail" 
-               class="thumbnail"
-               [class.active]="selectedImage === product.MainImageUrl || !selectedImage">
-        </div>
-        
-        <!-- Additional images thumbnails -->
-        <!-- <div class="thumbnail-container" 
-             *ngFor="let img of product.MainImageUrl"
-             (click)="selectedImage = img">
-          <img [src]="img" 
-               alt="Thumbnail" 
-               class="thumbnail"
-               [class.active]="selectedImage === img">
-        </div> -->
-      </div>
+<div class="container mt-5 pt-5">
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="text-center py-5">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
     </div>
-
-    <div class="col-md-6 product-details">
-    
-      <span class="d-inline-block rounded-3 bg-black text-white fw-bold fs-6 py-1 px-2 mb-2">{{ product.Name }}</span>
-      <h2 *ngIf="product?.Name">{{ product.Name}}</h2>
-      <p  *ngIf="product?.BasePrice" class="price">${{ product.BasePrice}}</p>
-      <p class="stock fw-bold text-black-50">Stock: {{ product.StockQuantity}}</p>
-      <p class="description">{{ product.Description }}</p>
-      
-      <button class="btn btn-primary btn-add-to-cart" [disabled]="product.StockQuantity === 0">Add to cart</button>
-      <span class="outStock bg-black text-light fw-bold px-3 py-2" *ngIf="product.StockQuantity === 0">Out Of Stock</span>
-      <p class="free-delivery">Free delivery on orders over $50.00</p>
-    </div>
+    <p class="mt-2">Loading product details...</p>
   </div>
-</div>
 
+  <!-- Error State -->
+  <div *ngIf="errorMessage" class="alert alert-danger">
+    {{ errorMessage }}
+  </div>
 
-
-
-<!-- *****************************************************************************-->
- <!-- product-details.component.html -->
-<!-- <div class="container mt-5 pt-5" *ngIf="product">
-  <div class="row">
-    <div class="col-md-6 text-center">
-      <div class="image-container mb-3">
-        <img [src]="selectedImage || product.MainImageUrl" 
-             alt="Product Image" 
-             class="product-image">
-      </div>
-      
-      <div class="thumbnail-gallery d-flex justify-content-center flex-wrap">
-        <div class="thumbnail-container" 
-             (click)="selectedImage = product.MainImageUrl">
-          <img [src]="product.MainImageUrl" 
-               alt="Thumbnail" 
-               class="thumbnail"
-               [class.active]="selectedImage === product.MainImageUrl || !selectedImage">
+  <!-- Product Content -->
+  <div *ngIf="product && !isLoading && !errorMessage" class="container mt-5 pt-5">
+    <div class="row">
+      <!-- Images Column -->
+      <div class="col-md-6 text-center">
+        <!-- Main Image -->
+        <div class="image-container mb-3">
+          <img [src]="getFullImageUrl(selectedImage || product.MainImageUrl)" 
+               [alt]="product.Name" 
+               class="product-image img-fluid">
         </div>
         
-        <div class="thumbnail-container" 
-             *ngFor="let img of product.MainImageUrl"
-             (click)="selectedImage = img">
-          <img [src]="img" 
-               alt="Thumbnail" 
+        <!-- Thumbnail Gallery -->
+        <div class="thumbnail-gallery d-flex justify-content-center flex-wrap">
+          <div class="thumbnail-container m-1" 
+               *ngFor="let image of product.Images"
+               (click)="selectImage(image.ImageUrl)">
+               <img [src]="getFullImageUrl(image.ImageUrl)" 
+               [alt]="product.Name + ' thumbnail'"
                class="thumbnail"
-               [class.active]="selectedImage === img">
-        </div>
-      </div>
-    </div> -->
-
-    <!-- Product Details Column -->
-    <div class="col-md-6 product-details">
-      <h1 class="mb-3" *ngIf="product?.Name">{{ product.Name}}</h1>
-
-      <!-- Price Section -->
-      <div class="mb-4">
-        <span class="text-danger fs-4 fw-bold" *ngIf="product?.BasePrice">EGP {{ product.BasePrice| number }}</span>
-        <span *ngIf="product?.BasePrice" 
-              class="text-muted text-decoration-line-through ms-2">
-          EGP {{ product.BasePrice | number }}
-        </span>
-        <span *ngIf="product?.DiscountPercentage" 
-              class="ms-2 text-danger">
-              -{{ product.DiscountPercentage }}%
-        </span>
-      </div>
-
-     
-      <!-- Delivery Options -->
-      <div class="card mb-4">
-        <div class="card-body">
-          <h5 class="card-title mb-3">DELIVERY & RETURNS</h5>
-          
-          <div class="mb-3">
-            <label class="form-label">Choose your location</label>
-            <select class="form-select" [(ngModel)]="selectedLocation">
-              <option *ngFor="let location of deliveryLocations" 
-                      [value]="location.id">
-                {{ location.name }}
-              </option>
-            </select>
-          </div>
-
-          <div *ngFor="let option of deliveryOptions" 
-               class="delivery-option mb-3">
-            <div class="d-flex justify-content-between">
-              <div>
-                <h6>{{ option.type }}</h6>
-                <small class="text-muted">
-                  Ready between {{ getDeliveryDates(option.leadDays) }}
-                </small>
-              </div>
-              <div>
-                <span class="fw-bold">EGP {{ option.fee | number }}</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="mt-3 text-muted small">
-            <p class="mb-1">{{ returnPolicy }}</p>
-            <p class="mb-0">Report visible defects within {{ defectReportDays }} days</p>
+               [class.active]="selectedImage === image.ImageUrl">
           </div>
         </div>
       </div>
 
-      <!-- Seller Information -->
-      <div class="card mb-4">
-        <div class="card-body">
-          <h5 class="card-title mb-3">SELLER INFORMATION</h5>
-          <div class="d-flex justify-content-between align-items-center mb-3">
-            <div>
-              <h6>{{ sellername }}</h6>
-              <div class="small">
-                <span class="me-2">{{score }}% Seller Score</span>
-                <span>{{ followers | number }} Followers</span>
-              </div>
-            </div>
-            <button class="btn btn-outline-primary btn-sm"
-                    (click)="toggleFollow()"
-                    [class.following]="isFollowing">
-              {{ isFollowing ? 'Following' : 'Follow' }}
-            </button>
+      <!-- Product Details Column -->
+      <div class="col-md-6 product-details">
+        <div class="mb-2">
+          <small class="text-muted">{{ product.CategoryName }}</small>
+        </div>
+        <h2 class="mb-3">{{ product.Name }}</h2>
+        <div class="d-flex align-items-center mb-3">
+          <div class="me-3">
+            <span class="stars">
+              <i class="bi" *ngFor="let star of [1,2,3,4,5]"
+                 [class.bi-star-fill]="star <= product.AverageRating"
+                 [class.bi-star]="star > product.AverageRating">
+              </i>
+            </span>
+            <span class="ms-2">{{ product.AverageRating }}/5</span>
           </div>
+          <small class="text-muted">({{ product.ReviewCount }} reviews)</small>
+        </div>
+        
+        <!-- Price Section -->
+        <div class="mb-3">
+          <span class="text-danger fs-4 fw-bold">
+            ${{ product.BasePrice | number }}
+          </span>
+          <span *ngIf="product.DiscountPercentage > 0" 
+                class="ms-2 text-danger">
+            -{{ product.DiscountPercentage }}%
+          </span>
+        </div>
 
-          <div class="seller-performance">
-            <div class="d-flex flex-wrap gap-3 mb-2">
-              <span>🚚 {{ shippingSpeed }} Shipping</span>
-              <span>⭐ {{ qualityScore }} Quality</span>
-              <span>👍 {{ rating }} Rating</span>
+        <!-- Variants Section -->
+        <div class="mb-4" *ngIf="product && product.Variants && product.Variants.length > 0">
+          <h5 class="mb-3">Available Variants</h5>
+          <div class="row g-2">
+            <div class="col-6" *ngFor="let variant of product.Variants">
+              <div class="card variant-card" 
+                   [class.active]="selectedVariant?.VariantId === variant.VariantId"
+                   (click)="selectVariant(variant)">
+                <div class="card-body p-2">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <strong>{{ variant.VariantName }}</strong>
+                      <div class="small text-muted">{{ variant.Sku }}</div>
+                    </div>
+                    <div class="text-end">
+                      <div class="fw-bold">${{ variant.FinalPrice }}</div>
+                      <small class="text-success" *ngIf="variant.StockQuantity > 0">In Stock</small>
+                      <small class="text-danger" *ngIf="variant.StockQuantity === 0">Out of Stock</small>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-
-      <!-- Add to Cart Section -->
-      <div class="mb-4">
-        <div class="d-flex align-items-center gap-3 mb-3">
+        
+        <p class="stock fw-bold text-black-50">
+          Stock: {{ selectedVariant?.StockQuantity || product.StockQuantity | number }}
+        </p>
+        
+        <p class="description">{{ product.Description }}</p>
+        
+        <!-- Add to Cart Section -->
+        <div class="d-flex align-items-center gap-3 mb-4">
           <input type="number" 
                  class="form-control" 
-                 style="width: 100px"
+                 style="width: 80px"
                  min="1" 
                  [(ngModel)]="quantity"
-                 *ngIf="product?.StockQuantity "
-                 [max]="product.StockQuantity">
-          <button class="btn btn-primary w-100 btn-lg" 
-          *ngIf="product?.StockQuantity"
-                  [disabled]="product.StockQuantity === 0"
+                 [max]="selectedVariant?.StockQuantity || product.StockQuantity">
+                 
+          <button class="btn btn-primary" 
+                  [disabled]="(selectedVariant?.StockQuantity || product.StockQuantity) === 0"
                   (click)="addToCart()">
             Add to cart
           </button>
         </div>
         
-        <div *ngIf="product?.StockQuantity === 0" 
-             class="text-center text-danger fw-bold">
-          Out Of Stock
-        </div>
-        <p class="stock fw-bold text-black-50 mt-2" *ngIf="product?.StockQuantity">
-          
-          Stock: {{ product.StockQuantity | number }}
-        </p>
-        <div class="text-center small text-muted">
-          Free delivery on orders over EGP {{ freeDeliveryThreshold | number }}
-        </div>
-      </div>
-
-      <!-- Product Details Navigation -->
-      <div class="nav nav-tabs">
-        <a class="nav-link active" 
-           (click)="setActiveTab('details')"
-           [class.active]="activeTab === 'details'">
-           Product details
-        </a>
-        <a class="nav-link" 
-           (click)="setActiveTab('specs')"
-           [class.active]="activeTab === 'specs'">
-           Specifications
-        </a>
-        <a class="nav-link" 
-           (click)="setActiveTab('reviews')"
-           [class.active]="activeTab === 'reviews'">
-           Verified Feedback ({{ length }})
-        </a>
-      </div>
-
-      <!-- Tab Content -->
-      <div class="tab-content mt-3">
-        <div *ngIf="activeTab === 'details'" class="tab-pane active">
-          <p *ngIf="product?.Description">{{ product.Description }}</p>
+        <div *ngIf="(selectedVariant?.StockQuantity || product.StockQuantity) === 0" class="alert alert-warning">
+          Out of Stock
         </div>
         
-        <div *ngIf="activeTab === 'specs'" class="tab-pane">
-          <dl class="row">
-            <dt class="col-sm-3" *ngFor="let spec of specifications">
-              {{ spec.name }}
-            </dt>
-            <dd class="col-sm-9" *ngFor="let spec of specifications">
-              {{ spec.value }}
-            </dd>
-          </dl>
+        <!-- Seller Info -->
+        <div class="seller-info card mb-4">
+          <div class="card-body">
+            <h6 class="card-title">Sold by</h6>
+            <div class="d-flex align-items-center">
+              <strong class="me-2">{{ product.SellerName }}</strong>
+              <button class="btn btn-sm btn-outline-primary" 
+                      (click)="isFollowing = !isFollowing">
+                {{ isFollowing ? 'Following' : 'Follow Seller' }}
+              </button>
+            </div>
+          </div>
         </div>
-        
-        <div *ngIf="activeTab === 'reviews'" class="tab-pane">
-          <div *ngFor="let review of reviews" class="card mb-3">
-            <div class="card-body">
-              <div class="d-flex justify-content-between">
-                <h5>{{ review.reviewer }}</h5>
-                <div class="rating">
-                  ★{{ review.rating }}/5
+
+        <!-- Delivery Options -->
+        <div class="card mb-4">
+          <div class="card-body">
+            <h5 class="card-title mb-3">DELIVERY & RETURNS</h5>
+            
+            <div class="mb-3">
+              <label class="form-label">Choose your location</label>
+              <select class="form-select" [(ngModel)]="selectedLocation">
+                <option *ngFor="let loc of deliveryLocations" [value]="loc.id">
+                  {{ loc.name }}
+                </option>
+              </select>
+            </div>
+
+            <div class="delivery-options">
+              <div *ngFor="let option of deliveryOptions" class="mb-2">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <strong>{{ option.type }}</strong>
+                    <div class="text-muted small">
+                      Delivery by {{ getDeliveryDates(option.leadDays) }}
+                    </div>
+                  </div>
+                  <div class="text-end">
+                    <span class="text-primary">${{ option.fee }}</span>
+                  </div>
                 </div>
               </div>
-              <p class="mb-0">{{ review.comment }}</p>
+            </div>
+            
+            <div class="mt-3 small text-muted">
+              <div>{{ returnPolicy }}</div>
+              <div>Report any defects within {{ defectReportDays }} days</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product Tabs -->
+        <div class="nav nav-tabs mb-3">
+          <a class="nav-link" 
+             [class.active]="activeTab === 'details'"
+             (click)="setActiveTab('details')">
+             Details
+          </a>
+          <a class="nav-link" 
+             [class.active]="activeTab === 'specs'"
+             (click)="setActiveTab('specs')">
+             Specifications
+          </a>
+          <a class="nav-link" 
+             [class.active]="activeTab === 'reviews'"
+             (click)="setActiveTab('reviews')">
+             Reviews ({{ product.ReviewCount }})
+          </a>
+        </div>
+
+        <!-- Tab Content -->
+        <div [ngSwitch]="activeTab">
+          <div *ngSwitchCase="'details'" class="tab-content">
+            <p>{{ product.Description }}</p>
+          </div>
+          
+          <div *ngSwitchCase="'specs'" class="tab-content">
+            <dl class="row">
+              <div class="col-6" *ngFor="let attr of product.AttributeValues">
+                <dt>{{ attr.AttributeName }}</dt>
+                <dd>{{ attr.Value }}</dd>
+              </div>
+            </dl>
+          </div>
+          
+          <div *ngSwitchCase="'reviews'" class="tab-content">
+            <div *ngFor="let review of reviews" class="card mb-2">
+              <div class="card-body p-3">
+                <div class="d-flex justify-content-between">
+                  <strong>{{ review.reviewer }}</strong>
+                  <div>★ {{ review.rating }}/5</div>
+                </div>
+                <p class="mb-0 mt-2">{{ review.comment }}</p>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  <!-- </div>
-</div> -->
+  </div>
+</div>

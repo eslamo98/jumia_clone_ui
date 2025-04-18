@@ -29,7 +29,7 @@ export class AdminCategoryFormComponent implements OnInit {
   categories: Category[] = [];
   isLoading = false;
   isEditMode = false;
-  categoryId: string | null = null;
+  categoryId: number | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -77,7 +77,7 @@ export class AdminCategoryFormComponent implements OnInit {
     });
   }
 
-  loadCategory(id: string | null): void {
+  loadCategory(id: number | null): void {
     if (!id) return;
     this.isLoading = true;
     this.loadingService.show();

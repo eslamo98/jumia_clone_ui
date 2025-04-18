@@ -23,7 +23,7 @@ import { NotificationService } from '../../../../services/shared/notification.se
   templateUrl: './admin-order-details.component.html'
 })
 export class AdminOrderDetailsComponent implements OnInit {
-  orderId: string | null = null;
+  orderId!: number;
   order: Order | null = null;
   isLoading = false;
   
@@ -38,7 +38,7 @@ export class AdminOrderDetailsComponent implements OnInit {
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       if (params['id']) {
-        this.orderId = params['id'];
+        this.orderId = parseInt(params['id']);
         this.loadOrder(this.orderId);
       } else {
         this.router.navigate(['/admin/orders']);
@@ -46,7 +46,7 @@ export class AdminOrderDetailsComponent implements OnInit {
     });
   }
 
-  loadOrder(id: string | null): void {
+  loadOrder(id: number | null): void {
     if (!id) return;
     this.isLoading = true;
     this.loadingService.show();

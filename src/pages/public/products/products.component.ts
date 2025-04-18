@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Category } from '../../../models/category';
 import { CategoryService } from '../../../services/categories/categories.service';
-import { ProductService } from '../../../services/Product/product.service';
+import { ProductService } from '../../../services/products/product.service';
 import { CartsService } from '../../../services/cart/carts.service';
 
 @Component({
@@ -102,24 +102,10 @@ export class ProductsComponent implements OnInit {
   pageSize = 4;
   placeholderImage = 'assets/images/placeholder.png';
   
-  constructor(private categoryService: CategoryService,private productService: ProductService, private cartsService: CartsService) {}
+  constructor(private categoryService: CategoryService,private productsService: ProductService, private cartsService: CartsService) {}
   
   ngOnInit(): void {
-    this.loadCategories();
-    //this.loadProduct(1011, true); 
-    this.cartsService.addItemToCart().subscribe({
-      next: (response) => {
-        if (response.success) {
-          console.log('Item added to cart successfully:', response.data);
-        } else {
-          this.error = response.message || 'Failed to add item to cart';
-        }
-      },
-      error: (err) => {
-        this.error = 'Error adding item to cart. Please try again later.';
-        console.error('Error adding item to cart:', err);
-      }
-    });
+    this.loadCategories();    
   }
   
 

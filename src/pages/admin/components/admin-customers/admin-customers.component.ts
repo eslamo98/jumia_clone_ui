@@ -82,11 +82,11 @@ export class AdminCustomersComponent implements OnInit {
           } else if (this.sortField === 'email') {
             compareResult = a.email.localeCompare(b.email);
           } else if (this.sortField === 'createdAt') {
-            compareResult = a.createdAt.getTime() - b.createdAt.getTime();
+            compareResult = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
           } else if (this.sortField === 'lastLogin') {
-            const aTime = a.lastLogin ? a.lastLogin.getTime() : 0;
-            const bTime = b.lastLogin ? b.lastLogin.getTime() : 0;
-            compareResult = aTime - bTime;
+            const aTime = a.lastLogin ? a.lastLogin : 0;
+            const bTime = b.lastLogin ? b.lastLogin : 0;
+            compareResult = new Date(aTime).getTime() - new Date(bTime).getTime();  
           }
           
           return this.sortDirection === 'asc' ? compareResult : -compareResult;
@@ -134,7 +134,7 @@ export class AdminCustomersComponent implements OnInit {
     this.loadCustomers();
   }
 
-  updateCustomerStatus(id: string, status: User['status']): void {
+  updateCustomerStatus(id: number, status: User['status']): void {
     this.loadingService.show();
     
     this.adminService.updateCustomerStatus(id, status).subscribe({

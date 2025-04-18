@@ -79,7 +79,7 @@ export class AdminCategoriesComponent implements OnInit {
     this.loadCategories();
   }
 
-  deleteCategory(id: string): void {
+  deleteCategory(id: number): void {
     if (confirm('Are you sure you want to delete this category?')) {
       this.loadingService.show();
       
@@ -97,7 +97,7 @@ export class AdminCategoriesComponent implements OnInit {
     }
   }
 
-  updateCategoryStatus(id: string, status: 'active' | 'inactive'): void {
+  updateCategoryStatus(id: number, status: 'active' | 'inactive'): void {
     this.loadingService.show();
     
     this.adminService.updateCategory(id, { status }).subscribe({
@@ -113,7 +113,7 @@ export class AdminCategoriesComponent implements OnInit {
     });
   }
 
-  getParentCategoryName(parentId?: string): string {
+  getParentCategoryName(parentId?: number): string {
     if (!parentId) return 'None';
     const parent = this.categories.find(c => c.id === parentId);
     return parent ? parent.name : 'Unknown';
