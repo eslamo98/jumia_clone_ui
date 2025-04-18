@@ -33,4 +33,11 @@ export class ProductService {
         })
       );
   }
+
+  getFlashSaleProducts(): Observable<any> {
+    return this.http.get<ProductResponse>(`${this.apiUrl}/products/flash-sales`)
+      .pipe(
+        map(response => response.data)
+      );
+  }
 }
