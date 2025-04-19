@@ -4,7 +4,6 @@ import { Product } from '../../../models/product';
 import { Category } from '../../../models/category';
 import { CarouselComponent } from '../../../shared/carousel/carousel.component';
 import { ProductCardComponent } from '../../../shared/product-card/product-card.component';
-import { CategoryCardComponent } from '../../../shared/category-card/category-card.component';
 import { BannerComponent } from '../../../shared/banner/banner.component';
 import { HttpClient } from '@angular/common/http';
 import { PromoSliderComponent } from "./homeComponents/promoSlider/promo-slider.component";
@@ -21,7 +20,6 @@ import { FlashSalesBannerComponent } from "./homeComponents/flashSaleBannar/comp
     CommonModule,
     CarouselComponent,
     ProductCardComponent,
-    CategoryCardComponent,
     BannerComponent,
     PromoSliderComponent,
     StaticContainerComponent,

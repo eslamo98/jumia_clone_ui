@@ -32,38 +32,43 @@
           *ngFor="let product of products" 
           class="product-card"
           (click)="navigateToProductDetails(product.productId)">
-          <!-- Discount badge -->
-          <div class="discount-badge" *ngIf="product.discountPercentage > 0">
-            -{{ product.discountPercentage }}%
-          </div>
-          
-          <!-- Product image -->
-          <div class="product-image">
-            <img [src]="product.mainImageUrl" [alt]="product.name">
-          </div>
-          
-          <!-- Product info -->
-          <div class="product-info">
-            <h3 class="product-name">{{ product.name }}</h3>
-            <div class="product-price">
-              <span class="final-price">EGP {{ product.finalPrice }}</span>
-              <span class="base-price">EGP {{ product.basePrice }}</span>
+<a class="text-decoration-none"
+          [routerLink]="['/products', product.productId]">
+            <!-- Discount badge -->
+            <div class="discount-badge" *ngIf="product.discountPercentage > 0">
+              -{{ product.discountPercentage }}%
             </div>
             
-            <!-- Stock indicator -->
-<!-- Stock indicator في ملف flash-sales-banner.component.html -->
-<div class="stock-info">
-  <span class="items-left" [ngClass]="{'low-stock': product.stockQuantity < 10}">
-    {{ product.stockQuantity }} items left
-  </span>
-  <div class="progress-bar">
-    <div class="progress" 
-         [ngClass]="{'low-stock-progress': product.stockQuantity < 10}"
-         [style.width]="calculateProgressBarWidth(product.stockQuantity)">
+            <!-- Product image -->
+            <div class="product-image">
+              <img [src]="getFullImageUrl(product.mainImageUrl)" [alt]="product.name">
+            </div>
+            
+            <!-- Product info -->
+            <div class="product-info">
+              <h3 class="product-name">{{ product.name }}</h3>
+              <div class="product-price">
+                <span class="final-price">EGP {{ product.finalPrice }}</span>
+                <span class="base-price">EGP {{ product.basePrice }}</span>
+              </div>
+              
+              <!-- Stock indicator -->
+  <!-- Stock indicator في ملف flash-sales-banner.component.html -->
+  <div class="stock-info">
+    <span class="items-left" [ngClass]="{'low-stock': product.stockQuantity < 10}">
+      {{ product.stockQuantity }} items left
+    </span>
+    <div class="progress-bar">
+      <div class="progress" 
+           [ngClass]="{'low-stock-progress': product.stockQuantity < 10}"
+           [style.width]="calculateProgressBarWidth(product.stockQuantity)">
+      </div>
     </div>
   </div>
-</div>
-          </div>
+            </div>
+          
+          
+</a>
         </div>
       </div>
       
@@ -75,4 +80,19 @@
         <i class="fas fa-chevron-right"></i>
       </button>
     </div>
+
+    <!-- Add this to your template to show loading and error states -->
+<div *ngIf="loading" class="loading-indicator">
+  Loading products...
+</div>
+
+<div *ngIf="error" class="error-message">
+  {{ error }}
+</div>
+
+<!-- Show this when no products are available and not loading -->
+<div *ngIf="!loading && !error && products.length === 0" class="no-products">
+  No flash sale products available at the moment.
+</div>
+    
   </div>

@@ -87,33 +87,25 @@
       <app-carousel [images]="banners"></app-carousel>
     </section>
 
-  
-    <!-- Categories Section -->
+  <!--
+    <!-- Categories Section --
     <section class="categories-section">
-      <div class="section-title">
-        <h2>Shop Our Top Categories</h2>
-      </div>
-      
-      <!-- Loading state -->
+
+      <!-- Loading state --
       <div *ngIf="isLoading" class="loading-container">
         <div class="loading-spinner"></div>
         <p>Loading categories...</p>
       </div>
       
-      <!-- Error state -->
+      <!-- Error state --
       <div *ngIf="!isLoading && errorMessage" class="error-container">
         <p>{{ errorMessage }}</p>
         <button (click)="fetchCategories()" class="retry-button">Retry</button>
       </div>
       
-      <!-- Categories grid -->
-      <div *ngIf="!isLoading && !errorMessage" class="categories-grid">
-        <app-category-card 
-          *ngFor="let category of categories" 
-          [category]="category">
-        </app-category-card>
-      </div>
+      <!-- Categories grid --
     </section>
+  -->
   
     <!-- Flash Sales Section -->
     <section class="flash-sales-section">

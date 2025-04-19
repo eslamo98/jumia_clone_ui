@@ -1,30 +1,37 @@
 // flash-sales-banner.component.ts
 import { Component, OnInit, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { interval } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, takeWhile } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
-
-
+import { ProductService } from '../../../../../../../services/products/product.service';
+import { Helpers } from '../../../../../../../Utility/helpers';
 
 interface Product {
   productId: number;
   name: string;
+  description: string;
   basePrice: number;
-  finalPrice: number;
   discountPercentage: number;
-  mainImageUrl: string;
+  finalPrice: number;
   stockQuantity: number;
+  isAvailable: boolean;
+  mainImageUrl: string;
+  averageRating: number;
+  sellerId: number;
+  sellerName: string;
+  subcategoryName: string;
+  // Add other properties as needed
 }
 
 @Component({
   selector: 'app-flash-sales-bannar',
-  imports: [CommonModule],
+  imports: [CommonModule , RouterModule],
   templateUrl: './flash-sales-bannar.component.html',
   styleUrls: ['./flash-sales-bannar.component.css'],
   standalone: true
 })
-export class FlashSalesBannerComponent implements OnInit, AfterViewInit {
+export class FlashSalesBannerComponent extends Helpers implements OnInit, AfterViewInit {
   @ViewChild('productContainer') productContainer!: ElementRef;
   
   products: Product[] = [];
@@ -35,80 +42,59 @@ export class FlashSalesBannerComponent implements OnInit, AfterViewInit {
   showLeftArrow: boolean = false;
   showRightArrow: boolean = true;
   scrollAmount: number = 250;
+  loading: boolean = true;
+  error: string | null = null;
   
-  constructor(private router: Router) { }
+  constructor(
+    private router: Router,
+    private productService: ProductService
+  ) { super(); }
 
   ngOnInit(): void {
-    // Sample data - replace with actual API call
-    this.loadProducts();
+    // Load products from API
+    this.loadProductsFromApi();
     
-    // Initialize countdown timer
+    // Start the countdown timer
     this.startCountdown();
   }
   
   ngAfterViewInit(): void {
-    // Check if we need to show scroll arrows
-    this.checkScrollArrows();
+    setTimeout(() => this.checkScrollArrows(), 500);
   }
   
-  loadProducts(): void {
-    // Placeholder - replace with actual HTTP request
-    this.products = [
-      {
-        productId: 41,
-        name: "Samsung 52-inch B2 Series",
-        basePrice: 95.00,
-        finalPrice: 59.00,
-        discountPercentage: 38,
-        mainImageUrl: "/images/home/slider1.png",
-        stockQuantity: 233
+  loadProductsFromApi(): void {
+    this.loading = true;
+    this.error = null;
+    
+    this.productService.getFlashSaleProducts("TVs").subscribe({
+      next: (data) => {
+        console.log('API response data:', data);
+        
+        // Handle different response formats
+        if (data && Array.isArray(data)) {
+          this.products = data;
+        } else if (data && typeof data === 'object' && data.products) {
+          // In case API returns { products: [...] }
+          this.products = data.products;
+        } else if (data && typeof data === 'object') {
+          // If API returns a single product or object with product properties
+          this.products = [data];
+        } else {
+          console.error('Unexpected API response format:', data);
+          this.error = 'Invalid data format received from API';
+          this.products = []; // Initialize as empty array
+        }
+        
+        console.log('Processed products:', this.products);
+        this.loading = false;
+        setTimeout(() => this.checkScrollArrows(), 100);
       },
-      {
-        productId: 42,
-        name: "L'Oreal Paris Elvive Hyaluronic",
-        basePrice: 109.00,
-        finalPrice: 59.00,
-        discountPercentage: 46,
-        mainImageUrl: "assets/images/products/loreal-elvive.jpg",
-        stockQuantity: 67
-      },
-      {
-        productId: 43,
-        name: "Maybelline Colossal Kajal",
-        basePrice: 220.00,
-        finalPrice: 135.00,
-        discountPercentage: 39,
-        mainImageUrl: "assets/images/products/maybelline-kajal.jpg",
-        stockQuantity: 31
-      },
-      {
-        productId: 44,
-        name: "Garnier SkinActive Tissue Mask",
-        basePrice: 105.00,
-        finalPrice: 39.00,
-        discountPercentage: 63,
-        mainImageUrl: "assets/images/products/garnier-tissue-mask.jpg",
-        stockQuantity: 7
-      },
-      {
-        productId: 45,
-        name: "Maybelline Tattoo Brow 36H",
-        basePrice: 395.00,
-        finalPrice: 285.50,
-        discountPercentage: 28,
-        mainImageUrl: "assets/images/products/maybelline-tattoo-brow.jpg",
-        stockQuantity: 9
-      },
-      {
-        productId: 46,
-        name: "Maybelline New York Lipstick",
-        basePrice: 685.00,
-        finalPrice: 428.00,
-        discountPercentage: 38,
-        mainImageUrl: "assets/images/products/maybelline-lipstick.jpg",
-        stockQuantity: 4
+      error: (err) => {
+        console.error('Error loading flash sale products', err);
+        this.error = 'Failed to load products';
+        this.loading = false;
       }
-    ];
+    });
   }
   
   startCountdown(): void {
@@ -134,21 +120,28 @@ export class FlashSalesBannerComponent implements OnInit, AfterViewInit {
         }
         
         this.timeLeft = `${this.hours}h : ${this.minutes}m : ${this.seconds}s`;
-      })
+      }),
+      takeWhile(() => this.hours > 0 || this.minutes > 0 || this.seconds > 0)
     ).subscribe();
   }
   
   scrollLeft(): void {
-    this.productContainer.nativeElement.scrollLeft -= this.scrollAmount;
-    setTimeout(() => this.checkScrollArrows(), 100);
+    if (this.productContainer) {
+      this.productContainer.nativeElement.scrollLeft -= this.scrollAmount;
+      setTimeout(() => this.checkScrollArrows(), 100);
+    }
   }
   
   scrollRight(): void {
-    this.productContainer.nativeElement.scrollLeft += this.scrollAmount;
-    setTimeout(() => this.checkScrollArrows(), 100);
+    if (this.productContainer) {
+      this.productContainer.nativeElement.scrollLeft += this.scrollAmount;
+      setTimeout(() => this.checkScrollArrows(), 100);
+    }
   }
   
   checkScrollArrows(): void {
+    if (!this.productContainer) return;
+    
     const container = this.productContainer.nativeElement;
     this.showLeftArrow = container.scrollLeft > 0;
     this.showRightArrow = container.scrollWidth > container.clientWidth + container.scrollLeft;
@@ -161,5 +154,9 @@ export class FlashSalesBannerComponent implements OnInit, AfterViewInit {
   calculateProgressBarWidth(available: number, total: number = 250): string {
     const percentage = (available / total) * 100;
     return `${percentage}%`;
+  }
+  
+  getProgressBarColor(quantity: number): string {
+    return quantity < 10 ? '#e41e23' : '#ff9900';
   }
 }
