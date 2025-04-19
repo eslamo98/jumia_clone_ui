@@ -15,7 +15,6 @@ import { Component, HostListener, OnInit } from '@angular/core';
   imports: [CommonModule]
 })
 export class HeaderComponent implements OnInit {
-  isScrolled = false;
   isAccountDropdownOpen = false;
   cartItemCount = 0;
   
@@ -23,12 +22,6 @@ export class HeaderComponent implements OnInit {
 
   ngOnInit(): void {
     // Initialize any data needed
-  }
-
-  @HostListener('window:scroll', [])
-  onWindowScroll() {
-    // Check if page is scrolled
-    this.isScrolled = window.scrollY > 50;
   }
 
   toggleAccountDropdown() {
