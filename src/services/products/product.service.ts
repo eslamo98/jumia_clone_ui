@@ -56,4 +56,26 @@ export class ProductService {
         })
       );
   }
+  getRandomCategoryProducts(Category:string , count:number=15): Observable<any> {
+    const params = new HttpParams()
+    .set('CategoryName', Category.toString())
+    .set('count', count.toString());  
+    return this.http.get<any>(`${this.apiUrl}/api/Products/random/Category`,{params})
+      .pipe(
+        map(response => {
+          console.log (response);
+          // Check if response has a data property
+          if (response && response.data) {
+            return response.data;
+          } else {
+            // If response is already an array or another format
+            return response;
+          }
+        }),
+        catchError(err => {
+          console.error('Error fetching flash sale products:', err);
+          throw err;
+        })
+      );
+  }
 }
