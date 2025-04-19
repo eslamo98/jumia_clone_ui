@@ -11,6 +11,7 @@ import { StaticContainerComponent } from "./homeComponents/static-container/stat
 import { CenterSliderComponent } from "./homeComponents/center-slider/center-slider.component";
 import { TwoImagesBannarComponent } from "./homeComponents/twoImagesBannar/two-images-bannar/two-images-bannar.component";
 import { FlashSalesBannerComponent } from "./homeComponents/flashSaleBannar/components/flash-sales-bannar/flash-sales-bannar.component";
+import { TopPicksContainerComponent } from "./homeComponents/TopPicksContainer/top-picks-container/top-picks-container.component";
 
 
 @Component({
@@ -25,7 +26,8 @@ import { FlashSalesBannerComponent } from "./homeComponents/flashSaleBannar/comp
     StaticContainerComponent,
     CenterSliderComponent,
     TwoImagesBannarComponent,
-    FlashSalesBannerComponent
+    FlashSalesBannerComponent,
+    TopPicksContainerComponent
 ],
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.css'
