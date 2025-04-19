@@ -1,4 +1,4 @@
-<!-- src/app/auth/login/login.component.html -->
+<!-- src/app/auth/login/login.component.html
 
 <div class="login-container">
     <div class="login-form-wrapper">
@@ -47,5 +47,72 @@
           Don't have an account? <a routerLink="/auth/register">Register here</a>
         </div>
       </form>
+    </div>
+  </div> -->
+  <div class="login-container">
+    <div class="jumia-brand">
+      <div class="jumia-logo-container">
+        <img src="assets/images/JMIA.png" alt="Jumia Logo"   class="jumia-logo-image">
+      </div>
+    </div>
+  
+    <div class="login-card">
+      <h2>Welcome to Jumia</h2>
+      <p class="instruction">Type your e-mail or phone number to log in or create a Jumia account.</p>
+  
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+          <label for="email">Email or Mobile Number *</label>
+          <input 
+            type="email" 
+            id="email" 
+            formControlName="email" 
+            class="form-control" 
+            placeholder="Enter email or mobile number"
+            [ngClass]="{ 'is-invalid': submitted && f['email'].errors }" 
+          />
+          <div *ngIf="submitted && f['email'].errors" class="invalid-feedback">
+            <div *ngIf="f['email'].errors['required']">Email is required</div>
+            <div *ngIf="f['email'].errors['email']">Email must be a valid email address</div>
+          </div>
+        </div>
+  
+        <div class="form-group">
+          <label for="password">Password *</label>
+          <input 
+            type="password" 
+            id="password" 
+            formControlName="password" 
+            class="form-control" 
+            placeholder="Enter password"
+            [ngClass]="{ 'is-invalid': submitted && f['password'].errors }" 
+          />
+          <div *ngIf="submitted && f['password'].errors" class="invalid-feedback">
+            <div *ngIf="f['password'].errors['required']">Password is required</div>
+            <div *ngIf="f['password'].errors['minlength']">Password must be at least 6 characters</div>
+          </div>
+        </div>
+  
+        <button class="btn-continue" [disabled]="loading">
+          <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1"></span>
+          Continue
+        </button>
+  
+        <p class="terms">
+          By continuing you agree to Jumia’s<br>
+          <a href="#" class="terms-link">Terms and Conditions</a>
+        </p>
+  
+        <div class="social-login">
+          <button type="button" class="btn-facebook">
+            <i class="fab fa-facebook-f"></i>
+            Log in with Facebook
+          </button>
+        </div>
+      </form>
+  
+      <div class="support-links">
+        <p>For further support, you may visit the <a href="#" class="support-link">Help Center</a> or contact our customer service team.</p>
+      </div>
     </div>
   </div>

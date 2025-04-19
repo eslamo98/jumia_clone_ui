@@ -1,1 +1,87 @@
-<p>header works!</p>
+<!-- header.component.html -->
+<!-- Top Banner - Disappears on scroll -->
+<div class="top-banner" [ngClass]="{'hidden': isScrolled}">
+    <div class="flash-sale">
+      <div class="call-to-order">
+        <span>Call To Order</span>
+        <span class="phone-number">17269</span>
+      </div>
+      <div class="flash-sale-text">Flash Sale</div>
+      <div class="limited-time">Limited Time Savings!</div>
+    </div>
+    <div class="secondary-top-bar">
+      <div class="sell-on-jumia">
+        <img src="/images/header/star.png" alt="Sell Icon" class="small-icon">
+        <span>Sell on Jumia</span>
+      </div>
+      <div class="jumia-pay">
+        <img src="/images/jumiaLogo.png" alt="Jumia Logo" class="jumia-logo">
+        <!-- <img src="assets/icons/jumia-pay.png" alt="Jumia Pay" class="jumia-pay-logo"> -->
+      </div>
+      <div class="language-selector">
+        <span class="english">English</span>
+        <span class="arabic">عربي</span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Main Header - Fixed on scroll -->
+  <div class="main-header" [ngClass]="{'fixed': isScrolled}">
+    <div class="header-container">
+      <!-- Logo -->
+      <div class="logo">
+        <a href="/">
+          <img src="/images/jumiaLogo.png" alt="Jumia Logo">
+        </a>
+      </div>
+      
+      <!-- Search Box -->
+      <div class="search-box">
+        <input type="text" placeholder="Search products, brands and categories">
+        <button class="search-button">Search</button>
+      </div>
+      
+      <!-- Right Navigation -->
+      <div class="right-nav">
+        <!-- Account Dropdown -->
+        <div class="account-wrapper" (clickOutside)="closeAccountDropdown()">
+          <div class="account-button" (click)="toggleAccountDropdown()">
+            <img src="/images/header/account.png" alt="Account" class="nav-icon">
+            <span>Account</span>
+            <i class="arrow-down"></i>
+          </div>
+          <div class="account-dropdown" *ngIf="isAccountDropdownOpen">
+            <div class="sign-in-button">Sign In</div>
+            <ul class="account-menu">
+              <li>
+                <img src="/images/header/account.png" alt="My Account" class="menu-icon">
+                <span>My Account</span>
+              </li>
+              <li>
+                <img src="/images/header/order.png" alt="Orders" class="menu-icon">
+                <span>Orders</span>
+              </li>
+              <li>
+                <img src="/images/header/wishList.png" alt="Wishlist" class="menu-icon">
+                <span>Wishlist</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+        
+        <!-- Help -->
+        <div class="help-button">
+          <img src="/images/header/help.png" alt="Help" class="nav-icon">
+          <span>Help</span>
+          <i class="arrow-down"></i>
+        </div>
+        
+        <!-- Cart -->
+        <div class="cart-button">
+          <img src="/images/header/cart.png" alt="Cart" class="nav-icon">
+          <span>Cart</span>
+          <span class="cart-count" *ngIf="cartItemCount > 0">{{ cartItemCount }}</span>
+        </div>
+      </div>
+    </div>
+  </div>

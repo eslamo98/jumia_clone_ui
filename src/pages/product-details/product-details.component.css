@@ -1,14 +1,20 @@
 .image-container {
+<<<<<<< HEAD
   border: 1px solid #dee2e6;
   border-radius: 4px;
   padding: 1rem;
   background: white;
+=======
+  border-radius: 10px;
+  padding: 10px;
+>>>>>>> 8adf096ff1720555f2c7447c57dbdc4f9f0b8282
   display: flex;
   justify-content: center;
   align-items: center;
   overflow: hidden;
   max-width: 500px;
   margin: 0 auto;
+<<<<<<< HEAD
   height: 400px; /* Fixed height for consistency */
 }
 
@@ -16,11 +22,23 @@
   max-height: 400px;
   width: auto;
   object-fit: contain;
+=======
+}
+
+.product-image {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+>>>>>>> 8adf096ff1720555f2c7447c57dbdc4f9f0b8282
   border-radius: 10px;
 }
 
 .product-details {
+<<<<<<< HEAD
   padding: 1rem;
+=======
+  padding: 20px;
+>>>>>>> 8adf096ff1720555f2c7447c57dbdc4f9f0b8282
 }
 
 .product-details h2 {
@@ -71,6 +89,7 @@
   transition: background-color 0.3s ease;
   margin-bottom: 10px;
 }
+<<<<<<< HEAD
 
 .btn-add-to-cart:hover {
   background-color: #333;
@@ -106,6 +125,28 @@
 .thumbnail-container.active {
   border-color: #0d6efd;
   border-width: 2px;
+=======
+/* Existing styles... */
+
+/* Thumbnail Gallery Styles */
+.thumbnail-gallery {
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.thumbnail-container {
+  width: 70px;
+  height: 70px;
+  border-radius: 5px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.thumbnail-container:hover {
+  border-color: #000;
+>>>>>>> 8adf096ff1720555f2c7447c57dbdc4f9f0b8282
 }
 
 .thumbnail {
@@ -115,9 +156,56 @@
 }
 
 .thumbnail.active {
+<<<<<<< HEAD
   border: 2px solid #0d6efd;
 }
 
+=======
+  border: 2px solid #000;
+}
+
+/* Make the main image container responsive */
+.image-container {
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  max-width: 500px;
+  margin: 0 auto;
+  height: 400px; /* Fixed height for consistency */
+}
+
+.product-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* Changed to contain to see the whole image */
+  border-radius: 10px;
+}
+
+/* Rest of your existing styles... */
+.btn-add-to-cart:hover {
+  background-color: #333;
+}
+
+.free-delivery {
+  font-size: 0.9em;
+  color: #28a745;
+  margin-top: 10px;
+}
+#product-images-carousel .carousel-item img {
+  object-fit: cover;
+  height: 100%;
+  max-height: 400px;
+}
+
+#product-images-carousel .carousel-item img {
+  object-fit: cover;
+  height: 100%;
+  max-height: 400px;
+}
+>>>>>>> 8adf096ff1720555f2c7447c57dbdc4f9f0b8282
 #product-images-carousel .carousel-item img {
   object-fit: cover;
   height: 100%;
@@ -147,6 +235,7 @@
   border-bottom: 2px solid #dee2e6;
 }
 
+<<<<<<< HEAD
 .nav-tabs .nav-link {
   cursor: pointer;
 }
@@ -164,12 +253,19 @@
   border: 1px solid #dee2e6;
   border-top: none;
   border-radius: 0 0 0.25rem 0.25rem;
+=======
+.nav-link.active {
+  font-weight: bold;
+  border-color: transparent;
+  border-bottom: 3px solid #0d6efd;
+>>>>>>> 8adf096ff1720555f2c7447c57dbdc4f9f0b8282
 }
 
 .card-title {
   font-size: 1.2rem;
   font-weight: 600;
 }
+<<<<<<< HEAD
 
 .description {
   color: #6c757d;
@@ -223,3 +319,5 @@
     height: 60px;
   }
 }
+=======
+>>>>>>> 8adf096ff1720555f2c7447c57dbdc4f9f0b8282

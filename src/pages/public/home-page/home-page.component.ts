@@ -1,23 +1,206 @@
-// src/app/pages/public/home-page/home-page.component.ts
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Product } from '../../../models/product';
+import { Category } from '../../../models/category';
+import { CarouselComponent } from '../../../shared/carousel/carousel.component';
+import { ProductCardComponent } from '../../../shared/product-card/product-card.component';
+import { CategoryCardComponent } from '../../../shared/category-card/category-card.component';
+import { BannerComponent } from '../../../shared/banner/banner.component';
+import { HttpClient } from '@angular/common/http';
+import { PromoSliderComponent } from "./homeComponents/promoSlider/promo-slider.component";
+import { StaticContainerComponent } from "./homeComponents/static-container/static-container.component";
+import { CenterSliderComponent } from "./homeComponents/center-slider/center-slider.component";
+import { TwoImagesBannarComponent } from "./homeComponents/twoImagesBannar/two-images-bannar/two-images-bannar.component";
+import { FlashSalesBannerComponent } from "./homeComponents/flashSaleBannar/components/flash-sales-bannar/flash-sales-bannar.component";
+
 
 @Component({
-  selector: 'app-home-page',
+  selector: 'app-home',
   standalone: true,
-  imports: [CommonModule],
-  template: `
-    <div class="container">
-      <h1>Welcome to Jumia Clone</h1>
-      <p>This is the home page.</p>
-    </div>
-  `,
-  styles: [`
-    .container {
-      padding: 20px;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-  `]
+  imports: [
+    CommonModule,
+    CarouselComponent,
+    ProductCardComponent,
+    CategoryCardComponent,
+    BannerComponent,
+    PromoSliderComponent,
+    StaticContainerComponent,
+    CenterSliderComponent,
+    TwoImagesBannarComponent,
+    FlashSalesBannerComponent
+],
+  templateUrl: './home-page.component.html',
+  styleUrl: './home-page.component.css'
 })
-export class HomePageComponent {}
+
+export class HomeComponent implements OnInit {
+  featuredProducts: Product[] = [];
+  topDeals: Product[] = [];
+  categories: Category[] = [];
+  banners: {image: string, link: string}[] = [];
+  isLoading = true;
+  errorMessage = '';
+  
+  // Easter Sale banner data
+  easterSaleBanner = {
+    title: 'EASTER SALE',
+    startingPrice: '35 EGP',
+    brands: ['Parkville', 'Seropipe', 'GlamyLab', 'Clary', 'Borai'],
+    features: ['Free Shipping', 'Wide Assortment'],
+    products: [
+      { name: 'StrongVille Nourishing Cream', image: 'assets/images/products/strongville-cream.png' },
+      { name: 'GlamyLab Eye Contour', image: 'assets/images/products/glamylab-eye-contour.png' }
+    ]
+  };
+  
+  
+  // Side menu categories
+  sidebarCategories = [
+    { name: 'Fashion', icon: 'fashion-icon' },
+    { name: 'Phones & Tablets', icon: 'phone-icon' },
+    { name: 'Health & Beauty', icon: 'health-icon' },
+    { name: 'Home & Furniture', icon: 'home-icon' },
+    { name: 'Appliances', icon: 'appliance-icon' },
+    { name: 'Televisions & Audio', icon: 'tv-icon' },
+    { name: 'Baby Products', icon: 'baby-icon' },
+    { name: 'Supermarket', icon: 'supermarket-icon' },
+    { name: 'Computing', icon: 'computing-icon' },
+    { name: 'Sporting Goods', icon: 'sporting-icon' },
+    { name: 'Gaming', icon: 'gaming-icon' },
+    { name: 'Other categories', icon: 'other-icon' }
+  ];
+  
+  // Right sidebar options
+  sidebarOptions = [
+    { 
+      title: 'Join Jumia', 
+      subtitle: 'as a Sales Consultant', 
+      icon: 'star-icon' 
+    },
+    { 
+      title: 'Sell on JUMIA', 
+      subtitle: 'And Grow Your Business', 
+      icon: 'money-icon' 
+    },
+    { 
+      title: 'Warranty', 
+      subtitle: 'On Your Purchases', 
+      icon: 'warranty-icon' 
+    }
+  ];
+
+  
+  
+  // Main banner carousel current slide index
+  currentSlide: number = 0;
+
+  constructor(private http: HttpClient) { }
+
+  ngOnInit(): void {
+    // Load categories from API
+    this.fetchCategories();
+    
+    // Mock data for products - in a real app, these would come from a service
+    this.featuredProducts = [];
+
+    this.topDeals = [];
+    
+    this.banners = [
+      { image: 'assets/images/banners/banner1.jpg', link: '/promotions/sale' },
+      { image: 'assets/images/banners/banner2.jpg', link: '/category/electronics' },
+      { image: 'assets/images/banners/banner3.jpg', link: '/flash-sale' }
+    ];
+    
+    // Start automatic banner slider
+    this.startSlideShow();
+  }
+
+  fetchCategories(): void {
+    this.isLoading = true;
+    this.http.get<{success: boolean, message: string, data: Category[]}>('api/categories')
+      .subscribe({
+        next: (response) => {
+          if (response.success) {
+            // Filter only active categories
+            this.categories = response.data.filter(category => category.isActive);
+            this.isLoading = false;
+          } else {
+            this.errorMessage = response.message;
+            this.isLoading = false;
+          }
+        },
+        error: (error) => {
+          this.errorMessage = 'Failed to load categories. Please try again later.';
+          this.isLoading = false;
+          console.error('Error fetching categories:', error);
+          
+          // Fallback to mock data for development purposes
+          this.loadMockCategories();
+        }
+      });
+  }
+
+  loadMockCategories(): void {
+    // Mock data for categories in case API fails
+    this.categories = [
+      { 
+        categoryId: 1, 
+        name: 'Supermarket', 
+        description: 'Groceries and daily needs', 
+        imageUrl: 'assets/images/categories/supermarket.png', 
+        isActive: true, 
+        subcategoryCount: 8 
+      },
+      { 
+        categoryId: 2, 
+        name: 'Fashion', 
+        description: 'Clothing, shoes and accessories', 
+        imageUrl: 'assets/images/categories/fashion.png', 
+        isActive: true, 
+        subcategoryCount: 12 
+      },
+      { 
+        categoryId: 3, 
+        name: 'Electronics', 
+        description: 'TVs, audio, cameras and more', 
+        imageUrl: 'assets/images/categories/electronics.png', 
+        isActive: true, 
+        subcategoryCount: 10 
+      },
+      { 
+        categoryId: 4, 
+        name: 'Phones & Tablets', 
+        description: 'Mobile phones and accessories', 
+        imageUrl: 'assets/images/categories/phones.png', 
+        isActive: true, 
+        subcategoryCount: 6 
+      },
+      { 
+        categoryId: 5, 
+        name: 'Home & Office', 
+        description: 'Furniture and home appliances', 
+        imageUrl: 'assets/images/categories/home.png', 
+        isActive: true, 
+        subcategoryCount: 15 
+      },
+      { 
+        categoryId: 6, 
+        name: 'Health & Beauty', 
+        description: 'Personal care and wellness products', 
+        imageUrl: 'assets/images/categories/beauty.png', 
+        isActive: true, 
+        subcategoryCount: 9 
+      }
+    ];
+  }
+  
+  startSlideShow(): void {
+    setInterval(() => {
+      this.currentSlide = (this.currentSlide + 1) % 7; // Assuming 7 slides based on the dots in the UI
+    }, 5000); // Change slide every 5 seconds
+  }
+
+  setCurrentSlide(index: number): void {
+    this.currentSlide = index;
+  }
+}

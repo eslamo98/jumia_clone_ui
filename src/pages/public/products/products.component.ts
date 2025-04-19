@@ -105,29 +105,27 @@ export class ProductsComponent implements OnInit {
   constructor(private categoryService: CategoryService,private productsService: ProductService, private cartsService: CartsService) {}
   
   ngOnInit(): void {
-    this.loadCategories();
-    this.loadProduct(1011, true); 
-    
+    this.loadCategories();    
   }
   
 
-  loadProduct(id: number, includeDetails: boolean): void {
+  // loadProduct(id: number, includeDetails: boolean): void {
    
     
-    this.productsService.getProductById(id, includeDetails).subscribe({
-      next: (response) => {
-        if (response.success) {
-          console.log('Product loaded successfully:', response.data);
-        } else {
-          this.error = response.message || 'Failed to load categories';
-        }
-      },
-      error: (err) => {
-        this.error = 'Error loading categories. Please try again later.';
-        console.error('Error fetching categories:', err);
-      }
-    });
-  }
+  //   this.productsService.getProductById(id, includeDetails).subscribe({
+  //     next: (response) => {
+  //       if (response.success) {
+  //         console.log('Product loaded successfully:', response.data);
+  //       } else {
+  //         this.error = response.message || 'Failed to load categories';
+  //       }
+  //     },
+  //     error: (err) => {
+  //       this.error = 'Error loading categories. Please try again later.';
+  //       console.error('Error fetching categories:', err);
+  //     }
+  //   });
+  // }
 
   loadCategories(): void {
     this.loading = true;

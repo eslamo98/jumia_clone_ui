@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from '../guards/auth.guard';
 import { roleGuard } from '../guards/role.guard';
-import { HomePageComponent } from '../pages/public/home-page/home-page.component';
+import { HomeComponent } from '../pages/public/home-page/home-page.component';
 import { ProductsComponent } from '../pages/public/products/products.component';
 import { UnauthorizedComponent } from '../shared/unauthorized/unauthorized.component';
 import { CustomerAccountComponent } from '../pages/customer/customer-account/customer-account.component';
@@ -9,6 +9,7 @@ import { CartComponent } from '../pages/customer/cart/cart.component';
 import { SellerDashboardComponent } from '../pages/seller/seller-dashboard/seller-dashboard.component';
 import { SellerProductsComponent } from '../pages/seller/seller-products/seller-products.component';
 import { AdminDashboardComponent } from '../pages/admin/admin-dashboard/admin-dashboard.component';
+
 import { AdminProductsComponent } from '../pages/admin/components/admin-products/admin-products.component';
 import { AdminProductFormComponent } from '../pages/admin/components/admin-product-form/admin-product-form.component';
 import { AdminCategoriesComponent } from '../pages/admin/components/admin-categories/admin-categories.component';
@@ -28,7 +29,7 @@ export const routes: Routes = [
   // Public routes
   {
     path: '',
-    component: HomePageComponent
+    component: HomeComponent
   },
   {
     path: 'products',
@@ -67,6 +68,7 @@ export const routes: Routes = [
     path: 'admin',
     canActivate: [roleGuard],
     data: { role: 'admin' },
+
     children: [
       { path: '', component: AdminDashboardComponent },
       { path: 'products', component: AdminProductsComponent },
@@ -106,4 +108,5 @@ export const routes: Routes = [
     path: '**',
     redirectTo: ''
   }
+
 ];
