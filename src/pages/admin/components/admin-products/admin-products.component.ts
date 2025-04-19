@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AdminSidebarComponent } from '../admin-sidebar/admin-sidebar.component';
-import { Product } from '../../../../models/admin';
+import { Product, ProductQueryParams } from '../../../../models/admin';
 import { AdminService } from '../../../../services/admin/admin.service';
 import { LoadingService } from '../../../../services/shared/loading.service';
 import { NotificationService } from '../../../../services/shared/notification.service';
@@ -56,49 +56,20 @@ export class AdminProductsComponent implements OnInit {
     this.isLoading = true;
     this.loadingService.show();
     
-    // Here we would pass the filter parameters to the service
-    this.adminService.getProducts().subscribe({
+    const queryParams: ProductQueryParams = {
+      pageSize: this.pageSize,
+      pageNumber: this.currentPage,
+      searchTerm: this.searchTerm,
+      categoryId: this.categoryFilter ? parseInt(this.categoryFilter) : undefined,
+      sortBy: this.sortField,
+      sortDirection: this.sortDirection,
+      approvalStatus: this.statusFilter as 'pending' | 'approved' | 'rejected' | 'deleted' | 'pending_review'
+    };
+
+    this.adminService.getProducts(queryParams).subscribe({
       next: (products) => {
         this.products = products;
         this.totalItems = products.length;
-        
-        // Apply filtering
-        if (this.searchTerm) {
-          this.products = this.products.filter(p => 
-            p.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-            p.description.toLowerCase().includes(this.searchTerm.toLowerCase())
-          );
-        }
-        
-        if (this.categoryFilter) {
-          this.products = this.products.filter(p => p.categoryId === this.categoryFilter);
-        }
-        
-        if (this.statusFilter) {
-          this.products = this.products.filter(p => p.status === this.statusFilter);
-        }
-        
-        // Apply sorting
-        this.products.sort((a, b) => {
-          let compareResult = 0;
-          
-          if (this.sortField === 'name') {
-            compareResult = a.name.localeCompare(b.name);
-          } else if (this.sortField === 'price') {
-            compareResult = a.price - b.price;
-          } else if (this.sortField === 'stock') {
-            compareResult = a.stock - b.stock;
-          } else if (this.sortField === 'createdAt') {
-            compareResult = a.createdAt.getTime() - b.createdAt.getTime();
-          }
-          
-          return this.sortDirection === 'asc' ? compareResult : -compareResult;
-        });
-        
-        // Apply pagination
-        const startIndex = (this.currentPage - 1) * this.pageSize;
-        this.products = this.products.slice(startIndex, startIndex + this.pageSize);
-        
         this.isLoading = false;
         this.loadingService.hide();
       },
@@ -137,7 +108,7 @@ export class AdminProductsComponent implements OnInit {
     this.loadProducts();
   }
 
-  deleteProduct(id: string): void {
+  deleteProduct(id: number): void {
     if (confirm('Are you sure you want to delete this product?')) {
       this.loadingService.show();
       
@@ -155,10 +126,10 @@ export class AdminProductsComponent implements OnInit {
     }
   }
 
-  updateProductStatus(id: string, status: 'active' | 'inactive' | 'draft'): void {
+  updateProductStatus(id: number, status: 'pending' | 'approved' | 'rejected' | 'deleted' | 'pending_review'): void {
     this.loadingService.show();
     
-    this.adminService.updateProduct(id, { status }).subscribe({
+    this.adminService.updateProduct(id, { approvalStatus: status }).subscribe({
       next: () => {
         this.notificationService.showSuccess('Product status updated successfully');
         this.loadProducts();
@@ -171,10 +142,10 @@ export class AdminProductsComponent implements OnInit {
     });
   }
 
-  featuredToggle(id: string, featured: boolean): void {
+  featuredToggle(id: number, featured: boolean): void {
     this.loadingService.show();
     
-    this.adminService.updateProduct(id, { featured }).subscribe({
+    this.adminService.updateProduct(id, { isAvailable: featured }).subscribe({
       next: () => {
         this.notificationService.showSuccess(`Product ${featured ? 'marked as featured' : 'removed from featured'}`);
         this.loadProducts();
@@ -185,6 +156,18 @@ export class AdminProductsComponent implements OnInit {
         this.loadingService.hide();
       }
     });
+  }
+
+  getCategoryName(categoryId: number): string {
+    const categories: Record<number, string> = {
+      1: 'Electronics',
+      2: 'Accessories',
+      3: 'Computer Hardware',
+      4: 'Fashion',
+      5: 'Home & Kitchen',
+      6: 'Beauty & Health'
+    };
+    return categories[categoryId] || 'Unknown';
   }
 
   get totalPages(): number {

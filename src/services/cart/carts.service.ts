@@ -7,27 +7,27 @@ import { environment } from '../../environments/environment';
   providedIn: 'root'
 })
 export class CartsService {
-private apiUrl = environment.apiUrl;
-  constructor(private http: HttpClient) { }
-  addItemToCart(): Observable<any> {
-     
-      const request = {
-        "productId": 1011,
-        "quantity": 5,
-      };
-      return this.http.post<any>(`${this.apiUrl}/api/Carts/items`, request)
-        .pipe(
-          tap(response => {
-            if (response.success) {
-                console.log('successfully:', response.data);
-            }
-          }),
-          catchError(error => {
-            // If refresh token fails, log the user out
-            console.error(error)
-            return "";
-          })
-        );
-    }
+  private apiUrl = environment.apiUrl;
   
+  constructor(private http: HttpClient) { }
+  
+  addItemToCart(productId: number, quantity: number): Observable<any> {
+    const request = {
+      productId,
+      quantity
+    };
+    
+    return this.http.post<any>(`${this.apiUrl}/api/Carts/items`, request)
+      .pipe(
+        tap(response => {
+          if (response.success) {
+            console.log('Item added successfully:', response.data);
+          }
+        }),
+        catchError(error => {
+          console.error('Error adding item to cart:', error);
+          throw error; // Re-throw the error so subscribers can handle it
+        })
+      );
+  }
 }

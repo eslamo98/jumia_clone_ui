@@ -61,7 +61,7 @@ export class AdminOrdersComponent implements OnInit {
         // Apply filtering
         if (this.searchTerm) {
           this.orders = this.orders.filter(o => 
-            o.id.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+            o.id.toString().toLowerCase().includes(this.searchTerm.toLowerCase()) ||
             o.customerName.toLowerCase().includes(this.searchTerm.toLowerCase())
           );
         }
@@ -115,7 +115,7 @@ export class AdminOrdersComponent implements OnInit {
     this.loadOrders();
   }
 
-  updateOrderStatus(id: string, status: Order['status']): void {
+  updateOrderStatus(id: number, status: Order['status']): void {
     this.loadingService.show();
     
     this.adminService.updateOrderStatus(id, status).subscribe({

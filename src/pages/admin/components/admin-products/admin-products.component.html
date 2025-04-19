@@ -56,12 +56,12 @@
                     (change)="onFilterChange()"
                   >
                     <option value="">All Categories</option>
-                    <option value="CAT-1">Electronics</option>
-                    <option value="CAT-2">Accessories</option>
-                    <option value="CAT-3">Computer Hardware</option>
-                    <option value="CAT-4">Fashion</option>
-                    <option value="CAT-5">Home & Kitchen</option>
-                    <option value="CAT-6">Beauty & Health</option>
+                    <option [value]="1">Electronics</option>
+                    <option [value]="2">Accessories</option>
+                    <option [value]="3">Computer Hardware</option>
+                    <option [value]="4">Fashion</option>
+                    <option [value]="5">Home & Kitchen</option>
+                    <option [value]="6">Beauty & Health</option>
                   </select>
                 </div>
                 
@@ -163,35 +163,30 @@
                       <td>
                         <div class="d-flex align-items-center">
                           <img 
-                            [src]="product.image" 
+                            [src]="product.mainImageUrl" 
                             class="img-thumbnail me-3" 
                             width="50" 
                             [alt]="product.name"
                           >
                           <div>
                             <h6 class="mb-0">{{product.name}}</h6>
-                            <small class="text-muted">ID: {{product.id}}</small>
+                            <small class="text-muted">ID: {{product.productId}}</small>
                           </div>
                         </div>
                       </td>
                       <td>
                         <span class="badge bg-secondary">
-                          {{product.categoryId === 'CAT-1' ? 'Electronics' : 
-                             product.categoryId === 'CAT-2' ? 'Accessories' : 
-                             product.categoryId === 'CAT-3' ? 'Computer Hardware' : 
-                             product.categoryId === 'CAT-4' ? 'Fashion' : 
-                             product.categoryId === 'CAT-5' ? 'Home & Kitchen' : 
-                             product.categoryId === 'CAT-6' ? 'Beauty & Health' : 'Unknown'}}
+                          {{getCategoryName(product.categoryId)}}
                         </span>
                       </td>
-                      <td>₦{{product.price.toLocaleString()}}</td>
+                      <td>₦{{product.finalPrice.toLocaleString()}}</td>
                       <td>
                         <span [ngClass]="{
-                          'text-success': product.stock > 50,
-                          'text-warning': product.stock > 10 && product.stock <= 50,
-                          'text-danger': product.stock <= 10
+                          'text-success': product.stockQuantity > 50,
+                          'text-warning': product.stockQuantity > 10 && product.stockQuantity <= 50,
+                          'text-danger': product.stockQuantity <= 10
                         }">
-                          {{product.stock}}
+                          {{product.stockQuantity}}
                         </span>
                       </td>
                       <td>
@@ -200,19 +195,19 @@
                             class="btn btn-sm dropdown-toggle" 
                             type="button" 
                             [ngClass]="{
-                              'btn-success': product.status === 'active',
-                              'btn-secondary': product.status === 'inactive',
-                              'btn-warning': product.status === 'draft'
+                              'btn-success': product.approvalStatus === 'approved',
+                              'btn-secondary': product.approvalStatus === 'pending',
+                              'btn-warning': product.approvalStatus === 'pending_review'
                             }"
                             data-bs-toggle="dropdown" 
                             aria-expanded="false"
                           >
-                            {{product.status | titlecase}}
+                            {{product.approvalStatus | titlecase}}
                           </button>
                           <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="javascript:void(0)" (click)="updateProductStatus(product.id, 'active')">Active</a></li>
-                            <li><a class="dropdown-item" href="javascript:void(0)" (click)="updateProductStatus(product.id, 'inactive')">Inactive</a></li>
-                            <li><a class="dropdown-item" href="javascript:void(0)" (click)="updateProductStatus(product.id, 'draft')">Draft</a></li>
+                            <li><a class="dropdown-item" href="javascript:void(0)" (click)="updateProductStatus(product.productId, 'approved')">Approved</a></li>
+                            <li><a class="dropdown-item" href="javascript:void(0)" (click)="updateProductStatus(product.productId, 'pending')">Pending</a></li>
+                            <li><a class="dropdown-item" href="javascript:void(0)" (click)="updateProductStatus(product.productId, 'pending_review')">Review</a></li>
                           </ul>
                         </div>
                       </td>
@@ -222,18 +217,18 @@
                             class="form-check-input" 
                             type="checkbox" 
                             role="switch" 
-                            [checked]="product.featured" 
-                            (change)="featuredToggle(product.id, !product.featured)"
+                            [checked]="product.isAvailable" 
+                            (change)="featuredToggle(product.productId, !product.isAvailable)"
                           >
                         </div>
                       </td>
                       <td>{{product.createdAt | date:'short'}}</td>
                       <td>
                         <div class="d-flex justify-content-end">
-                          <a [routerLink]="['/admin/products/edit', product.id]" class="btn btn-sm btn-outline-primary me-2">
+                          <a [routerLink]="['/admin/products/edit', product.productId]" class="btn btn-sm btn-outline-primary me-2">
                             <i class="bi bi-pencil"></i>
                           </a>
-                          <button type="button" class="btn btn-sm btn-outline-danger" (click)="deleteProduct(product.id)">
+                          <button type="button" class="btn btn-sm btn-outline-danger" (click)="deleteProduct(product.productId)">
                             <i class="bi bi-trash"></i>
                           </button>
                         </div>

@@ -30,7 +30,7 @@ export class AdminProductFormComponent implements OnInit {
   sellers: any[] = [];
   isLoading = false;
   isEditMode = false;
-  productId: string | null = null;
+  productId!: number;
 
   constructor(
     private fb: FormBuilder,
@@ -97,7 +97,7 @@ export class AdminProductFormComponent implements OnInit {
     });
   }
 
-  loadProduct(id: string | null): void {
+  loadProduct(id: number | null): void {
     if (!id) return;
     this.isLoading = true;
     this.loadingService.show();
@@ -108,15 +108,15 @@ export class AdminProductFormComponent implements OnInit {
           this.productForm.patchValue({
             name: product.name,
             description: product.description,
-            price: product.price,
-            discountPrice: product.discountPrice,
-            stock: product.stock,
-            image: product.image,
+            price: product.finalPrice,
+            discountPrice: product.discountPercentage,
+            stock: product.stockQuantity,
+            image: product.mainImageUrl,
             images: product.images || [],
             categoryId: product.categoryId,
             sellerId: product.sellerId,
-            status: product.status,
-            featured: product.featured || false
+            status: product.approvalStatus,
+            featured: false
           });
         } else {
           this.notificationService.showError('Product not found');

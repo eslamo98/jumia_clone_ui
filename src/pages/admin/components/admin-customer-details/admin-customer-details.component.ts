@@ -24,7 +24,7 @@ import { NotificationService } from '../../../../services/shared/notification.se
   templateUrl: './admin-customer-details.component.html'
 })
 export class AdminCustomerDetailsComponent implements OnInit {
-  customerId: string | null = null;
+  customerId: number | null = null;
   customer: User | null = null;
   customerOrders: Order[] = [];
   isLoading = false;
@@ -49,7 +49,7 @@ export class AdminCustomerDetailsComponent implements OnInit {
     });
   }
 
-  loadCustomer(id: string | null): void {
+  loadCustomer(id: number | null): void {
     if (!id) return;
     this.isLoading = true;
     this.loadingService.show();
@@ -74,7 +74,7 @@ export class AdminCustomerDetailsComponent implements OnInit {
     });
   }
 
-  loadCustomerOrders(customerId: string): void {
+  loadCustomerOrders(customerId: number): void {
     this.adminService.getOrders().subscribe({
       next: (orders) => {
         // Filter orders for this customer

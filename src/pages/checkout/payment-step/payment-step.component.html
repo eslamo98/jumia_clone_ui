@@ -1,0 +1,11 @@
+<div class="step" [ngClass]="{'active': currentStep === 3}">
+  <h2> <span class="checkmark">✅</span> Payment <i class="fa fa-credit-card"></i></h2>
+  <div class="payment-options">
+    <p>Select Payment Method:</p>
+    <input type="radio" id="credit-card" name="payment" value="credit-card" [(ngModel)]="selectedPaymentMethod" (ngModelChange)="onPaymentMethodChange()" />
+    <label for="credit-card"><i class="fa fa-credit-card"></i> Credit Card</label><br />
+    <input type="radio" id="paypal" name="payment" value="paypal" [(ngModel)]="selectedPaymentMethod" (ngModelChange)="onPaymentMethodChange()" />
+    <label for="paypal"><i class="fa fa-paypal"></i> PayPal</label><br />
+  </div>
+  <button class="confirm-btn" (click)="confirmPaymentMethod()">Confirm Payment Method </button>
+</div>

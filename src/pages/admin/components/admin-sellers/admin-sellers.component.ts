@@ -78,23 +78,7 @@ export class AdminSellersComponent implements OnInit {
         }
         
         // Apply sorting
-        this.sellers.sort((a, b) => {
-          let compareResult = 0;
-          
-          if (this.sortField === 'storeName') {
-            compareResult = a.storeName.localeCompare(b.storeName);
-          } else if (this.sortField === 'email') {
-            compareResult = a.email.localeCompare(b.email);
-          } else if (this.sortField === 'createdAt') {
-            compareResult = a.createdAt.getTime() - b.createdAt.getTime();
-          } else if (this.sortField === 'rating') {
-            const aRating = a.rating || 0;
-            const bRating = b.rating || 0;
-            compareResult = aRating - bRating;
-          }
-          
-          return this.sortDirection === 'asc' ? compareResult : -compareResult;
-        });
+        this.sortSellers();
         
         // Apply pagination
         const startIndex = (this.currentPage - 1) * this.pageSize;
@@ -138,7 +122,19 @@ export class AdminSellersComponent implements OnInit {
     this.loadSellers();
   }
 
-  updateSellerStatus(id: string, status: Seller['status']): void {
+  sortSellers(): void {
+    this.sellers.sort((a, b) => {
+      let compareResult = 0;
+      if (this.sortField === 'name') {
+        compareResult = a.storeName.localeCompare(b.storeName);
+      } else if (this.sortField === 'date') {
+        compareResult = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+      }
+      return this.sortDirection === 'asc' ? compareResult : -compareResult;
+    });
+  }
+
+  updateSellerStatus(id: number, status: 'active' | 'inactive' | 'banned'): void {
     this.loadingService.show();
     
     this.adminService.updateSellerStatus(id, status).subscribe({
@@ -154,7 +150,7 @@ export class AdminSellersComponent implements OnInit {
     });
   }
 
-  updateVerificationStatus(id: string, status: Seller['verificationStatus'], reason?: string): void {
+  updateVerificationStatus(id: number, status: 'pending' | 'verified' | 'rejected', reason?: string): void {
     this.loadingService.show();
     
     this.adminService.updateSellerVerification(id, status, reason).subscribe({

@@ -5,7 +5,7 @@ import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AdminSidebarComponent } from '../admin-sidebar/admin-sidebar.component';
 import { AdminHeaderComponent } from '../admin-header/admin-header.component';
-import { Product, Seller } from '../../../../models/admin';
+import { Product, Seller, ProductQueryParams } from '../../../../models/admin';
 import { AdminService } from '../../../../services/admin/admin.service';
 import { LoadingService } from '../../../../services/shared/loading.service';
 import { NotificationService } from '../../../../services/shared/notification.service';
@@ -24,7 +24,7 @@ import { NotificationService } from '../../../../services/shared/notification.se
   templateUrl: './admin-seller-details.component.html'
 })
 export class AdminSellerDetailsComponent implements OnInit {
-  sellerId: string | null = null;
+  sellerId: number | null = null;
   seller: Seller | null = null;
   sellerProducts: Product[] = [];
   isLoading = false;
@@ -42,19 +42,15 @@ export class AdminSellerDetailsComponent implements OnInit {
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       if (params['id']) {
-        this.sellerId = params['id'];
-        this.loadSeller(this.sellerId);
-      } else {
-        this.router.navigate(['/admin/sellers']);
+        this.sellerId = parseInt(params['id'], 10);
+        this.loadSellerDetails(this.sellerId);
+        this.loadSellerProducts();
       }
     });
   }
 
-  loadSeller(id: string | null): void {
-    if (!id) return;
+  loadSellerDetails(id: number): void {
     this.isLoading = true;
-    this.loadingService.show();
-    
     this.adminService.getSellerById(id).subscribe({
       next: (seller) => {
         if (seller) {
@@ -76,17 +72,17 @@ export class AdminSellerDetailsComponent implements OnInit {
   }
 
   loadSellerProducts(): void {
-    if (!this.sellerId) {
-      this.isLoading = false;
-      this.loadingService.hide();
-      return;
-    }
+    if (!this.sellerId) return;
+
+    const params: ProductQueryParams = {
+      pageSize: 100, // Load more to ensure we get all seller's products
+      pageNumber: 1
+    };
     
-    this.adminService.getProducts().subscribe({
+    this.adminService.getProducts(params).subscribe({
       next: (products) => {
-        // Filter products for this seller
+        // Filter products for this seller after fetching
         this.sellerProducts = products.filter(product => product.sellerId === this.sellerId);
-        
         this.isLoading = false;
         this.loadingService.hide();
       },
@@ -98,7 +94,7 @@ export class AdminSellerDetailsComponent implements OnInit {
     });
   }
 
-  updateSellerStatus(status: Seller['status']): void {
+  updateSellerStatus(status: 'active' | 'inactive' | 'banned'): void {
     if (!this.sellerId) return;
     
     this.loadingService.show();
@@ -119,7 +115,7 @@ export class AdminSellerDetailsComponent implements OnInit {
     });
   }
 
-  updateVerificationStatus(status: Seller['verificationStatus']): void {
+  updateVerificationStatus(status: 'pending' | 'verified' | 'rejected'): void {
     if (!this.sellerId) return;
     
     let reason = undefined;

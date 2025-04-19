@@ -93,13 +93,13 @@
                           <tr *ngFor="let product of dashboardStats.topProducts">
                             <td>
                               <div class="d-flex align-items-center">
-                                <img [src]="product.image" class="img-thumbnail me-2" width="40" alt="{{product.name}}">
+                                <img [src]="product.mainImageUrl" class="img-thumbnail me-2" width="40" alt="Product image">
                                 <span>{{product.name}}</span>
                               </div>
                             </td>
-                            <td>₦{{product.price.toFixed(2)}}</td>
+                            <td>₦{{product.finalPrice.toFixed(2)}}</td>
                             <td>{{product.unitsSold}}</td>
-                            <td>₦{{(product.price * (product.unitsSold ?? 0)).toFixed(2)}}</td>                          </tr>
+                            <td>₦{{(product.finalPrice * (product.unitsSold ?? 0)).toFixed(2)}}</td>                          </tr>
                         </tbody>
                       </table>
                     </div>

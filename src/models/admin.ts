@@ -1,3 +1,73 @@
+import { PaginationParams } from "./general";
+export interface ApiResponse {
+  success: boolean;
+  message: string;
+  data: Product[];
+}
+
+export interface Product {
+  productId: number;
+  name: string;
+  description: string;
+  basePrice: number;
+  discountPercentage: number;
+  finalPrice: number;
+  stockQuantity: number;
+  isAvailable: boolean;
+  approvalStatus: 'pending' | 'approved' | 'rejected' | 'deleted' | 'pending_review';
+  createdAt: string; // ISO date string
+  updatedAt: string; // ISO date string
+  mainImageUrl: string;
+  averageRating: number;
+  sellerId: number;
+  sellerName: string;
+  subcategoryId: number;
+  subcategoryName: string;
+  categoryId: number;
+  categoryName: string | null;
+  ratingCount: number;
+  reviewCount: number;
+  unitsSold?: number;
+  images: ProductImage[];
+  variants: ProductVariant[];
+  attributeValues: ProductAttributeValue[];
+}
+
+export interface ProductImage {
+  imageId: number;
+  productId: number;
+  imageUrl: string;
+  displayOrder: number;
+}
+
+export interface ProductVariant {
+  variantId: number;
+  productId: number;
+  variantName: string;
+  price: number;
+  discountPercentage: number;
+  finalPrice: number;
+  stockQuantity: number;
+  sku: string;
+  variantImageUrl: string;
+  isDefault: boolean;
+  isAvailable: boolean;
+  attributes: VariantAttribute[]; // Currently an empty array
+}
+
+export interface VariantAttribute {
+  // If attributes ever get values, define fields here
+}
+
+export interface ProductAttributeValue {
+  valueId: number;
+  productId: number;
+  attributeId: number;
+  attributeName: string;
+  attributeType: string;
+  value: string;
+}
+
 // src/app/models/dashboard-stats.model.ts
 export interface DashboardStats {
     revenue: number;
@@ -14,10 +84,10 @@ export interface DashboardStats {
   
   // src/app/models/order.model.ts
   export interface Order {
-    id: string;
+    id: number;
     customerName: string;
-    customerId: string;
-    date: Date;
+    customerId: number;
+    date: string; // ISO date string for consistency
     amount: number;
     status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'completed';
     items: OrderItem[];
@@ -27,7 +97,7 @@ export interface DashboardStats {
   }
   
   export interface OrderItem {
-    productId: string;
+    productId: number;
     productName: string;
     quantity: number;
     price: number;
@@ -35,57 +105,59 @@ export interface DashboardStats {
   }
   
   // src/app/models/product.model.ts
-  export interface Product {
-    id: string;
-    name: string;
-    description: string;
-    price: number;
-    discountPrice?: number;
-    stock: number;
-    image: string;
-    images?: string[];
-    categoryId: string;
-    category?: Category;
-    sellerId: string;
-    sellerName?: string;
-    rating?: number;
-    reviewCount?: number;
-    featured?: boolean;
-    status: 'active' | 'inactive' | 'draft';
-    createdAt: Date;
-    updatedAt: Date;
-    unitsSold?: number;
-  }
+  // export interface Product {
+  //   id: string;
+  //   name: string;
+  //   description: string;
+  //   price: number;
+  //   discountPrice?: number;
+  //   stock: number;
+  //   image: string;
+  //   images?: string[];
+  //   categoryId: string;
+  //   category?: Category;
+  //   sellerId: string;
+  //   sellerName?: string;
+  //   rating?: number;
+  //   reviewCount?: number;
+  //   featured?: boolean;
+  //   status: 'active' | 'inactive' | 'draft';
+  //   createdAt: Date;
+  //   updatedAt: Date;
+  //   unitsSold?: number;
+  // }
   
   // src/app/models/category.model.ts
   export interface Category {
-    id: string;
+    id: number;
     name: string;
     description?: string;
     image?: string;
-    parentId?: string;
+    parentId?: number;
     subCategories?: Category[];
     productCount?: number;
     status: 'active' | 'inactive';
+    createdAt: string; // ISO date string
+    updatedAt: string; // ISO date string
   }
   
   // src/app/models/user.model.ts
   export interface User {
-    id: string;
+    id: number;
     email: string;
     firstName: string;
     lastName: string;
-    role: 'admin' | 'customer' | 'seller';
+    role: 'Admin' | 'Customer' | 'Seller';
     phoneNumber?: string;
     avatar?: string;
     addresses?: Address[];
     status: 'active' | 'inactive' | 'banned';
-    createdAt: Date;
-    lastLogin?: Date;
+    createdAt: string; // ISO date string
+    lastLogin?: string; // ISO date string
   }
   
   export interface Address {
-    id?: string;
+    id?: number;
     street: string;
     city: string;
     state: string;
@@ -114,6 +186,17 @@ export interface DashboardStats {
     accountNumber: string;
     bankName: string;
     branchCode?: string;
+  }
+  export interface ProductQueryParams extends PaginationParams {
+    categoryId?: number;
+    subcategoryId?: number;
+    minPrice?: number;
+    maxPrice?: number;
+    sellerId?: number;
+    searchTerm?: string;
+    approvalStatus?: 'pending' | 'approved' | 'rejected' | 'deleted' | 'pending_review';
+    sortBy?: string;
+    sortDirection?: 'asc' | 'desc';
   }
   
   // src/app/models/review.model.ts
