@@ -26,6 +26,7 @@ export class ProductDetailsComponent implements OnInit {
   isFollowing: boolean = false;
   selectedLocation: number = 1;
   freeDeliveryThreshold: number = 500;
+  showToast: boolean = false;
   
   deliveryLocations = [
     { id: 1, name: 'Al Beheira' },
@@ -52,6 +53,7 @@ export class ProductDetailsComponent implements OnInit {
     private route: ActivatedRoute,
     private productService: ProductService,
     private cartsService: CartsService,
+    
     private notificationService: NotificationService
   ) {}
 
@@ -163,30 +165,50 @@ export class ProductDetailsComponent implements OnInit {
     endDate.setDate(endDate.getDate() + 1);
     return `${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`;
   }
-
+  isAddedToCart: boolean = false;
   public addToCart(): void {
+    // Check if the product is available and the quantity is greater than 0
     if (!this.product || this.quantity < 1) return;
-
+    this.isAddedToCart = true;
+    // Get the productId and variantId
     const productId = this.product.ProductId;
     const variantId = this.selectedVariant?.VariantId;
-    
-    this.cartsService.addItemToCart(productId, this.quantity).subscribe({
+  
+    // Call the service to add the item to the cart
+    this.cartsService.addItemToCart(productId, this.quantity, variantId).subscribe({
       next: (response) => {
         if (response.success) {
+          // Display a success notification if the item is added to the cart
           this.notificationService.showSuccess('Item added to cart successfully');
           console.log('Item added to cart:', response.data);
         } else {
+          // Display an error notification if the API response indicates failure
           this.notificationService.showError(response.message || 'Failed to add item to cart');
           console.error('Failed to add item to cart:', response.message);
         }
       },
       error: (err) => {
+        // Display a generic error notification in case of network or server issues
         this.notificationService.showError('Error adding item to cart. Please try again.');
         console.error('Error adding item to cart:', err);
-      }
-    });
-  }
+      
+      
+      setTimeout(() => {
+        this.isAddedToCart = false; 
+      }, 300);
+    }
+  });
 
+  
+    // Show the toast notification
+    this.showToast = true;
+
+    // Hide the toast after 3 seconds
+    setTimeout(() => {
+      this.showToast = false;
+    }, 3000);
+  }
+  
   public setActiveTab(tab: string): void {
     this.activeTab = tab;
   }
