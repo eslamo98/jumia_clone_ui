@@ -16,6 +16,8 @@ import { TrendyOutfitsContainerComponent } from "./homeComponents/trendyOutfitsC
 import { KitchenContainerComponent } from "./homeComponents/KitchenContainer/kitchen-container/kitchen-container.component";
 import { PhonesContainerComponent } from "./homeComponents/PhonesContainer/phones-container/phones-container.component";
 import { ComputingContainerComponent } from "./homeComponents/computingContainer/computing-container/computing-container.component";
+import { DecorContainerComponent } from "./homeComponents/decorContainer/decor-container/decor-container.component";
+import { KeepShoppingComponent } from "./homeComponents/keepShoppingContainer/keep-shopping/keep-shopping.component";
 
 
 
@@ -36,7 +38,9 @@ import { ComputingContainerComponent } from "./homeComponents/computingContainer
     TrendyOutfitsContainerComponent,
     KitchenContainerComponent,
     PhonesContainerComponent,
-    ComputingContainerComponent
+    ComputingContainerComponent,
+    DecorContainerComponent,
+    KeepShoppingComponent
 ],
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.css'

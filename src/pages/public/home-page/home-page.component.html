@@ -84,9 +84,14 @@
 
 <app-trendy-outfits-container></app-trendy-outfits-container>
 
+
 <app-kitchen-container></app-kitchen-container>
 
+<app-keep-shopping></app-keep-shopping>
+
 <app-phones-container></app-phones-container>
+
+<app-decor-container></app-decor-container>
 
 <app-computing-container></app-computing-container>
 
@@ -117,32 +122,10 @@
     </section>
   -->
   
-    <!-- Flash Sales Section -->
-    <section class="flash-sales-section">
-      <div class="section-title">
-        <h2>Flash Sales</h2>
-        <div class="timer">
-          <span>Ends in:</span>
-          <div class="countdown">
-            <span>10</span>:<span>45</span>:<span>30</span>
-          </div>
-        </div>
-      </div>
-      <div class="products-grid">
-        <app-product-card 
-          *ngFor="let product of featuredProducts" 
-          [product]="product">
-        </app-product-card>
-      </div>
-    </section>
+  
   
     <!-- Mid Banner -->
-    <section class="mid-banner">
-      <app-banner 
-        [image]="'/images/home/slider1.png'"
-        [link]="'/promotions/clearance'">
-      </app-banner>
-    </section>
+ 
   
     <!-- Top Deals Section -->
     <section class="top-deals-section">

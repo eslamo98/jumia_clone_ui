@@ -11,7 +11,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #fff2d6;
+    background-color: #ffffff;
     color: black;
     padding: 15px 20px;
   }
@@ -27,7 +27,7 @@
   
   .see-all {
     a {
-      color: black;
+      color: #f49932;
       text-decoration: none;
       display: flex;
       align-items: center;
@@ -49,7 +49,7 @@
     background-color: #ffffff;
     height: 320px;
     padding: 10px 0;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
   }
   
   .products-container {

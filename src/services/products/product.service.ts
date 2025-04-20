@@ -34,7 +34,7 @@ export class ProductService {
       );
   }
 
-  getFlashSaleProducts(subCategory:string , count:number=15): Observable<any> {
+  getRandomSubCategoryProducts(subCategory:string , count:number=15): Observable<any> {
     const params = new HttpParams()
     .set('subCategoryName', subCategory.toString())
     .set('count', count.toString());  

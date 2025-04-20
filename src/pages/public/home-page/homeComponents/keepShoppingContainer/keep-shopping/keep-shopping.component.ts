@@ -1,11 +1,11 @@
-// flash-sales-banner.component.ts
+// KeepShopping-container.component.ts
 import { Component, OnInit, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { interval } from 'rxjs';
 import { map, takeWhile } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
-import { ProductService } from '../../../../../../../services/products/product.service';
-import { Helpers } from '../../../../../../../Utility/helpers';
+import { ProductService } from '../../../../../../services/products/product.service';
+import { Helpers } from '../../../../../../Utility/helpers';
 
 interface Product {
   productId: number;
@@ -14,7 +14,7 @@ interface Product {
   basePrice: number;
   discountPercentage: number;
   finalPrice: number;
-  stockQuantity: number;
+  // stockQuantity: number;
   isAvailable: boolean;
   mainImageUrl: string;
   averageRating: number;
@@ -25,13 +25,13 @@ interface Product {
 }
 
 @Component({
-  selector: 'app-flash-sales-bannar',
+  selector: 'app-keep-shopping',
   imports: [CommonModule , RouterModule],
-  templateUrl: './flash-sales-bannar.component.html',
-  styleUrls: ['./flash-sales-bannar.component.css'],
+  templateUrl: './keep-shopping.component.html',
+  styleUrl: './keep-shopping.component.css',
   standalone: true
 })
-export class FlashSalesBannerComponent extends Helpers implements OnInit, AfterViewInit {
+export class KeepShoppingComponent extends Helpers implements OnInit, AfterViewInit {
   @ViewChild('productContainer') productContainer!: ElementRef;
   
   products: Product[] = [];
@@ -66,7 +66,7 @@ export class FlashSalesBannerComponent extends Helpers implements OnInit, AfterV
     this.loading = true;
     this.error = null;
     
-    this.productService.getRandomSubCategoryProducts("TVs").subscribe({
+    this.productService.getRandomSubCategoryProducts("Cameras").subscribe({
       next: (data) => {
         console.log('API response data:', data);
         
