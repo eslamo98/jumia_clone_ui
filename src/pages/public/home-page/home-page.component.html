@@ -78,24 +78,35 @@
 
 <app-static-container></app-static-container>
 
+<app-electronics-container></app-electronics-container>
+
 <app-two-images-bannar></app-two-images-bannar>
 
 <app-top-picks-container></app-top-picks-container>
 
 <app-trendy-outfits-container></app-trendy-outfits-container>
 
+
 <app-kitchen-container></app-kitchen-container>
+
+<app-keep-shopping></app-keep-shopping>
 
 <app-phones-container></app-phones-container>
 
+<app-decor-container></app-decor-container>
+
 <app-computing-container></app-computing-container>
+
+<app-top-selling></app-top-selling>
+
+<app-info></app-info>
 
 <!-- pages/home/home.component.html -->
 <div class="jumia-home-container">
     <!-- Main Carousel -->
-    <section class="main-carousel">
+    <!-- <section class="main-carousel">
       <app-carousel [images]="banners"></app-carousel>
-    </section>
+    </section> -->
 
   <!--
     <!-- Categories Section --
@@ -117,55 +128,8 @@
     </section>
   -->
   
-    <!-- Flash Sales Section -->
-    <section class="flash-sales-section">
-      <div class="section-title">
-        <h2>Flash Sales</h2>
-        <div class="timer">
-          <span>Ends in:</span>
-          <div class="countdown">
-            <span>10</span>:<span>45</span>:<span>30</span>
-          </div>
-        </div>
-      </div>
-      <div class="products-grid">
-        <app-product-card 
-          *ngFor="let product of featuredProducts" 
-          [product]="product">
-        </app-product-card>
-      </div>
-    </section>
+
+
   
-    <!-- Mid Banner -->
-    <section class="mid-banner">
-      <app-banner 
-        [image]="'/images/home/slider1.png'"
-        [link]="'/promotions/clearance'">
-      </app-banner>
-    </section>
-  
-    <!-- Top Deals Section -->
-    <section class="top-deals-section">
-      <div class="section-title">
-        <h2>Top Deals</h2>
-      </div>
-      <div class="products-grid">
-        <app-product-card 
-          *ngFor="let product of topDeals" 
-          [product]="product">
-        </app-product-card>
-      </div>
-    </section>
-  
-    <!-- Newsletter Subscription -->
-    <section class="newsletter-section">
-      <div class="newsletter-container">
-        <h3>Subscribe to our Newsletter</h3>
-        <p>Get updates on our latest offers!</p>
-        <div class="subscription-form">
-          <input type="email" placeholder="Enter your email">
-          <button>Subscribe</button>
-        </div>
-      </div>
-    </section>
+
 </div>

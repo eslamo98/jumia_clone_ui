@@ -66,7 +66,7 @@ export class TopPicksContainerComponent extends Helpers implements OnInit, After
     this.loading = true;
     this.error = null;
     
-    this.productService.getFlashSaleProducts("Footwear").subscribe({
+    this.productService.getRandomSubCategoryProducts("Footwear").subscribe({
       next: (data) => {
         console.log('API response data:', data);
         
