@@ -11,8 +11,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #e41e23;
-    color: white;
+    background-color: #fff2d6;
+    color: black;
     padding: 15px 20px;
   }
   
@@ -20,26 +20,21 @@
     display: flex;
     align-items: center;
     font-size: 18px;
-    font-weight: bold;
+    /* font-weight: bold; */
     
     .flash-icon {
       display: inline-block;
       width: 24px;
       height: 24px;
-      background-image: url('/images/home/flashSale/flashSale.png');
       background-size: contain;
       margin-right: 8px;
     }
   }
   
-  .timer {
-    font-size: 18px;
-    font-weight: bold;
-  }
   
   .see-all {
     a {
-      color: white;
+      color: black;
       text-decoration: none;
       display: flex;
       align-items: center;
@@ -48,7 +43,6 @@
         display: inline-block;
         width: 16px;
         height: 16px;
-        background-image: url('/images/home/flashSale/flashSale.png');
         background-size: contain;
         margin-left: 5px;
       }
@@ -59,7 +53,8 @@
     position: relative;
     display: flex;
     align-items: center;
-    background-color: #fff;
+    background-color: #ffffff;
+    height: 320px;
     padding: 10px 0;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
@@ -80,7 +75,7 @@
   .product-card {
     flex: 0 0 auto;
     width: 225px;
-    height: 320px;
+    height: 290px;
     margin: 0 10px;
     border-radius: 5px;
     overflow: hidden;
@@ -129,8 +124,9 @@
   
   .product-name {
     font-size: 14px;
+    color: #000000;
     margin: 0 0 10px;
-    height: 40px;
+    /* height: 40px; */
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
@@ -155,32 +151,7 @@
     }
   }
   
-  /* في ملف flash-sales-banner.component.scss */
-.stock-info {
-  .items-left {
-    font-size: 12px;
-    color: #333;
-    margin-bottom: 5px;
-    display: block;
-  }
-  
-  .progress-bar {
-    height: 5px;
-    background-color: #eee;
-    border-radius: 3px;
-    overflow: hidden;
-    
-    .progress {
-      height: 100%;
-      background-color: #ff9900; /* اللون البرتقالي الافتراضي */
-      
-      &.low-stock-progress {
-        background-color: #e41e23; /* لون أحمر عندما تكون الكمية أقل من 10 */
-      }
-    }
-  }
-}
-  
+
   .scroll-arrow {
     position: absolute;
     display: flex;
