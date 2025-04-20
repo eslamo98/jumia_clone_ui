@@ -21,7 +21,6 @@ export class AppComponent {
   title = 'Jumia Clone';
   notificationMessage: string | null = null;
   notificationType: 'success' | 'error' = 'success';
-  
   constructor(
     public authService: AuthService,
     private router: Router
@@ -33,7 +32,12 @@ export class AppComponent {
       this.clearNotification();
     });
   }
-  
+  getCurrentUrl(): string {
+    return this.router.url;
+  }
+
+
+
   showNotification(message: string, type: 'success' | 'error'): void {
     this.notificationMessage = message;
     this.notificationType = type;

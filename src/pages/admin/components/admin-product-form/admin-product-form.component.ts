@@ -5,11 +5,11 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } 
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { AdminSidebarComponent } from '../admin-sidebar/admin-sidebar.component';
 import { AdminHeaderComponent } from '../admin-header/admin-header.component';
-import { Category } from '../../../../models/admin';
+import { Category, Product, Seller } from '../../../../models/admin';
 import { AdminService } from '../../../../services/admin/admin.service';
+import { ProductsService } from '../../../../services/admin/products.service';
 import { LoadingService } from '../../../../services/shared/loading.service';
 import { NotificationService } from '../../../../services/shared/notification.service';
-
 
 @Component({
   selector: 'app-admin-product-form',
@@ -27,7 +27,7 @@ import { NotificationService } from '../../../../services/shared/notification.se
 export class AdminProductFormComponent implements OnInit {
   productForm: FormGroup;
   categories: Category[] = [];
-  sellers: any[] = [];
+  sellers: Seller[] = [];
   isLoading = false;
   isEditMode = false;
   productId!: number;
@@ -35,6 +35,7 @@ export class AdminProductFormComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private adminService: AdminService,
+    private productsService: ProductsService,
     private loadingService: LoadingService,
     private notificationService: NotificationService,
     private route: ActivatedRoute,
@@ -50,7 +51,7 @@ export class AdminProductFormComponent implements OnInit {
     // Check if we're in edit mode
     this.route.params.subscribe(params => {
       if (params['id']) {
-        this.productId = params['id'];
+        this.productId = parseInt(params['id'], 10);
         this.isEditMode = true;
         this.loadProduct(this.productId);
       }
@@ -61,15 +62,14 @@ export class AdminProductFormComponent implements OnInit {
     return this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3)]],
       description: ['', [Validators.required, Validators.minLength(10)]],
-      price: [0, [Validators.required, Validators.min(0)]],
-      discountPrice: [null],
-      stock: [0, [Validators.required, Validators.min(0)]],
-      image: ['', Validators.required],
-      images: [[]],
+      basePrice: [0, [Validators.required, Validators.min(0)]],
+      discountPercentage: [0, [Validators.min(0), Validators.max(100)]],
+      stockQuantity: [0, [Validators.required, Validators.min(0)]],
+      mainImageUrl: ['', Validators.required],
       categoryId: ['', Validators.required],
       sellerId: ['', Validators.required],
-      status: ['active', Validators.required],
-      featured: [false]
+      approvalStatus: ['pending', Validators.required],
+      isAvailable: [true]
     });
   }
 
@@ -97,26 +97,24 @@ export class AdminProductFormComponent implements OnInit {
     });
   }
 
-  loadProduct(id: number | null): void {
-    if (!id) return;
+  loadProduct(id: number): void {
     this.isLoading = true;
     this.loadingService.show();
     
-    this.adminService.getProductById(id).subscribe({
+    this.productsService.getProductById(id).subscribe({
       next: (product) => {
         if (product) {
           this.productForm.patchValue({
             name: product.name,
             description: product.description,
-            price: product.finalPrice,
-            discountPrice: product.discountPercentage,
-            stock: product.stockQuantity,
-            image: product.mainImageUrl,
-            images: product.images || [],
+            basePrice: product.basePrice,
+            discountPercentage: product.discountPercentage,
+            stockQuantity: product.stockQuantity,
+            mainImageUrl: product.mainImageUrl,
             categoryId: product.categoryId,
             sellerId: product.sellerId,
-            status: product.approvalStatus,
-            featured: false
+            approvalStatus: product.approvalStatus,
+            isAvailable: product.isAvailable
           });
         } else {
           this.notificationService.showError('Product not found');
@@ -138,7 +136,6 @@ export class AdminProductFormComponent implements OnInit {
 
   onSubmit(): void {
     if (this.productForm.invalid) {
-      // Mark all fields as touched to trigger validation messages
       this.productForm.markAllAsTouched();
       this.notificationService.showWarning('Please fix the form errors');
       return;
@@ -147,11 +144,13 @@ export class AdminProductFormComponent implements OnInit {
     this.isLoading = true;
     this.loadingService.show();
     
-    const productData = this.productForm.value;
+    const productData = new FormData();
+    Object.keys(this.productForm.value).forEach(key => {
+      productData.append(key, this.productForm.value[key]);
+    });
     
-    if (this.isEditMode && this.productId) {
-      // Update existing product
-      this.adminService.updateProduct(this.productId, productData).subscribe({
+    if (this.isEditMode) {
+      this.productsService.updateProduct(this.productId, productData).subscribe({
         next: (product) => {
           this.notificationService.showSuccess('Product updated successfully');
           this.isLoading = false;
@@ -166,8 +165,7 @@ export class AdminProductFormComponent implements OnInit {
         }
       });
     } else {
-      // Create new product
-      this.adminService.createProduct(productData).subscribe({
+      this.productsService.createProduct(productData).subscribe({
         next: (product) => {
           this.notificationService.showSuccess('Product created successfully');
           this.isLoading = false;
@@ -208,6 +206,10 @@ export class AdminProductFormComponent implements OnInit {
     
     if (control.errors?.['min']) {
       return `Value should be at least ${control.errors['min'].min}`;
+    }
+
+    if (control.errors?.['max']) {
+      return `Value should not exceed ${control.errors['max'].max}`;
     }
     
     return 'Invalid value';

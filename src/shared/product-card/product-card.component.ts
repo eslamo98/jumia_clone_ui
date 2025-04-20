@@ -7,6 +7,7 @@ import { Product } from '../../models/product';
 
 @Component({
   selector: 'app-product-card',
+  imports: [CommonModule, RouterModule],
   templateUrl: './product-card.component.html',
   styleUrls: ['./product-card.component.css']
 })

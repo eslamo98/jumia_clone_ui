@@ -1,10 +1,14 @@
 import { PaginationParams } from "./general";
-export interface ApiResponse {
+export interface ApiResponse<T = ProductsData> {
   success: boolean;
   message: string;
-  data: Product[];
+  data: T;
 }
 
+export interface ProductsData {
+  products: Product[];
+  totalItems: number;
+}
 export interface Product {
   productId: number;
   name: string;
