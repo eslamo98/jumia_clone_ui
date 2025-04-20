@@ -6,10 +6,10 @@ import { FormsModule } from '@angular/forms';
 import { AdminSidebarComponent } from '../admin-sidebar/admin-sidebar.component';
 import { Product, ProductQueryParams } from '../../../../models/admin';
 import { AdminService } from '../../../../services/admin/admin.service';
+import { ProductsService } from '../../../../services/admin/products.service';
 import { LoadingService } from '../../../../services/shared/loading.service';
 import { NotificationService } from '../../../../services/shared/notification.service';
 import { AdminHeaderComponent } from '../admin-header/admin-header.component';
-
 
 @Component({
   selector: 'app-admin-products',
@@ -44,6 +44,7 @@ export class AdminProductsComponent implements OnInit {
 
   constructor(
     private adminService: AdminService,
+    private productsService: ProductsService,
     private loadingService: LoadingService,
     private notificationService: NotificationService
   ) {}
@@ -66,10 +67,10 @@ export class AdminProductsComponent implements OnInit {
       approvalStatus: this.statusFilter as 'pending' | 'approved' | 'rejected' | 'deleted' | 'pending_review'
     };
 
-    this.adminService.getProducts(queryParams).subscribe({
-      next: (products) => {
-        this.products = products;
-        this.totalItems = products.length;
+    this.productsService.getProducts(queryParams).subscribe({
+      next: (response) => {
+        this.products = response.products;
+        this.totalItems = response.totalItems;
         this.isLoading = false;
         this.loadingService.hide();
       },
@@ -112,7 +113,7 @@ export class AdminProductsComponent implements OnInit {
     if (confirm('Are you sure you want to delete this product?')) {
       this.loadingService.show();
       
-      this.adminService.deleteProduct(id).subscribe({
+      this.productsService.deleteProduct(id).subscribe({
         next: () => {
           this.notificationService.showSuccess('Product deleted successfully');
           this.loadProducts();
@@ -129,7 +130,7 @@ export class AdminProductsComponent implements OnInit {
   updateProductStatus(id: number, status: 'pending' | 'approved' | 'rejected' | 'deleted' | 'pending_review'): void {
     this.loadingService.show();
     
-    this.adminService.updateProduct(id, { approvalStatus: status }).subscribe({
+    this.productsService.updateProduct(id, { approvalStatus: status }).subscribe({
       next: () => {
         this.notificationService.showSuccess('Product status updated successfully');
         this.loadProducts();
@@ -142,16 +143,16 @@ export class AdminProductsComponent implements OnInit {
     });
   }
 
-  featuredToggle(id: number, featured: boolean): void {
+  toggleAvailability(id: number, isAvailable: boolean): void {
     this.loadingService.show();
     
-    this.adminService.updateProduct(id, { isAvailable: featured }).subscribe({
+    this.productsService.updateProduct(id, { isAvailable: !isAvailable }).subscribe({
       next: () => {
-        this.notificationService.showSuccess(`Product ${featured ? 'marked as featured' : 'removed from featured'}`);
+        this.notificationService.showSuccess(`Product ${isAvailable ? 'disabled' : 'enabled'} successfully`);
         this.loadProducts();
       },
       error: (error) => {
-        console.error('Error updating product featured status', error);
+        console.error('Error updating product availability', error);
         this.notificationService.showError('Failed to update product');
         this.loadingService.hide();
       }

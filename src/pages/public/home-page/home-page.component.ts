@@ -12,6 +12,16 @@ import { CenterSliderComponent } from "./homeComponents/center-slider/center-sli
 import { TwoImagesBannarComponent } from "./homeComponents/twoImagesBannar/two-images-bannar/two-images-bannar.component";
 import { FlashSalesBannerComponent } from "./homeComponents/flashSaleBannar/components/flash-sales-bannar/flash-sales-bannar.component";
 import { TopPicksContainerComponent } from "./homeComponents/TopPicksContainer/top-picks-container/top-picks-container.component";
+import { TrendyOutfitsContainerComponent } from "./homeComponents/trendyOutfitsContainer/trendy-outfits-container/trendy-outfits-container.component";
+import { KitchenContainerComponent } from "./homeComponents/KitchenContainer/kitchen-container/kitchen-container.component";
+import { PhonesContainerComponent } from "./homeComponents/PhonesContainer/phones-container/phones-container.component";
+import { ComputingContainerComponent } from "./homeComponents/computingContainer/computing-container/computing-container.component";
+import { DecorContainerComponent } from "./homeComponents/decorContainer/decor-container/decor-container.component";
+import { KeepShoppingComponent } from "./homeComponents/keepShoppingContainer/keep-shopping/keep-shopping.component";
+import { ElectronicsContainerComponent } from "./homeComponents/electronicsContainer/electronics-container/electronics-container.component";
+import { TopSellingComponent } from "./homeComponents/topSellingContainer/top-selling/top-selling.component";
+import { InfoComponent } from "./homeComponents/infoContainer/info/info.component";
+
 
 
 @Component({
@@ -27,7 +37,16 @@ import { TopPicksContainerComponent } from "./homeComponents/TopPicksContainer/t
     CenterSliderComponent,
     TwoImagesBannarComponent,
     FlashSalesBannerComponent,
-    TopPicksContainerComponent
+    TopPicksContainerComponent,
+    TrendyOutfitsContainerComponent,
+    KitchenContainerComponent,
+    PhonesContainerComponent,
+    ComputingContainerComponent,
+    DecorContainerComponent,
+    KeepShoppingComponent,
+    ElectronicsContainerComponent,
+    TopSellingComponent,
+    InfoComponent
 ],
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.css'
@@ -41,18 +60,7 @@ export class HomeComponent implements OnInit {
   isLoading = true;
   errorMessage = '';
   
-  // Easter Sale banner data
-  easterSaleBanner = {
-    title: 'EASTER SALE',
-    startingPrice: '35 EGP',
-    brands: ['Parkville', 'Seropipe', 'GlamyLab', 'Clary', 'Borai'],
-    features: ['Free Shipping', 'Wide Assortment'],
-    products: [
-      { name: 'StrongVille Nourishing Cream', image: 'assets/images/products/strongville-cream.png' },
-      { name: 'GlamyLab Eye Contour', image: 'assets/images/products/glamylab-eye-contour.png' }
-    ]
-  };
-  
+
   
   // Side menu categories
   sidebarCategories = [

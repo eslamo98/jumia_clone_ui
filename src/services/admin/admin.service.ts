@@ -1,7 +1,7 @@
 // src/app/services/admin.service.ts
 import { Injectable } from '@angular/core';
-import { Observable, of, delay } from 'rxjs';
-import { Category, DashboardStats, Order, Product, ProductQueryParams, Review, Seller, User } from '../../models/admin';
+import { Observable, of, delay, map, catchError } from 'rxjs';
+import { ApiResponse, Category, DashboardStats, Order, Product, ProductQueryParams, ProductsData, Review, Seller, User } from '../../models/admin';
 import { environment } from '../../environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { PaginationParams } from '../../models/general';
@@ -24,12 +24,6 @@ export class AdminService {
     recentOrders: [],
     topProducts: []
   };
-
-  // Mock products data
-  private mockProducts: Product[] = [
-    ...this.mockDashboardStats.topProducts,
-   
-  ];
 
   // Mock categories data
   private mockCategories: Category[] = [
@@ -140,93 +134,6 @@ export class AdminService {
   getDashboardStats(): Observable<DashboardStats> {
     // Simulate API call with delay
     return of(this.mockDashboardStats).pipe(delay(800));
-  }
-
-  // Product methods
-  getProducts(params: ProductQueryParams): Observable<Product[]> {
-    let httpParams = new HttpParams()
-      .set('PageSize', params.pageSize.toString())
-      .set('PageNumber', params.pageNumber.toString());
-  
-    if (params.categoryId !== undefined) {
-      httpParams = httpParams.set('CategoryId', params.categoryId.toString());
-    }
-    if (params.subcategoryId !== undefined) {
-      httpParams = httpParams.set('SubcategoryId', params.subcategoryId.toString());
-    }
-    if (params.sellerId !== undefined) {
-      httpParams = httpParams.set('SellerId', params.sellerId.toString());
-    }
-    if (params.minPrice !== undefined) {
-      httpParams = httpParams.set('MinPrice', params.minPrice.toString());
-    }
-    if (params.maxPrice !== undefined) {
-      httpParams = httpParams.set('MaxPrice', params.maxPrice.toString());
-    }
-    if (params.searchTerm) {
-      httpParams = httpParams.set('SearchTerm', params.searchTerm);
-    }
-    if (params.approvalStatus) {
-      httpParams = httpParams.set('ApprovalStatus', params.approvalStatus);
-    }
-    if (params.sortBy) {
-      httpParams = httpParams.set('SortBy', params.sortBy);
-    }
-    if (params.sortDirection) {
-      httpParams = httpParams.set('SortDirection', params.sortDirection);
-    }
-  
-    return this.http.get<Product[]>(`${this.apiUrl}/api/Products`, { params: httpParams });
-  }
-  
-
-  getProductById(id: number): Observable<Product | undefined> {
-    const product = this.mockProducts.find(p => p.productId === id);
-    return of(product).pipe(delay(500));
-  }
-
-  createProduct(product: Omit<Product, 'prouctId' | 'createdAt' | 'updatedAt'>): Observable<Product> {
-    const newProduct: Product = {
-      ...product,
-      productId: this.mockProducts.length + 1,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
-    
-    // In a real application, we would add to the array
-    // this.mockProducts.push(newProduct);
-    
-    return of(newProduct).pipe(delay(800));
-  }
-
-  updateProduct(id: number, product: Partial<Product>): Observable<Product> {
-    const index = this.mockProducts.findIndex(p => p.productId === id);
-    if (index === -1) {
-      throw new Error('Product not found');
-    }
-    
-    const updatedProduct: Product = {
-      ...this.mockProducts[index],
-      ...product,
-      updatedAt: new Date().toISOString()
-    };
-    
-    // In a real application, we would update the array
-    // this.mockProducts[index] = updatedProduct;
-    
-    return of(updatedProduct).pipe(delay(800));
-  }
-
-  deleteProduct(id: number): Observable<boolean> {
-    const index = this.mockProducts.findIndex(p => p.productId === id);
-    if (index === -1) {
-      throw new Error('Product not found');
-    }
-    
-    // In a real application, we would remove from the array
-    // this.mockProducts.splice(index, 1);
-    
-    return of(true).pipe(delay(800));
   }
 
   // Category methods

@@ -5,11 +5,11 @@ import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AdminSidebarComponent } from '../admin-sidebar/admin-sidebar.component';
 import { AdminHeaderComponent } from '../admin-header/admin-header.component';
-import { Product, Seller, ProductQueryParams } from '../../../../models/admin';
+import { Product, ProductQueryParams, ProductsData, Seller } from '../../../../models/admin';
 import { AdminService } from '../../../../services/admin/admin.service';
+import { ProductsService } from '../../../../services/admin/products.service';
 import { LoadingService } from '../../../../services/shared/loading.service';
 import { NotificationService } from '../../../../services/shared/notification.service';
-
 
 @Component({
   selector: 'app-admin-seller-details',
@@ -35,6 +35,7 @@ export class AdminSellerDetailsComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private adminService: AdminService,
+    private productsService: ProductsService,
     private loadingService: LoadingService,
     private notificationService: NotificationService
   ) {}
@@ -76,17 +77,17 @@ export class AdminSellerDetailsComponent implements OnInit {
 
     const params: ProductQueryParams = {
       pageSize: 100, // Load more to ensure we get all seller's products
-      pageNumber: 1
+      pageNumber: 1,
+      sellerId: this.sellerId
     };
     
-    this.adminService.getProducts(params).subscribe({
-      next: (products) => {
-        // Filter products for this seller after fetching
-        this.sellerProducts = products.filter(product => product.sellerId === this.sellerId);
+    this.productsService.getProducts(params).subscribe({
+      next: (response: ProductsData) => {
+        this.sellerProducts = response.products;
         this.isLoading = false;
         this.loadingService.hide();
       },
-      error: (error) => {
+      error: (error: Error) => {
         console.error('Error loading seller products', error);
         this.isLoading = false;
         this.loadingService.hide();

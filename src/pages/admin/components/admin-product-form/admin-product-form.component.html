@@ -1,5 +1,5 @@
 <!-- src/app/pages/admin/admin-product-form/admin-product-form.component.html -->
-<div class="admin-product-form-container">
+<div class="admin-product-form-container" style="overflow-y: hidden; height: 100vh;">
     <div class="row g-0">
       <!-- Sidebar -->
       <div class="col-md-2 bg-dark min-vh-100">
@@ -10,7 +10,7 @@
       <div class="col-md-10">
         <app-admin-header></app-admin-header>
         
-        <div class="container mt-4">
+        <div class="container mt-4" style="overflow-y: auto; height: 100vh;">
           <div class="row mb-4">
             <div class="col">
               <h2>{{isEditMode ? 'Edit' : 'Add'}} Product</h2>

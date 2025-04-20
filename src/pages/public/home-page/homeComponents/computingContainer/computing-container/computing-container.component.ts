@@ -1,11 +1,12 @@
-// flash-sales-banner.component.ts
+
+// Computing-container.component.ts
 import { Component, OnInit, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { interval } from 'rxjs';
 import { map, takeWhile } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
-import { ProductService } from '../../../../../../../services/products/product.service';
-import { Helpers } from '../../../../../../../Utility/helpers';
+import { ProductService } from '../../../../../../services/products/product.service';
+import { Helpers } from '../../../../../../Utility/helpers';
 
 interface Product {
   productId: number;
@@ -14,7 +15,7 @@ interface Product {
   basePrice: number;
   discountPercentage: number;
   finalPrice: number;
-  stockQuantity: number;
+  // stockQuantity: number;
   isAvailable: boolean;
   mainImageUrl: string;
   averageRating: number;
@@ -25,13 +26,13 @@ interface Product {
 }
 
 @Component({
-  selector: 'app-flash-sales-bannar',
+  selector: 'app-computing-container',
   imports: [CommonModule , RouterModule],
-  templateUrl: './flash-sales-bannar.component.html',
-  styleUrls: ['./flash-sales-bannar.component.css'],
+  templateUrl: './computing-container.component.html',
+  styleUrl: './computing-container.component.css',
   standalone: true
 })
-export class FlashSalesBannerComponent extends Helpers implements OnInit, AfterViewInit {
+export class ComputingContainerComponent extends Helpers implements OnInit, AfterViewInit {
   @ViewChild('productContainer') productContainer!: ElementRef;
   
   products: Product[] = [];
@@ -66,7 +67,7 @@ export class FlashSalesBannerComponent extends Helpers implements OnInit, AfterV
     this.loading = true;
     this.error = null;
     
-    this.productService.getRandomSubCategoryProducts("Audio").subscribe({
+    this.productService.getRandomCategoryProducts("Computing").subscribe({
       next: (data) => {
         console.log('API response data:', data);
         

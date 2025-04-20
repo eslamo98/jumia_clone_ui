@@ -21,7 +21,14 @@
     align-items: center;
     font-size: 18px;
     /* font-weight: bold; */
-
+    
+    .flash-icon {
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      background-size: contain;
+      margin-right: 8px;
+    }
   }
   
   
