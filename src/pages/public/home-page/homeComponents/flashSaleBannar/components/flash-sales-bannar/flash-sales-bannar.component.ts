@@ -66,7 +66,7 @@ export class FlashSalesBannerComponent extends Helpers implements OnInit, AfterV
     this.loading = true;
     this.error = null;
     
-    this.productService.getRandomSubCategoryProducts("TVs").subscribe({
+    this.productService.getRandomSubCategoryProducts("Audio").subscribe({
       next: (data) => {
         console.log('API response data:', data);
         

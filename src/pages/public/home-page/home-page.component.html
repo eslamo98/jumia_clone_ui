@@ -99,12 +99,14 @@
 
 <app-top-selling></app-top-selling>
 
+<app-info></app-info>
+
 <!-- pages/home/home.component.html -->
 <div class="jumia-home-container">
     <!-- Main Carousel -->
-    <section class="main-carousel">
+    <!-- <section class="main-carousel">
       <app-carousel [images]="banners"></app-carousel>
-    </section>
+    </section> -->
 
   <!--
     <!-- Categories Section --
@@ -126,23 +128,8 @@
     </section>
   -->
   
-  
-  
-    <!-- Mid Banner -->
- 
-  
-    <!-- Top Deals Section -->
-    <section class="top-deals-section">
-      <div class="section-title">
-        <h2>Top Deals</h2>
-      </div>
-      <div class="products-grid">
-        <app-product-card 
-          *ngFor="let product of topDeals" 
-          [product]="product">
-        </app-product-card>
-      </div>
-    </section>
+
+
   
     <!-- Newsletter Subscription -->
     <section class="newsletter-section">

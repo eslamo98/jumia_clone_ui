@@ -20,6 +20,7 @@ import { DecorContainerComponent } from "./homeComponents/decorContainer/decor-c
 import { KeepShoppingComponent } from "./homeComponents/keepShoppingContainer/keep-shopping/keep-shopping.component";
 import { ElectronicsContainerComponent } from "./homeComponents/electronicsContainer/electronics-container/electronics-container.component";
 import { TopSellingComponent } from "./homeComponents/topSellingContainer/top-selling/top-selling.component";
+import { InfoComponent } from "./homeComponents/infoContainer/info/info.component";
 
 
 
@@ -44,7 +45,8 @@ import { TopSellingComponent } from "./homeComponents/topSellingContainer/top-se
     DecorContainerComponent,
     KeepShoppingComponent,
     ElectronicsContainerComponent,
-    TopSellingComponent
+    TopSellingComponent,
+    InfoComponent
 ],
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.css'
