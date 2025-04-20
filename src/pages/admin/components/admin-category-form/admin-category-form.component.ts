@@ -48,7 +48,7 @@ export class AdminCategoryFormComponent implements OnInit {
     // Check if we're in edit mode
     this.route.params.subscribe(params => {
       if (params['id']) {
-        this.categoryId = params['id'];
+        this.categoryId = parseInt(params['id']);
         this.isEditMode = true;
         this.loadCategory(this.categoryId);
       }
@@ -66,13 +66,20 @@ export class AdminCategoryFormComponent implements OnInit {
   }
 
   loadCategories(): void {
+    this.isLoading = true;
+    this.loadingService.show();
+    
     this.adminService.getCategories().subscribe({
       next: (categories) => {
         this.categories = categories;
+        this.isLoading = false;
+        this.loadingService.hide();
       },
-      error: (error) => {
-        console.error('Error loading categories', error);
+      error: (error: Error) => {
+        console.error('Error loading categories:', error);
         this.notificationService.showError('Failed to load categories');
+        this.isLoading = false;
+        this.loadingService.hide();
       }
     });
   }

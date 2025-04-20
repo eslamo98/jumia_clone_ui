@@ -19,20 +19,20 @@
       <div class="col-md-6 text-center">
         <!-- Main Image -->
         <div class="image-container mb-3">
-          <img [src]="getFullImageUrl(selectedImage || product.MainImageUrl)" 
-               [alt]="product.Name" 
+          <img [src]="getFullImageUrl(selectedImage || product.mainImageUrl)" 
+               [alt]="product.name" 
                class="product-image img-fluid">
         </div>
         
         <!-- Thumbnail Gallery -->
         <div class="thumbnail-gallery d-flex justify-content-center flex-wrap">
           <div class="thumbnail-container m-1" 
-               *ngFor="let image of product.Images"
-               (click)="selectImage(image.ImageUrl)">
-               <img [src]="getFullImageUrl(image.ImageUrl)" 
-               [alt]="product.Name + ' thumbnail'"
+               *ngFor="let image of product.images"
+               (click)="selectImage(image.imageUrl)">
+               <img [src]="getFullImageUrl(image.imageUrl)" 
+               [alt]="product.name + ' thumbnail'"
                class="thumbnail"
-               [class.active]="selectedImage === image.ImageUrl">
+               [class.active]="selectedImage === image.imageUrl">
           </div>
         </div>
       </div>
@@ -40,51 +40,51 @@
       <!-- Product Details Column -->
       <div class="col-md-6 product-details">
         <div class="mb-2">
-          <small class="text-muted">{{ product.CategoryName }}</small>
+          <small class="text-muted">{{ product.categoryName }}</small>
         </div>
-        <h2 class="mb-3">{{ product.Name }}</h2>
+        <h2 class="mb-3">{{ product.name }}</h2>
         <div class="d-flex align-items-center mb-3">
           <div class="me-3">
             <span class="stars">
               <i class="bi" *ngFor="let star of [1,2,3,4,5]"
-                 [class.bi-star-fill]="star <= product.AverageRating"
-                 [class.bi-star]="star > product.AverageRating">
+                 [class.bi-star-fill]="star <= product.averageRating"
+                 [class.bi-star]="star > product.averageRating">
               </i>
             </span>
-            <span class="ms-2">{{ product.AverageRating }}/5</span>
+            <span class="ms-2">{{ product.averageRating }}/5</span>
           </div>
-          <small class="text-muted">({{ product.ReviewCount }} reviews)</small>
+          <small class="text-muted">({{ product.reviewCount }} reviews)</small>
         </div>
         
         <!-- Price Section -->
         <div class="mb-3">
           <span class="text-danger fs-4 fw-bold">
-            ${{ product.BasePrice | number }}
+            ${{ product.basePrice | number }}
           </span>
-          <span *ngIf="product.DiscountPercentage > 0" 
+          <span *ngIf="product.discountPercentage > 0" 
                 class="ms-2 text-danger">
-            -{{ product.DiscountPercentage }}%
+            -{{ product.discountPercentage }}%
           </span>
         </div>
 
         <!-- Variants Section -->
-        <div class="mb-4" *ngIf="product && product.Variants && product.Variants.length > 0">
+        <div class="mb-4" *ngIf="product && product.variants && product.variants.length > 0">
           <h5 class="mb-3">Available Variants</h5>
           <div class="row g-2">
-            <div class="col-6" *ngFor="let variant of product.Variants">
+            <div class="col-6" *ngFor="let variant of product.variants">
               <div class="card variant-card" 
-                   [class.active]="selectedVariant?.VariantId === variant.VariantId"
+                   [class.active]="selectedVariant?.variantId === variant.variantId"
                    (click)="selectVariant(variant)">
                 <div class="card-body p-2">
                   <div class="d-flex justify-content-between align-items-center">
                     <div>
-                      <strong>{{ variant.VariantName }}</strong>
-                      <div class="small text-muted">{{ variant.Sku }}</div>
+                      <strong>{{ variant.variantName }}</strong>
+                      <div class="small text-muted">{{ variant.sku }}</div>
                     </div>
                     <div class="text-end">
-                      <div class="fw-bold">${{ variant.FinalPrice }}</div>
-                      <small class="text-success" *ngIf="variant.StockQuantity > 0">In Stock</small>
-                      <small class="text-danger" *ngIf="variant.StockQuantity === 0">Out of Stock</small>
+                      <div class="fw-bold">${{ variant.finalPrice }}</div>
+                      <small class="text-success" *ngIf="variant.stockQuantity > 0">In Stock</small>
+                      <small class="text-danger" *ngIf="variant.stockQuantity === 0">Out of Stock</small>
                     </div>
                   </div>
                 </div>
@@ -94,10 +94,10 @@
         </div>
         
         <p class="stock fw-bold text-black-50">
-          Stock: {{ selectedVariant?.StockQuantity || product.StockQuantity | number }}
+          Stock: {{ selectedVariant?.stockQuantity || product.stockQuantity | number }}
         </p>
         
-        <p class="description">{{ product.Description }}</p>
+        <p class="description">{{ product.description }}</p>
         
         <!-- Add to Cart Section -->
         <div class="d-flex align-items-center gap-3 mb-4">
@@ -106,16 +106,16 @@
                  style="width: 80px"
                  min="1" 
                  [(ngModel)]="quantity"
-                 [max]="selectedVariant?.StockQuantity || product.StockQuantity">
+                 [max]="selectedVariant?.stockQuantity || product.stockQuantity">
                  
           <button class="btn btn-primary" 
-                  [disabled]="(selectedVariant?.StockQuantity || product.StockQuantity) === 0"
+                  [disabled]="(selectedVariant?.stockQuantity || product.stockQuantity) === 0"
                   (click)="addToCart()">
             Add to cart
           </button>
         </div>
         
-        <div *ngIf="(selectedVariant?.StockQuantity || product.StockQuantity) === 0" class="alert alert-warning">
+        <div *ngIf="(selectedVariant?.stockQuantity || product.stockQuantity) === 0" class="alert alert-warning">
           Out of Stock
         </div>
         
@@ -124,7 +124,7 @@
           <div class="card-body">
             <h6 class="card-title">Sold by</h6>
             <div class="d-flex align-items-center">
-              <strong class="me-2">{{ product.SellerName }}</strong>
+              <strong class="me-2">{{ product.sellerName }}</strong>
               <button class="btn btn-sm btn-outline-primary" 
                       (click)="isFollowing = !isFollowing">
                 {{ isFollowing ? 'Following' : 'Follow Seller' }}
@@ -185,21 +185,21 @@
           <a class="nav-link" 
              [class.active]="activeTab === 'reviews'"
              (click)="setActiveTab('reviews')">
-             Reviews ({{ product.ReviewCount }})
+             Reviews ({{ product.reviewCount }})
           </a>
         </div>
 
         <!-- Tab Content -->
         <div [ngSwitch]="activeTab">
           <div *ngSwitchCase="'details'" class="tab-content">
-            <p>{{ product.Description }}</p>
+            <p>{{ product.description }}</p>
           </div>
           
           <div *ngSwitchCase="'specs'" class="tab-content">
             <dl class="row">
-              <div class="col-6" *ngFor="let attr of product.AttributeValues">
-                <dt>{{ attr.AttributeName }}</dt>
-                <dd>{{ attr.Value }}</dd>
+              <div class="col-6" *ngFor="let attr of product.attributeValues">
+                <dt>{{ attr.attributeName }}</dt>
+                <dd>{{ attr.value }}</dd>
               </div>
             </dl>
           </div>

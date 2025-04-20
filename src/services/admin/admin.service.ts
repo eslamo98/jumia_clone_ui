@@ -1,7 +1,7 @@
 // src/app/services/admin.service.ts
 import { Injectable } from '@angular/core';
 import { Observable, of, delay, map, catchError } from 'rxjs';
-import { ApiResponse, Category, DashboardStats, Order, Product, ProductQueryParams, ProductsData, Review, Seller, User } from '../../models/admin';
+import { ApiResponse, BasicCategoiesInfo, BasicSellerInfo, BasicSubCategoriesInfo, Category, DashboardStats, Order, Product, ProductQueryParams, ProductsData, Review, Seller, User } from '../../models/admin';
 import { environment } from '../../environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { PaginationParams } from '../../models/general';
@@ -10,7 +10,131 @@ import { PaginationParams } from '../../models/general';
   providedIn: 'root'
 })
 export class AdminService {
-  apiUrl = environment.apiUrl;
+  private apiUrl = environment.apiUrl;
+
+  constructor(private http: HttpClient) { }
+
+  // Categories
+  getBasicCategories(): Observable<BasicCategoiesInfo[]> {
+    return this.http.get<ApiResponse<BasicCategoiesInfo[]>>(`${this.apiUrl}/api/categories/basic-info`)
+      .pipe(
+        map(response => response.data)
+      );
+  }
+
+  getCategories(): Observable<Category[]> {
+    return this.http.get<ApiResponse<Category[]>>(`${this.apiUrl}/api/categories`)
+      .pipe(
+        map(response => response.data)
+      );
+  }
+
+  getCategoryById(id: number): Observable<Category | undefined> {
+    const category = this.mockCategories.find(c => c.id === id);
+    return of(category).pipe(delay(500));
+  }
+
+  createCategory(category: Omit<Category, 'id'>): Observable<Category> {
+    const newCategory: Category = {
+      ...category,
+      id: this.mockCategories.length + 1
+    };
+    
+    // In a real application, we would add to the array
+    // this.mockCategories.push(newCategory);
+    
+    return of(newCategory).pipe(delay(800));
+  }
+
+  updateCategory(id: number, category: Partial<Category>): Observable<Category> {
+    const index = this.mockCategories.findIndex(c => c.id === id);
+    if (index === -1) {
+      throw new Error('Category not found');
+    }
+    
+    const updatedCategory: Category = {
+      ...this.mockCategories[index],
+      ...category
+    };
+    
+    // In a real application, we would update the array
+    // this.mockCategories[index] = updatedCategory;
+    
+    return of(updatedCategory).pipe(delay(800));
+  }
+
+  deleteCategory(id: number): Observable<boolean> {
+    const index = this.mockCategories.findIndex(c => c.id === id);
+    if (index === -1) {
+      throw new Error('Category not found');
+    }
+    
+    // In a real application, we would remove from the array
+    // this.mockCategories.splice(index, 1);
+    
+    return of(true).pipe(delay(800));
+  }
+
+  // Subcategories
+  getBasicSubcategoriesByCategory(categoryId: number): Observable<BasicSubCategoriesInfo[]> {
+    return this.http.get<ApiResponse<BasicSubCategoriesInfo[]>>(`${this.apiUrl}/api/Subcategory/basic-info/${categoryId}`)
+      .pipe(
+        map(response => response.data)
+      );
+  }
+
+  getSubcategoriesByCategory(categoryId: number, pageSize: number, pageNumber: number): Observable<any[]> {
+    const params = new HttpParams()
+      .set('pageSize', pageSize.toString())
+      .set('pageNumber', pageNumber.toString());
+    return this.http.get<ApiResponse<any[]>>(`${this.apiUrl}/api/Subcategory/category/${categoryId}`, { params })
+      .pipe(
+        map(response => response.data)
+      );
+  }
+
+  // Sellers
+
+  getSellers(): Observable<Seller[]> {
+    return this.http.get<ApiResponse<Seller[]>>(`${this.apiUrl}/api/users/sellers`)
+      .pipe(
+        map(response => response.data)
+      );
+  }
+
+  getBasicSellers(): Observable<BasicSellerInfo[]> {
+    return this.http.get<ApiResponse<BasicSellerInfo[]>>(`${this.apiUrl}/api/Users/sellers/basic-info`)
+      .pipe(
+        map(response => response.data)
+      );
+  }
+
+  getSellerById(id: number): Observable<Seller> {
+    return this.http.get<ApiResponse<Seller>>(`${this.apiUrl}/api/users/sellers/${id}`)
+      .pipe(
+        map(response => response.data)
+      );
+  }
+
+  updateSellerStatus(id: number, status: boolean): Observable<Seller> {
+    return this.http.patch<ApiResponse<Seller>>(`${this.apiUrl}/api/users/sellers/${id}/verify`, status)
+      .pipe(
+        map(response => response.data)
+      );
+  }
+
+  updateVerificationStatus(id: number, status: 'verified' | 'rejected', rejectionReason?: string): Observable<Seller> {
+    const data = {
+      verificationStatus: status,
+      ...(rejectionReason && { rejectionReason })
+    };
+
+    return this.http.patch<ApiResponse<Seller>>(`${this.apiUrl}/api/users/sellers/${id}/verification`, data)
+      .pipe(
+        map(response => response.data)
+      );
+  }
+
   // Mock data for dashboard stats
   private mockDashboardStats: DashboardStats = {
     revenue: 2567890,
@@ -128,63 +252,10 @@ export class AdminService {
     }
   ];
 
-  constructor(private http: HttpClient) { }
-
   // Dashboard methods
   getDashboardStats(): Observable<DashboardStats> {
     // Simulate API call with delay
     return of(this.mockDashboardStats).pipe(delay(800));
-  }
-
-  // Category methods
-  getCategories(): Observable<Category[]> {
-    return of(this.mockCategories).pipe(delay(800));
-  }
-
-  getCategoryById(id: number): Observable<Category | undefined> {
-    const category = this.mockCategories.find(c => c.id === id);
-    return of(category).pipe(delay(500));
-  }
-
-  createCategory(category: Omit<Category, 'id'>): Observable<Category> {
-    const newCategory: Category = {
-      ...category,
-      id: this.mockCategories.length + 1
-    };
-    
-    // In a real application, we would add to the array
-    // this.mockCategories.push(newCategory);
-    
-    return of(newCategory).pipe(delay(800));
-  }
-
-  updateCategory(id: number, category: Partial<Category>): Observable<Category> {
-    const index = this.mockCategories.findIndex(c => c.id === id);
-    if (index === -1) {
-      throw new Error('Category not found');
-    }
-    
-    const updatedCategory: Category = {
-      ...this.mockCategories[index],
-      ...category
-    };
-    
-    // In a real application, we would update the array
-    // this.mockCategories[index] = updatedCategory;
-    
-    return of(updatedCategory).pipe(delay(800));
-  }
-
-  deleteCategory(id: number): Observable<boolean> {
-    const index = this.mockCategories.findIndex(c => c.id === id);
-    if (index === -1) {
-      throw new Error('Category not found');
-    }
-    
-    // In a real application, we would remove from the array
-    // this.mockCategories.splice(index, 1);
-    
-    return of(true).pipe(delay(800));
   }
 
   // Order methods
@@ -241,31 +312,6 @@ export class AdminService {
     // this.mockCustomers[index] = updatedCustomer;
     
     return of(updatedCustomer).pipe(delay(800));
-  }
-
-  // Seller methods
-  getSellers(filters?: any): Observable<Seller[]> {
-    // TODO: Implement filtering logic
-    return of(this.mockSellers).pipe(delay(800));
-  }
-
-  getSellerById(id: number): Observable<Seller | undefined> {
-    const seller = this.mockSellers.find(s => s.id === id);
-    return of(seller).pipe(delay(500));
-  }
-
-  updateSellerStatus(id: number, status: Seller['status']): Observable<Seller> {
-    const index = this.mockSellers.findIndex(s => s.id === id);
-    if (index === -1) {
-      throw new Error('Seller not found');
-    }
-    
-    const updatedSeller: Seller = {
-      ...this.mockSellers[index],
-      status
-    };
-    
-    return of(updatedSeller).pipe(delay(800));
   }
 
   updateSellerVerification(id: number, status: Seller['verificationStatus'], rejectionReason?: string): Observable<Seller> {

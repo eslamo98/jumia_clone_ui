@@ -70,56 +70,56 @@ export class ProductDetailsComponent implements OnInit {
           // Map the camelCase response to PascalCase interface
           console.log(response);
           this.product = {
-            ProductId: response.data.productId,
-            SellerId: response.data.sellerId,
-            SubcategoryId: response.data.subcategoryId,
-            Name: response.data.name,
-            Description: response.data.description,
-            BasePrice: response.data.basePrice,
-            DiscountPercentage: response.data.discountPercentage,
-            IsAvailable: response.data.isAvailable,
-            StockQuantity: response.data.stockQuantity,
-            MainImageUrl: response.data.mainImageUrl,
-            AverageRating: response.data.averageRating,
-            SellerName: response.data.sellerName,
-            CategoryId: response.data.categoryId,
-            CategoryName: response.data.categoryName,
-            RatingCount: response.data.ratingCount,
-            ReviewCount: response.data.reviewCount,
-            Images: response.data.images?.map((img: any) => ({
-              ImageId: img.imageId,
-              ProductId: img.productId,
-              ImageUrl: img.imageUrl,
-              DisplayOrder: img.displayOrder
+            productId: response.data.productId,
+            sellerId: response.data.sellerId,
+            subcategoryId: response.data.subcategoryId,
+            name: response.data.name,
+            description: response.data.description,
+            basePrice: response.data.basePrice,
+            discountPercentage: response.data.discountPercentage,
+            isAvailable: response.data.isAvailable,
+            stockQuantity: response.data.stockQuantity,
+            mainImageUrl: response.data.mainImageUrl,
+            averageRating: response.data.averageRating,
+            sellerName: response.data.sellerName,
+            categoryId: response.data.categoryId,
+            categoryName: response.data.categoryName,
+            ratingCount: response.data.ratingCount,
+            reviewCount: response.data.reviewCount,
+            images: response.data.images?.map((img: any) => ({
+              imageId: img.imageId,
+              productId: img.productId,
+              imageUrl: img.imageUrl,
+              displayOrder: img.displayOrder
             })) || [],
-            Variants: response.data.variants?.map((variant: any) => ({
-              VariantId: variant.variantId,
-              ProductId: variant.productId,
-              VariantName: variant.variantName,
-              Price: variant.price,
-              DiscountPercentage: variant.discountPercentage,
-              FinalPrice: variant.finalPrice,
-              StockQuantity: variant.stockQuantity,
-              Sku: variant.sku,
-              VariantImageUrl: variant.variantImageUrl,
-              IsDefault: variant.isDefault,
-              IsAvailable: variant.isAvailable,
-              Attributes: variant.attributes
+            variants: response.data.variants?.map((variant: any) => ({
+              variantId: variant.variantId,
+              productId: variant.productId,
+              variantName: variant.variantName,
+              price: variant.price,
+              discountPercentage: variant.discountPercentage,
+              finalPrice: variant.finalPrice,
+              stockQuantity: variant.stockQuantity,
+              sku: variant.sku,
+              variantImageUrl: variant.variantImageUrl,
+              isDefault: variant.isDefault,
+              isAvailable: variant.isAvailable,
+              attributes: variant.attributes
             })) || [],
-            AttributeValues: response.data.attributeValues?.map((attr: any) => ({
-              ValueId: attr.valueId,
-              ProductId: attr.productId,
-              AttributeId: attr.attributeId,
-              AttributeName: attr.attributeName,
-              AttributeType: attr.attributeType,
-              Value: attr.value
+            attributeValues: response.data.attributeValues?.map((attr: any) => ({
+              valueId: attr.valueId,
+              productId: attr.productId,
+              attributeId: attr.attributeId,
+              attributeName: attr.attributeName,
+              attributeType: attr.attributeType,
+              value: attr.value
             })) || []
           };
 
-          this.selectedImage = this.product.MainImageUrl;
+          this.selectedImage = this.product.mainImageUrl;
           
-          if (this.product.Variants?.length > 0) {
-            const defaultVariant = this.product.Variants.find(v => v.IsDefault);
+          if (this.product.variants?.length > 0) {
+            const defaultVariant = this.product.variants.find(v => v.isDefault);
             if (defaultVariant) {
               this.selectVariant(defaultVariant);
             }
@@ -144,8 +144,8 @@ export class ProductDetailsComponent implements OnInit {
 
   public selectVariant(variant: ProductVariant): void {
     this.selectedVariant = variant;
-    if (variant.VariantImageUrl) {
-      this.selectImage(variant.VariantImageUrl);
+    if (variant.variantImageUrl) {
+      this.selectImage(variant.variantImageUrl);
     }
     this.quantity = 1; // Reset quantity when changing variants
   }
@@ -167,8 +167,8 @@ export class ProductDetailsComponent implements OnInit {
   public addToCart(): void {
     if (!this.product || this.quantity < 1) return;
 
-    const productId = this.product.ProductId;
-    const variantId = this.selectedVariant?.VariantId;
+    const productId = this.product.productId;
+    const variantId = this.selectedVariant?.variantId;
     
     this.cartsService.addItemToCart(productId, this.quantity).subscribe({
       next: (response) => {
