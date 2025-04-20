@@ -21,7 +21,8 @@ import { NotificationService } from '../../../../services/shared/notification.se
     AdminSidebarComponent,
     AdminHeaderComponent
   ],
-  templateUrl: './admin-sellers.component.html'
+  templateUrl: './admin-sellers.component.html',
+  styleUrls: ['./admin-sellers.component.css']
 })
 export class AdminSellersComponent implements OnInit {
   sellers: Seller[] = [];
@@ -87,8 +88,8 @@ export class AdminSellersComponent implements OnInit {
         this.isLoading = false;
         this.loadingService.hide();
       },
-      error: (error) => {
-        console.error('Error loading sellers', error);
+      error: (error: Error) => {
+        console.error('Error loading sellers:', error);
         this.notificationService.showError('Failed to load sellers');
         this.isLoading = false;
         this.loadingService.hide();
@@ -134,7 +135,7 @@ export class AdminSellersComponent implements OnInit {
     });
   }
 
-  updateSellerStatus(id: number, status: 'active' | 'inactive' | 'banned'): void {
+  updateSellerStatus(id: number, status: boolean): void {
     this.loadingService.show();
     
     this.adminService.updateSellerStatus(id, status).subscribe({
@@ -142,8 +143,8 @@ export class AdminSellersComponent implements OnInit {
         this.notificationService.showSuccess('Seller status updated successfully');
         this.loadSellers();
       },
-      error: (error) => {
-        console.error('Error updating seller status', error);
+      error: (error: Error) => {
+        console.error('Error updating seller status:', error);
         this.notificationService.showError('Failed to update seller status');
         this.loadingService.hide();
       }

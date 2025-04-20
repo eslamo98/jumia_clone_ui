@@ -1,0 +1,69 @@
+
+
+<div class="cart-item">
+  <div class="item-image">
+    <img [src]="item.imageUrl" [alt]="item.name" />
+    <div *ngIf="item.isJumiaExpress" class="express-badge">
+      <span>Jumia Express</span>
+    </div>
+  </div>
+
+  <div class="item-details">
+    <div class="item-name">{{ item.name }}</div>
+
+    <div class="item-attributes" *ngIf="getAttributesDisplay()">
+      {{ getAttributesDisplay() }}
+    </div>
+
+    <div class="item-pricing">
+      <div class="price-current">{{ item.discountedPrice | currency }}</div>
+      <div class="price-original">{{ item.originalPrice | currency }}</div>
+      <div class="price-discount">-{{ item.percentOff }}%</div>
+    </div>
+
+    <div class="stock-status" *ngIf="getStockMessage()">
+      {{ getStockMessage() }}
+    </div>
+
+    <div class="item-actions">
+      <div class="quantity-controls">
+        <button
+          class="quantity-btn"
+          [disabled]="item.quantity === 1"
+          (click)="decreaseQuantity()"
+        >
+          <i class="fas fa-minus"></i>
+        </button>
+        <span class="quantity-value">{{ item.quantity }}</span>
+        <button
+          class="quantity-btn"
+          [disabled]="item.quantity >= item.maxQuantity"
+          (click)="increaseQuantity()"
+        >
+          <i class="fas fa-plus"></i>
+        </button>
+      </div>
+
+      <button class="remove-btn" (click)="confirmRemove()">
+        <i class="fas fa-trash"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="confirmation-overlay" *ngIf="showRemoveConfirmation">
+  <div class="confirmation-dialog">
+    <div class="dialog-header">
+      <h4>Remove Item</h4>
+    </div>
+    <div class="dialog-content">
+      <p>Are you sure you want to remove "{{ item.name }}" from your cart?</p>
+    </div>
+    <div class="dialog-actions">
+      <button class="cancel-btn" (click)="cancelRemove()">Cancel</button>
+      <button class="confirm-btn" (click)="confirmRemove()">
+        Confirm Remove
+      </button>
+    </div>
+  </div>
+</div>

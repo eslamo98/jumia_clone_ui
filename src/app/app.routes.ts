@@ -89,7 +89,7 @@ export const routes: Routes = [
   },
   //product routes
     
-  { path: 'products/:id',
+  { path: 'Products/:id',
     component: ProductDetailsComponent 
   },
   // Checkout routes

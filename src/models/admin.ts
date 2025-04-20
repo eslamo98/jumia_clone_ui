@@ -108,28 +108,15 @@ export interface DashboardStats {
     discount?: number;
   }
   
-  // src/app/models/product.model.ts
-  // export interface Product {
-  //   id: string;
-  //   name: string;
-  //   description: string;
-  //   price: number;
-  //   discountPrice?: number;
-  //   stock: number;
-  //   image: string;
-  //   images?: string[];
-  //   categoryId: string;
-  //   category?: Category;
-  //   sellerId: string;
-  //   sellerName?: string;
-  //   rating?: number;
-  //   reviewCount?: number;
-  //   featured?: boolean;
-  //   status: 'active' | 'inactive' | 'draft';
-  //   createdAt: Date;
-  //   updatedAt: Date;
-  //   unitsSold?: number;
-  // }
+  export interface BasicCategoiesInfo {
+    categoryId: number;
+    name: string;
+  }
+
+  export interface BasicSubCategoriesInfo {
+    subcategoryId: number;
+    name: string;
+  }
   
   // src/app/models/category.model.ts
   export interface Category {
@@ -143,6 +130,23 @@ export interface DashboardStats {
     status: 'active' | 'inactive';
     createdAt: string; // ISO date string
     updatedAt: string; // ISO date string
+  }
+  
+  export interface Category {
+    categoryId: number;
+    name: string;
+    description?: string;
+    imageUrl?: string;
+    isActive: boolean;
+  }
+  
+  export interface Subcategory {
+    subcategoryId: number;
+    name: string;
+    description?: string;
+    imageUrl?: string;
+    isActive: boolean;
+    categoryId: number;
   }
   
   // src/app/models/user.model.ts
@@ -171,6 +175,11 @@ export interface DashboardStats {
   }
   
   // src/app/models/seller.model.ts
+  export interface BasicSellerInfo {
+    sellerId: number;
+    name: string
+
+  }
   export interface Seller extends User {
     storeName: string;
     storeDescription?: string;
@@ -183,6 +192,13 @@ export interface DashboardStats {
     reviewCount?: number;
     verificationStatus: 'pending' | 'verified' | 'rejected';
     rejectionReason?: string;
+  }
+  
+  export interface Seller {
+    id: number;
+    storeName: string;
+    email: string;
+    isVerified: boolean;
   }
   
   export interface BankDetails {

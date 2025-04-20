@@ -1,82 +1,102 @@
 export interface Product {
-    ProductId: number;
-    SellerId: number;
-    SubcategoryId: number;
-    Name: string;
-    Description: string;
-    BasePrice: number;
-    DiscountPercentage: number;
-    IsAvailable: boolean;
-    StockQuantity: number;
-    MainImageUrl: string;
-    AverageRating: number;
-    SellerName: string;
-    CategoryId: number;
-    CategoryName: string;
-    RatingCount: number;
-    ReviewCount: number;
-    Images: ProductImage[];
-    Variants: ProductVariant[];
-    AttributeValues: ProductAttribute[];
+    productId: number;
+    sellerId: number;
+    subcategoryId: number;
+    name: string;
+    description: string;
+    basePrice: number;
+    discountPercentage: number;
+    isAvailable: boolean;
+    stockQuantity: number;
+    mainImageUrl: string;
+    averageRating: number;
+    sellerName: string;
+    categoryId: number;
+    categoryName: string;
+    ratingCount: number;
+    reviewCount: number;
+    images: ProductImage[];
+    variants: ProductVariant[];
+    attributeValues: ProductAttribute[];
 }
 
 export interface ProductImage {
-    ImageId: number;
-    ProductId: number;
-    ImageUrl: string;
-    DisplayOrder: number;
+    imageId: number;
+    productId: number;
+    imageUrl: string;
+    displayOrder: number;
 }
 
 export interface ProductVariant {
-    VariantId: number;
-    ProductId: number;
-    VariantName: string;
-    Price: number;
-    DiscountPercentage: number;
-    FinalPrice: number;
-    StockQuantity: number;
-    Sku: string;
-    VariantImageUrl: string;
-    IsDefault: boolean;
-    IsAvailable: boolean;
-    Attributes: any[];
+    variantId: number;
+    productId: number;
+    variantName: string;
+    price: number;
+    discountPercentage: number;
+    finalPrice: number;
+    stockQuantity: number;
+    sku: string;
+    variantImageUrl: string;
+    isDefault: boolean;
+    isAvailable: boolean;
+    attributes: VariantAttribute[];
+}
+
+export interface VariantAttribute {
+    attributeId: number;
+    name: string;
+    value: string;
 }
 
 export interface ProductAttribute {
-    ValueId: number;
-    ProductId: number;
-    AttributeId: number;
-    AttributeName: string;
-    AttributeType: string;
-    Value: string;
+    valueId: number;
+    productId: number;
+    attributeId: number;
+    attributeName: string;
+    attributeType: string;
+    value: string;
 }
-  
+
+export interface ProductFormData {
+    name: string;
+    description: string;
+    basePrice: number;
+    discountPercentage: number;
+    stockQuantity: number;
+    mainImageUrl: string;
+    categoryId: number;
+    sellerId: number;
+    hasVariants: boolean;
+    isAvailable: boolean;
+    approvalStatus: string;
+    variants?: ProductVariantFormData[];
+    attributeValues?: ProductAttributeFormData[];
+}
+
+export interface ProductVariantFormData {
+    variantName: string;
+    price: number;
+    discountPercentage: number;
+    stockQuantity: number;
+    sku: string;
+    variantImageUrl?: string;
+    isDefault: boolean;
+    isAvailable: boolean;
+    attributes: VariantAttributeFormData[];
+}
+
+export interface VariantAttributeFormData {
+    name: string;
+    value: string;
+}
+
+export interface ProductAttributeFormData {
+    attributeId: number;
+    value: string;
+}
+
 export interface ProductResponse {
     success: boolean;
     message: string;
     data: Product;
 }
-export interface Product {
-    ProductId: number;
-    SellerId: number;
-    SubcategoryId: number;
-    Name: string;
-    Description: string;
-    BasePrice: number;
-    DiscountPercentage: number;
-    IsAvailable: boolean;
-    // ApprovalStatus: string;
-    // CreatedAt: Date;
-    // UpdatedAt: Date;
-     StockQuantity: number;
-    MainImageUrl: string;
-    
-
-    AverageRating: number;
-  }
-  
- export interface ProductResponse {
-    success: boolean;
-    message: string;
-    data: Product;
-  }

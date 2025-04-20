@@ -160,20 +160,13 @@
                       <td>{{seller.phoneNumber || 'N/A'}}</td>
                       <td>
                         <div class="dropdown">
-                          <button 
-                            class="btn btn-sm dropdown-toggle" 
-                            type="button" 
-                            [ngClass]="getStatusBadgeClass(seller.status)"
-                            data-bs-toggle="dropdown" 
-                            aria-expanded="false"
-                          >
+                          <button class="btn btn-sm" [ngClass]="getStatusBadgeClass(seller.status)" type="button" data-bs-toggle="dropdown">
                             {{seller.status | titlecase}}
+                            <i class="bi bi-chevron-down ms-1"></i>
                           </button>
                           <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="javascript:void(0)" (click)="updateSellerStatus(seller.id, 'active')">Active</a></li>
-                            <li><a class="dropdown-item" href="javascript:void(0)" (click)="updateSellerStatus(seller.id, 'inactive')">Inactive</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-danger" href="javascript:void(0)" (click)="updateSellerStatus(seller.id, 'banned')">Banned</a></li>
+                            <li><a class="dropdown-item" href="javascript:void(0)" (click)="updateSellerStatus(seller.id, true)">Active</a></li>
+                            <li><a class="dropdown-item" href="javascript:void(0)" (click)="updateSellerStatus(seller.id, false)">Inactive</a></li>
                           </ul>
                         </div>
                       </td>

@@ -46,24 +46,11 @@ export class AdminCategoriesComponent implements OnInit {
     this.adminService.getCategories().subscribe({
       next: (categories) => {
         this.categories = categories;
-        
-        // Apply filtering
-        if (this.searchTerm) {
-          this.categories = this.categories.filter(c => 
-            c.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-            (c.description && c.description.toLowerCase().includes(this.searchTerm.toLowerCase()))
-          );
-        }
-        
-        if (this.statusFilter) {
-          this.categories = this.categories.filter(c => c.status === this.statusFilter);
-        }
-        
         this.isLoading = false;
         this.loadingService.hide();
       },
-      error: (error) => {
-        console.error('Error loading categories', error);
+      error: (error: Error) => {
+        console.error('Error loading categories:', error);
         this.notificationService.showError('Failed to load categories');
         this.isLoading = false;
         this.loadingService.hide();
