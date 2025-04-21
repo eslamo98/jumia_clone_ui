@@ -1,7 +1,7 @@
 // src/app/services/admin.service.ts
 import { Injectable } from '@angular/core';
-import { Observable, of, delay, map, catchError } from 'rxjs';
-import { ApiResponse, BasicCategoiesInfo, BasicSellerInfo, BasicSubCategoriesInfo, Category, DashboardStats, Order, Product, ProductQueryParams, ProductsData, Review, Seller, User } from '../../models/admin';
+import { Observable, of, delay, map, catchError, throwError } from 'rxjs';
+import { ApiResponse, BasicCategoiesInfo, BasicSellerInfo, BasicSubCategoriesInfo, Category, DashboardStats, Order, Product, ProductQueryParams, ProductsData, Review, Seller, User, SubcategoryAttribute } from '../../models/admin';
 import { environment } from '../../environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { PaginationParams } from '../../models/general';
@@ -22,57 +22,102 @@ export class AdminService {
       );
   }
 
-  getCategories(): Observable<Category[]> {
-    return this.http.get<ApiResponse<Category[]>>(`${this.apiUrl}/api/categories`)
-      .pipe(
-        map(response => response.data)
-      );
+getCategories(page: number = 1, pageSize: number = 10, searchTerm: string = '', status: string = ''): Observable<ApiResponse<Category[]>> {
+  let params = new HttpParams()
+    .set('pageNumber', page.toString())
+    .set('pageSize', pageSize.toString());
+    
+  if (searchTerm) {
+    params = params.set('searchTerm', searchTerm);
   }
-
-  getCategoryById(id: number): Observable<Category | undefined> {
-    const category = this.mockCategories.find(c => c.id === id);
-    return of(category).pipe(delay(500));
+  
+  if (status) {
+    params = params.set('status', status);
   }
+  params = params.set("include_inactive", true);
+  return this.http.get<ApiResponse<Category[]>>(`${this.apiUrl}/api/categories`, { params })
+    .pipe(
+      map(response => response)
+    );
+}
 
-  createCategory(category: Omit<Category, 'id'>): Observable<Category> {
-    const newCategory: Category = {
-      ...category,
-      id: this.mockCategories.length + 1
-    };
+
+// Get all subcategories with pagination
+getSubcategories(page: number = 1, pageSize: number = 10, searchTerm: string = '', status: string = ''): Observable<any> {
+  let params = new HttpParams()
+    .set('pageNumber', page.toString())
+    .set('pageSize', pageSize.toString());
     
-    // In a real application, we would add to the array
-    // this.mockCategories.push(newCategory);
-    
-    return of(newCategory).pipe(delay(800));
+  if (searchTerm) {
+    params = params.set('searchTerm', searchTerm);
   }
+  
+  if (status) {
+    params = params.set('status', status);
+  }
+  params = params.set("include_inactive", true);
+  return this.http.get<ApiResponse<any>>(`${this.apiUrl}/api/subcategory`, { params })
+    .pipe(
+      map(response => response)
+    );
+}
 
-  updateCategory(id: number, category: Partial<Category>): Observable<Category> {
-    const index = this.mockCategories.findIndex(c => c.id === id);
-    if (index === -1) {
-      throw new Error('Category not found');
-    }
-    
-    const updatedCategory: Category = {
-      ...this.mockCategories[index],
-      ...category
-    };
-    
-    // In a real application, we would update the array
-    // this.mockCategories[index] = updatedCategory;
-    
-    return of(updatedCategory).pipe(delay(800));
+// Get subcategory by ID
+getSubcategoryById(id: number): Observable<any> {
+  return this.http.get<ApiResponse<any>>(`${this.apiUrl}/api/subcategory/${id}`).pipe(
+    map(response => response.data)
+  );
+}
+
+// Create new subcategory
+createSubcategory(formData: FormData): Observable<any> {
+  return this.http.post<ApiResponse<any>>(`${this.apiUrl}/api/Subcategory`, formData).pipe(
+    map(response => response.data)
+  );
+}
+
+// Update existing subcategory
+updateSubcategory(id: number, formData: FormData): Observable<any> {
+  return this.http.put<ApiResponse<any>>(`${this.apiUrl}/api/subcategory/${id}`, formData).pipe(
+    map(response => response.data)
+  );
+}
+
+// Delete subcategory
+deleteSubcategory(id: number): Observable<boolean> {
+  return this.http.delete<ApiResponse<any>>(`${this.apiUrl}/api/subcategory/${id}`).pipe(
+    map(() => true)
+  );
+}
+getCategoryById(id: number): Observable<Category | undefined> {
+  return this.http.get<ApiResponse<Category>>(`${this.apiUrl}/api/categories/${id}`)
+    .pipe(
+      map(response => response.data)
+    );
+}
+
+  createCategory(categoryData: FormData): Observable<Category> {
+    return this.http.post<Category>(`${this.apiUrl}/api/categories`, categoryData);
+  }
+updateCategoryWithImage(id: number, categoryData: FormData): Observable<Category> {
+  return this.http.put<Category>(`${this.apiUrl}/api/categories/${id}`, categoryData);
+}
+
+createCategoryWithImage(categoryData: FormData): Observable<Category> {
+  return this.http.post<Category>(`${this.apiUrl}/api/categories`, categoryData);
+}
+  updateCategory(id: number, categoryData: FormData): Observable<Category> {
+    return this.http.put<Category>(`${this.apiUrl}/api/categories/${id}`, categoryData);
   }
 
   deleteCategory(id: number): Observable<boolean> {
-    const index = this.mockCategories.findIndex(c => c.id === id);
-    if (index === -1) {
-      throw new Error('Category not found');
-    }
-    
-    // In a real application, we would remove from the array
-    // this.mockCategories.splice(index, 1);
-    
-    return of(true).pipe(delay(800));
+    return this.http.delete<any>(`${this.apiUrl}/api/Categories/${id}`).pipe(
+      map(() => true),
+      catchError(error => {
+        console.error('Error deleting category:', error);
+        return throwError(() => new Error('Failed to delete category'));
+      })
+    );
   }
 
   // Subcategories
@@ -88,6 +133,13 @@ export class AdminService {
       .set('pageSize', pageSize.toString())
       .set('pageNumber', pageNumber.toString());
     return this.http.get<ApiResponse<any[]>>(`${this.apiUrl}/api/Subcategory/category/${categoryId}`, { params })
+      .pipe(
+        map(response => response.data)
+      );
+  }
+
+  getSubcategoryAttributes(subcategoryId: number): Observable<SubcategoryAttribute[]> {
+    return this.http.get<ApiResponse<SubcategoryAttribute[]>>(`${this.apiUrl}/api/ProductAttributes/subcategory/${subcategoryId}`)
       .pipe(
         map(response => response.data)
       );
@@ -419,7 +471,7 @@ export class AdminService {
 
   getTopSellingCategories(): Observable<any[]> {
     const topCategories = this.mockCategories.map(category => ({
-      id: category.id,
+      id: category.categoryId,
       name: category.name,
       sales: Math.floor(Math.random() * 5000000) + 500000,
       percentage: Math.floor(Math.random() * 30) + 5

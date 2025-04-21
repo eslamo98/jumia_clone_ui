@@ -9,7 +9,7 @@ import { Category } from '../../../../models/admin';
 import { AdminService } from '../../../../services/admin/admin.service';
 import { LoadingService } from '../../../../services/shared/loading.service';
 import { NotificationService } from '../../../../services/shared/notification.service';
-
+import { Helpers } from '../../../../Utility/helpers';
 
 @Component({
   selector: 'app-admin-category-form',
@@ -30,6 +30,8 @@ export class AdminCategoryFormComponent implements OnInit {
   isLoading = false;
   isEditMode = false;
   categoryId: number | null = null;
+  imageFile: File | null = null;
+  imagePreview: string | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -59,9 +61,8 @@ export class AdminCategoryFormComponent implements OnInit {
     return this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
       description: [''],
-      image: [''],
-      parentId: [''],
-      status: ['active', Validators.required]
+      isActive: [true, Validators.required],
+      parentId: ['']
     });
   }
 
@@ -71,7 +72,6 @@ export class AdminCategoryFormComponent implements OnInit {
     
     this.adminService.getCategories().subscribe({
       next: (categories) => {
-        this.categories = categories;
         this.isLoading = false;
         this.loadingService.hide();
       },
@@ -95,10 +95,14 @@ export class AdminCategoryFormComponent implements OnInit {
           this.categoryForm.patchValue({
             name: category.name,
             description: category.description || '',
-            image: category.image || '',
-            parentId: category.parentId || '',
-            status: category.status
+            isActive: category.isActive,
+            parentId: category.parentId || ''
           });
+          
+          // Set image preview if available
+          if (category.imageUrl) {
+            this.imagePreview = Helpers.getFullImageUrl2(category.imageUrl);
+          }
         } else {
           this.notificationService.showError('Category not found');
           this.router.navigate(['/admin/categories']);
@@ -117,6 +121,20 @@ export class AdminCategoryFormComponent implements OnInit {
     });
   }
 
+  onImageSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      this.imageFile = input.files[0];
+      
+      // Create preview URL
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.imagePreview = reader.result as string;
+      };
+      reader.readAsDataURL(this.imageFile);
+    }
+  }
+
   onSubmit(): void {
     if (this.categoryForm.invalid) {
       // Mark all fields as touched to trigger validation messages
@@ -125,19 +143,37 @@ export class AdminCategoryFormComponent implements OnInit {
       return;
     }
     
+    // Check if image is required for new categories
+    if (!this.isEditMode && !this.imageFile) {
+      this.notificationService.showWarning('Please select an image for the category');
+      return;
+    }
+    
     this.isLoading = true;
     this.loadingService.show();
     
-    const categoryData = this.categoryForm.value;
+    const formData = new FormData();
     
-    // Remove empty parentId
-    if (!categoryData.parentId) {
-      delete categoryData.parentId;
+    // Add form values to FormData
+    formData.append('Name', this.categoryForm.get('name')?.value);
+    formData.append('Description', this.categoryForm.get('description')?.value || '');
+    formData.append('IsActive', this.categoryForm.get('isActive')?.value.toString());
+    
+    if (this.categoryForm.get('parentId')?.value) {
+      formData.append('ParentId', this.categoryForm.get('parentId')?.value);
+    }
+    
+    // Add image file if available
+    if (this.imageFile) {
+      formData.append('ImageFile', this.imageFile);
     }
     
     if (this.isEditMode && this.categoryId) {
+      // Add category ID for update
+      formData.append('CategoryId', this.categoryId.toString());
+      
       // Update existing category
-      this.adminService.updateCategory(this.categoryId, categoryData).subscribe({
+      this.adminService.updateCategoryWithImage(this.categoryId, formData).subscribe({
         next: (category) => {
           this.notificationService.showSuccess('Category updated successfully');
           this.isLoading = false;
@@ -153,7 +189,7 @@ export class AdminCategoryFormComponent implements OnInit {
       });
     } else {
       // Create new category
-      this.adminService.createCategory(categoryData).subscribe({
+      this.adminService.createCategoryWithImage(formData).subscribe({
         next: (category) => {
           this.notificationService.showSuccess('Category created successfully');
           this.isLoading = false;
@@ -169,6 +205,7 @@ export class AdminCategoryFormComponent implements OnInit {
       });
     }
   }
+
 
   // Helper methods for form validation
   get f() { 
@@ -198,6 +235,6 @@ export class AdminCategoryFormComponent implements OnInit {
   // Filter out the current category from parent options to prevent circular references
   getParentOptions(): Category[] {
     if (!this.isEditMode) return this.categories;
-    return this.categories.filter(category => category.id !== this.categoryId);
+    return this.categories.filter(category => category.categoryId !== this.categoryId);
   }
 }

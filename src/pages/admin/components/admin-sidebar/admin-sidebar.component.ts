@@ -59,6 +59,7 @@ export class AdminSidebarComponent {
     { label: 'Dashboard', icon: 'bi-house-fill', route: '/admin', active: true },
     { label: 'Products', icon: 'bi-box-seam', route: '/admin/products' },
     { label: 'Categories', icon: 'bi-tags', route: '/admin/categories' },
+    { label: 'Subcategories', icon: 'bi-list', route: '/admin/subcategories' },
     { label: 'Orders', icon: 'bi-cart-check', route: '/admin/orders' },
     { label: 'Customers', icon: 'bi-people', route: '/admin/customers' },
     { label: 'Sellers', icon: 'bi-shop', route: '/admin/sellers' },

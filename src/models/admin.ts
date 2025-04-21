@@ -2,6 +2,7 @@ import { PaginationParams } from "./general";
 export interface ApiResponse<T = ProductsData> {
   success: boolean;
   message: string;
+  totalItems?: number;
   data: T;
 }
 
@@ -120,10 +121,10 @@ export interface DashboardStats {
   
   // src/app/models/category.model.ts
   export interface Category {
-    id: number;
+    categoryId: number;
     name: string;
     description?: string;
-    image?: string;
+    imageUrl?: string;
     parentId?: number;
     subCategories?: Category[];
     productCount?: number;
@@ -147,6 +148,14 @@ export interface DashboardStats {
     imageUrl?: string;
     isActive: boolean;
     categoryId: number;
+  }
+
+  export interface SubcategoryAttribute {
+    attributeId: number;
+    name: string;
+    type: 'text' | 'number' | 'select' | 'boolean';
+    options?: string[];
+    isRequired: boolean;
   }
   
   // src/app/models/user.model.ts
