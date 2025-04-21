@@ -1,4 +1,10 @@
 
+.mainHomeContainer {
+  flex: 1;
+  padding: 20px 0;
+  /* background-color: #f1f1f2; */
+}
+
 .jumia-container {
   display: flex;
   width: 100%;
