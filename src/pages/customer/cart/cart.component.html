@@ -1,1 +1,24 @@
-<p>cart works!</p>
+<div class="cart-container">
+  <h1>Shopping Cart ({{ getCartItemCount() }} items)</h1>
+
+  <div class="cart-content" *ngIf="cartItems.length > 0">
+    <div class="cart-items">
+      <app-cart-item
+        *ngFor="let item of cartItems"
+        [item]="item"
+        (quantityChange)="updateItemQuantity(item.cartItemId, $event)"
+        (onRemoveItem)="removeItem(item.cartItemId)"
+      ></app-cart-item>
+    </div>
+
+    <app-cart-summary
+      [totalPrice]="getTotalPrice()"
+      [hasExpressItems]="hasJumiaExpressItems()"
+      [itemCount]="getCartItemCount()"
+    ></app-cart-summary>
+  </div>
+
+  <div class="empty-cart" *ngIf="cartItems.length === 0">
+    Your cart is empty
+  </div>
+</div>

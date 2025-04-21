@@ -31,7 +31,7 @@
           class="product-card"
           (click)="navigateToProductDetails(product.productId)">
 <a class="text-decoration-none"
-          [routerLink]="['/products', product.productId]">
+          [routerLink]="['/Products', product.productId]">
             <!-- Discount badge -->
             <div class="discount-badge" *ngIf="product.discountPercentage > 0">
               -{{ product.discountPercentage }}%

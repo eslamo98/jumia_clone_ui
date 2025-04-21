@@ -66,6 +66,7 @@ export class ProductDetailsComponent implements OnInit {
   
     this.productService.getProductById(id, true).subscribe({
       next: (response) => {
+        console.log('Product response:', response);
         if (response.success) {
           // Map the camelCase response to PascalCase interface
           console.log(response);
