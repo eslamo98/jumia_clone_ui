@@ -130,7 +130,8 @@
   .product-name {
     font-size: 14px;
     margin: 0 0 10px;
-    height: 40px;
+    color: black;
+    height: 30px;
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;

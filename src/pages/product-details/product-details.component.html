@@ -101,22 +101,28 @@
         
         <!-- Add to Cart Section -->
         <div class="d-flex align-items-center gap-3 mb-4">
-          <input type="number" 
-                 class="form-control" 
-                 style="width: 80px"
-                 min="1" 
-                 [(ngModel)]="quantity"
-                 [max]="selectedVariant?.stockQuantity || product.stockQuantity">
+          
                  
-          <button class="btn btn-primary" 
-                  [disabled]="(selectedVariant?.stockQuantity || product.stockQuantity) === 0"
-                  (click)="addToCart()">
-            Add to cart
-          </button>
+         
+<button class="btn btn-orange btn-lg d-flex align-items-center justify-content-center w-100 py-3" 
+        [disabled]="(selectedVariant?.stockQuantity || product.stockQuantity) === 0"
+        (click)="addToCart()">
+  <i class="bi bi-cart me-2"></i> Add to Cart
+</button>
         </div>
-        
+
         <div *ngIf="(selectedVariant?.stockQuantity || product.stockQuantity) === 0" class="alert alert-warning">
           Out of Stock
+        </div>
+
+        <!-- Add a toast notification for confirmation -->
+        <div *ngIf="showToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+          <div class="d-flex">
+            <div class="toast-body">
+              Item added to cart successfully!
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
         </div>
         
         <!-- Seller Info -->

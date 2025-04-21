@@ -23,8 +23,8 @@ export class CartComponent implements OnInit {
 
   loadCart() {
     this.cartService.getCart().subscribe((response) => {
-      if (response.success) {
-        this.cartItems = response.data.cartItems;
+      if (response) {
+        this.cartItems = [];
       }
     });
   }
