@@ -214,7 +214,7 @@
 
                       <!-- Default Variant Radio -->
                       <div class="form-check">
-                        <input class="form-check-input" type="radio" [name]="'defaultVariant'" [id]="'defaultVariant' + i"
+                        <input class="form-check-input" type="radio" name="defaultVariant" [id]="'defaultVariant' + i"
                                formControlName="isDefault" [value]="true" (change)="onDefaultVariantChange(i)">
                         <label class="form-check-label" [for]="'defaultVariant' + i">
                           Set as default variant
@@ -225,6 +225,29 @@
                       <div class="form-check form-switch mt-2">
                         <input class="form-check-input" type="checkbox" [id]="'isAvailable' + i" formControlName="isAvailable">
                         <label class="form-check-label" [for]="'isAvailable' + i">Variant is available</label>
+                      </div>
+
+                      <!-- Variant Attributes -->
+                      <div class="card mb-3">
+                        <div class="card-header bg-light">
+                          <h6 class="mb-0">Variant Attributes</h6>
+                        </div>
+                        <div class="card-body">
+                          <div formArrayName="attributeValues">
+                            <div *ngFor="let attrControl of getVariantAttributeValues(i).controls; let j = index" [formGroupName]="j">
+                              <app-dynamic-attribute-input
+                                [formGroup]="getAttributeControl(i, j)"
+                                [attributeName]="getVariantAttributeValue(i, j, 'attributeName')"
+                                [attributeType]="getVariantAttributeValue(i, j, 'attributeType')"
+                                [options]="getVariantAttributeValue(i, j, 'options')"
+                                [isRequired]="true">
+                              </app-dynamic-attribute-input>
+                              <div class="invalid-feedback" *ngIf="isVariantAttributeInvalid(i, j)">
+                                {{getVariantAttributeErrorMessage(i, j)}}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
 
@@ -282,6 +305,26 @@
                 </div>
               </div>
 
+              <!-- Dynamic Attributes -->
+              <div class="card mb-4" *ngIf="!productForm.get('hasVariants')?.value && attributeValues.controls.length > 0">
+                <div class="card-header bg-light">
+                  <h5 class="mb-0">Product Attributes</h5>
+                </div>
+                <div class="card-body">
+                  <div formArrayName="attributeValues">
+                    <div *ngFor="let attrControl of attributeValues.controls; let i = index" [formGroupName]="i" class="mb-3">
+                      <app-dynamic-attribute-input 
+                        [formGroup]="getAttributeFormGroup(i)"
+                        [attributeName]="getAttributeValue(i, 'attributeName')"
+                        [attributeType]="getAttributeValue(i, 'attributeType')"
+                        [options]="getAttributeValue(i, 'options')"
+                        >
+                      </app-dynamic-attribute-input>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <!-- Image -->
               <div class="card mb-4">
                 <div class="card-header bg-light">
@@ -332,17 +375,17 @@
 
           <!-- Submit Buttons -->
           <div class="row mt-4 mb-5">
-            <div class="col">
-              <div class="d-flex justify-content-end gap-2">
-                <button type="button" class="btn btn-outline-secondary" routerLink="/admin/products">
-                  Cancel
-                </button>
-                <button type="submit" class="btn btn-primary" [disabled]="productForm.invalid || isLoading">
-                  <i class="bi" [ngClass]="{'bi-check-circle': isEditMode, 'bi-plus-circle': !isEditMode}"></i>
-                  {{isEditMode ? 'Update' : 'Create'}} Product
-                </button>
-              </div>
-            </div>
+                      <div class="col">
+                        <div class="d-flex justify-content-end gap-2">
+                          <button type="button" class="btn btn-outline-secondary" routerLink="/admin/products">
+                            Cancel
+                          </button>
+                          <button type="submit" class="btn btn-primary" [disabled]="isLoading">
+                            <i class="bi" [ngClass]="{'bi-check-circle': isEditMode, 'bi-plus-circle': !isEditMode}"></i>
+                            {{isEditMode ? 'Update' : 'Create'}} Product
+                          </button>
+                        </div>
+          </div>
           </div>
         </form>
       </div>

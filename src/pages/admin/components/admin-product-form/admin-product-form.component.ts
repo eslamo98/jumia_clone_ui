@@ -13,6 +13,7 @@ import { LoadingService } from '../../../../services/shared/loading.service';
 import { NotificationService } from '../../../../services/shared/notification.service';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { Subject } from 'rxjs';
+import { DynamicAttributeInputComponent } from '../../../../shared/dynamic-attribute-input/dynamic-attribute-input.component';
 
 @Component({
   selector: 'app-admin-product-form',
@@ -22,7 +23,8 @@ import { Subject } from 'rxjs';
     RouterModule,
     ReactiveFormsModule,
     AdminSidebarComponent,
-    AdminHeaderComponent
+    AdminHeaderComponent,
+    DynamicAttributeInputComponent
   ],
   templateUrl: './admin-product-form.component.html'
 })
@@ -39,6 +41,7 @@ export class AdminProductFormComponent implements OnInit {
   defaultVariantRequired = false;
   imagePreview: string | null = null;
   mainImageFile: File | null = null;
+  subcategoryAttributes: any[] = [];
 
   private categorySearchSubject = new Subject<string>();
   private sellerSearchSubject = new Subject<string>();
@@ -87,6 +90,16 @@ export class AdminProductFormComponent implements OnInit {
       }
     });
 
+    // Watch for subcategory changes to load attributes
+    this.productForm.get('subcategoryId')?.valueChanges.subscribe((subcategoryId: number) => {
+      if (subcategoryId) {
+        this.loadSubcategoryAttributes(subcategoryId);
+      } else {
+        this.subcategoryAttributes = [];
+        this.clearAttributeValues();
+      }
+    });
+
     // Watch for hasVariants changes to handle variant validation
     this.productForm.get('hasVariants')?.valueChanges.subscribe((hasVariants: boolean) => {
       if (hasVariants) {
@@ -116,7 +129,7 @@ export class AdminProductFormComponent implements OnInit {
       stockQuantity: [0, [Validators.required, Validators.min(0)]],
       mainImageFile: [null, Validators.required],
       categoryId: ['', Validators.required],
-      subcategoryId: ['', Validators.required], // Initialize as enabled
+      subcategoryId: [{value: '', disabled: true}, Validators.required],
       sellerId: ['', Validators.required],
       hasVariants: [false],
       isAvailable: [true],
@@ -136,16 +149,45 @@ export class AdminProductFormComponent implements OnInit {
       variantImageUrl: [''],
       isDefault: [false],
       isAvailable: [true],
-      attributes: this.fb.array([])
+      attributeValues: this.fb.array([])
     });
   }
 
-  get variants() {
-    return this.productForm.get('variants') as FormArray;
+  // Add helper method to setup variant attributes
+  private setupVariantAttributes(variant: FormGroup, attributes: any[]): void {
+    const attributeValues = variant.get('attributeValues') as FormArray;
+    attributeValues.clear();
+    
+    attributes.forEach(attr => {
+      const attributeGroup = this.fb.group({
+        attributeId: [attr.attributeId],
+        attributeName: [attr.name],
+        attributeType: [attr.type],
+        value: [''],
+        options: [attr.options || []]
+      });
+      attributeValues.push(attributeGroup);
+    });
   }
 
+  // Add helper method to update all variants' attributes
+  private updateVariantsAttributes(): void {
+    if (!this.productForm.get('hasVariants')?.value) return;
+
+    const variants = this.variants.controls;
+    variants.forEach(variant => {
+      if (variant instanceof FormGroup) {
+        this.setupVariantAttributes(variant, this.subcategoryAttributes);
+      }
+    });
+  }
+
+
+  // Helper method to update attributes when adding a new variant
   addVariant() {
-    this.variants.push(this.createVariantFormGroup());
+    const variantGroup = this.createVariantFormGroup();
+    this.setupVariantAttributes(variantGroup, this.subcategoryAttributes);
+    this.variants.push(variantGroup);
     this.updateVariantValidation(true);
   }
 
@@ -249,11 +291,67 @@ export class AdminProductFormComponent implements OnInit {
     }
   }
 
+  // Add these methods after the onSubmit method
+  
+  // Helper method to format attribute values according to backend DTO
+  private formatAttributeValues(): any[] {
+    const attributeValues = this.attributeValues.value;
+    if (!attributeValues || attributeValues.length === 0) {
+      return [];
+    }
+
+    return attributeValues
+      .filter((attr: any) => attr.value && attr.value.trim() !== '')
+      .map((attr: any) => ({
+        AttributeId: attr.attributeId,
+        Value: attr.value
+      }));
+  }
+
+  // Helper method to format variants according to backend DTO
+  private formatVariants(): any[] {
+    const variants = this.variants.value;
+    if (!variants || variants.length === 0) {
+      return [];
+    }
+
+    return variants.map((variant: any) => {
+      // Format variant attributes
+      const variantAttributes = variant.attributeValues
+        .filter((attr: any) => attr.value && attr.value.trim() !== '')
+        .map((attr: any) => ({
+          AttributeName: attr.attributeName,
+          AttributeValue: attr.value
+        }));
+
+      return {
+        VariantName: variant.variantName,
+        Price: variant.price,
+        DiscountPercentage: variant.discountPercentage,
+        StockQuantity: variant.stockQuantity,
+        Sku: variant.sku,
+        IsDefault: variant.isDefault,
+        VariantImageUrl: variant.variantImageUrl,
+        VariantAttributes: variantAttributes
+      };
+    });
+  }
+
   onSubmit(): void {
     if (this.productForm.invalid) {
-      this.markFormGroupTouched(this.productForm);
-      this.notificationService.showWarning('Please fix the form errors');
-      return;
+      // Check if the form is invalid only because of attributeValues
+      const formWithoutAttributes = { ...this.productForm.controls };
+      delete formWithoutAttributes['attributeValues'];
+      
+      const isOtherFieldsValid = Object.values(formWithoutAttributes).every(
+        control => !control.invalid
+      );
+      
+      if (!isOtherFieldsValid) {
+        this.markFormGroupTouched(this.productForm);
+        this.notificationService.showWarning('Please fix the form errors');
+        return;
+      }
     }
 
     if (this.productForm.get('hasVariants')?.value && !this.hasDefaultVariant()) {
@@ -267,14 +365,29 @@ export class AdminProductFormComponent implements OnInit {
     const formData = new FormData();
     const productData = this.prepareProductData();
     
-    // Append all product data to FormData
-    for (const [key, value] of Object.entries(productData)) {
-      if (key === 'variants' || key === 'attributeValues') {
-        formData.append(key + 'Json', JSON.stringify(value));
-      } else if (key !== 'mainImageFile') { // Skip mainImageFile as we'll handle it separately
-        formData.append(key, value.toString());
-      }
+    // Format attribute values according to backend DTO
+    const attributeValuesForBackend = this.formatAttributeValues();
+    if (attributeValuesForBackend.length > 0) {
+      formData.append('ProductAttributeValuesJson', JSON.stringify(attributeValuesForBackend));
     }
+    
+    // Format variants according to backend DTO
+    if (productData.hasVariants && productData.variants && productData.variants.length > 0) {
+      const variantsForBackend = this.formatVariants();
+      formData.append('ProductVariantsJson', JSON.stringify(variantsForBackend));
+    }
+    
+    // Append all other product data to FormData
+    formData.append('Name', productData.name);
+    formData.append('Description', productData.description);
+    formData.append('BasePrice', productData.basePrice.toString());
+    if (productData.discountPercentage !== null && productData.discountPercentage !== undefined) {
+      formData.append('DiscountPercentage', productData.discountPercentage.toString());
+    }
+    formData.append('StockQuantity', productData.stockQuantity.toString());
+    formData.append('SubcategoryId', this.productForm.get('subcategoryId')?.value.toString());
+    formData.append('SellerId', productData.sellerId.toString());
+    formData.append('HasVariants', productData.hasVariants.toString());
 
     // Append the actual file
     if (this.mainImageFile) {
@@ -322,15 +435,15 @@ export class AdminProductFormComponent implements OnInit {
     });
   }
 
-  isFieldInvalid(fieldName: string): boolean {
-    const control = this.productForm.get(fieldName);
-    return !!control && control.invalid && (control.dirty || control.touched);
-  }
+  // isFieldInvalid(fieldName: string): boolean {
+  //   const control = this.productForm.get(fieldName);
+  //   return !!control && control.invalid && (control.dirty || control.touched);
+  // }
 
-  isVariantFieldInvalid(variantIndex: number, fieldName: string): boolean {
-    const control = this.variants.at(variantIndex).get(fieldName);
-    return !!control && control.invalid && (control.dirty || control.touched);
-  }
+  // isVariantFieldInvalid(variantIndex: number, fieldName: string): boolean {
+  //   const control = this.variants.at(variantIndex).get(fieldName);
+  //   return !!control && control.invalid && (control.dirty || control.touched);
+  // }
 
   getErrorMessage(fieldName: string): string {
     const control = this.productForm.get(fieldName);
@@ -357,51 +470,104 @@ export class AdminProductFormComponent implements OnInit {
 
   loadCategories(): void {
     this.isLoading = true;
+    this.loadingService.show();
+    
     this.adminService.getBasicCategories().subscribe({
       next: (categories) => {
         this.categories = categories;
         this.filteredCategories = [...this.categories];
         this.isLoading = false;
+        this.loadingService.hide();
       },
       error: (error) => {
         console.error('Error loading categories:', error);
         this.notificationService.showError('Failed to load categories');
         this.isLoading = false;
+        this.loadingService.hide();
       }
     });
   }
 
   loadSellers(): void {
     this.isLoading = true;
+    this.loadingService.show();
+    
     this.adminService.getBasicSellers().subscribe({
       next: (sellers) => {
         this.sellers = sellers;
         this.filteredSellers = [...this.sellers];
         this.isLoading = false;
+        this.loadingService.hide();
       },
       error: (error) => {
         console.error('Error loading sellers:', error);
         this.notificationService.showError('Failed to load sellers');
         this.isLoading = false;
+        this.loadingService.hide();
       }
     });
   }
 
   loadSubcategories(categoryId: number): void {
     this.isLoading = true;
+    this.loadingService.show();
     this.productForm.get('subcategoryId')?.setValue(''); // Reset subcategory when category changes
     
     this.adminService.getBasicSubcategoriesByCategory(categoryId).subscribe({
       next: (subcategories) => {
         this.subcategories = subcategories;
         this.isLoading = false;
+        this.loadingService.hide();
       },
       error: (error) => {
         console.error('Error loading subcategories:', error);
         this.notificationService.showError('Failed to load subcategories');
         this.isLoading = false;
+        this.loadingService.hide();
       }
     });
+  }
+
+  loadSubcategoryAttributes(subcategoryId: number): void {
+    this.isLoading = true;
+    this.loadingService.show();
+    
+    this.adminService.getSubcategoryAttributes(subcategoryId).subscribe({
+      next: (attributes) => {
+        this.subcategoryAttributes = attributes;
+        // Setup attributes for both product and variants
+        this.setupAttributeValues(attributes);
+        this.updateVariantsAttributes();
+        this.isLoading = false;
+        this.loadingService.hide();
+      },
+      error: (error) => {
+        console.error('Error loading subcategory attributes:', error);
+        this.notificationService.showError('Failed to load attributes');
+        this.isLoading = false;
+        this.loadingService.hide();
+      }
+    });
+  }
+
+  private setupAttributeValues(attributes: any[]): void {
+    const attributeValues = this.productForm.get('attributeValues') as FormArray;
+    attributeValues.clear();
+    
+    attributes.forEach(attr => {
+      attributeValues.push(this.fb.group({
+        attributeId: [attr.attributeId],
+        attributeName: [attr.name],
+        attributeType: [attr.type],
+        value: [''],
+        options: [attr.options]
+      }));
+    });
+  }
+
+  private clearAttributeValues(): void {
+    const attributeValues = this.productForm.get('attributeValues') as FormArray;
+    attributeValues.clear();
   }
 
   // Category search and filter methods
@@ -438,5 +604,68 @@ export class AdminProductFormComponent implements OnInit {
     this.filteredSellers = this.sellers.filter(seller => 
       seller.name.toLowerCase().includes(searchTerm)
     );
+  }
+
+  // Form array getters
+  get attributeValues(): FormArray {
+    return this.productForm.get('attributeValues') as FormArray;
+  }
+
+  get variants(): FormArray {
+    return this.productForm.get('variants') as FormArray;
+  }
+
+  // Helper methods for form group handling
+  getAttributeFormGroup(index: number): FormGroup {
+    return this.attributeValues.at(index) as FormGroup;
+  }
+
+  getAttributeValue(index: number, field: string): any {
+    const control = this.getAttributeFormGroup(index);
+    return control.get(field)?.value;
+  }
+
+  getVariantFormGroup(index: number): FormGroup {
+    return this.variants.at(index) as FormGroup;
+  }
+
+  getVariantAttributeValues(variantIndex: number): FormArray {
+    const variant = this.getVariantFormGroup(variantIndex);
+    return variant.get('attributeValues') as FormArray;
+  }
+
+  getAttributeControl(variantIndex: number, attributeIndex: number): FormGroup {
+    const attributeValues = this.getVariantAttributeValues(variantIndex);
+    return attributeValues.at(attributeIndex) as FormGroup;
+  }
+
+  getVariantAttributeValue(variantIndex: number, attributeIndex: number, field: string): any {
+    const control = this.getAttributeControl(variantIndex, attributeIndex);
+    return control.get(field)?.value;
+  }
+
+  // Validation methods
+  isFieldInvalid(fieldName: string): boolean {
+    const control = this.productForm.get(fieldName);
+    return !!control && control.invalid && (control.dirty || control.touched);
+  }
+
+  isVariantFieldInvalid(variantIndex: number, fieldName: string): boolean {
+    const variant = this.variants.at(variantIndex) as FormGroup;
+    const control = variant.get(fieldName);
+    return !!control && control.invalid && (control.dirty || control.touched);
+  }
+
+  isVariantAttributeInvalid(variantIndex: number, attributeIndex: number): boolean {
+    const control = this.getAttributeControl(variantIndex, attributeIndex);
+    return control.invalid && (control.dirty || control.touched);
+  }
+
+  getVariantAttributeErrorMessage(variantIndex: number, attributeIndex: number): string {
+    const control = this.getAttributeControl(variantIndex, attributeIndex);
+    if (control.hasError('required')) {
+      return 'This field is required';
+    }
+    return '';
   }
 }

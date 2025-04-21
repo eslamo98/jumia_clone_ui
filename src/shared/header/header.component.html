@@ -43,44 +43,81 @@
       
       <!-- Right Navigation -->
       <div class="right-nav">
-        <!-- Account Dropdown -->
-        <div class="account-wrapper" (clickOutside)="closeAccountDropdown()">
-          <div class="account-button" (click)="toggleAccountDropdown()">
-            <img src="/images/header/account.png" alt="Account" class="nav-icon">
-            <span>Account</span>
-            <i class="arrow-down"></i>
+        <!-- Account and Cart Section -->
+        <div class="header-wrapper">
+          <div class="top-header">
+            <!-- ... existing header content ... -->
           </div>
-          <div class="account-dropdown" *ngIf="isAccountDropdownOpen">
-            <div class="sign-in-button">Sign In</div>
-            <ul class="account-menu">
-              <li>
-                <img src="/images/header/account.png" alt="My Account" class="menu-icon">
-                <span>My Account</span>
-              </li>
-              <li>
-                <img src="/images/header/order.png" alt="Orders" class="menu-icon">
-                <span>Orders</span>
-              </li>
-              <li>
-                <img src="/images/header/wishList.png" alt="Wishlist" class="menu-icon">
-                <span>Wishlist</span>
-              </li>
-            </ul>
+          <div class="bottom-header">
+            <div class="nav-controls d-flex">
+              <!-- Account Section -->
+              <div class="account-section">
+                <div class="account-button" (click)="toggleAccountDropdown()">
+                  <img src="/images/header/account.png" alt="Account" class="nav-icon">
+                  <ng-container *ngIf="authService.currentUserValue; else loginText">
+                    <span>Hi, {{authService.currentUserValue.firstName}}</span>
+                  </ng-container>
+                  <ng-template #loginText>
+                    <span>Account</span>
+                  </ng-template>
+                  <i class="arrow-down"></i>
+                </div>
+                
+                <div class="account-dropdown" [class.show]="isAccountDropdownOpen">
+                  <ng-container *ngIf="authService.currentUserValue; else unauthenticatedMenu">
+                    <!-- Authenticated Menu -->
+                    <ul class="account-menu">
+                      <li [routerLink]="['/account']">
+                        <img src="/images/header/account.png" alt="My Account" class="menu-icon">
+                        <span>My Account</span>
+                      </li>
+                      <li [routerLink]="['/orders']">
+                        <img src="/images/header/order.png" alt="Orders" class="menu-icon">
+                        <span>Orders</span>
+                      </li>
+                      <li [routerLink]="['/wishlist']">
+                        <img src="/images/header/wishList.png" alt="Wishlist" class="menu-icon">
+                        <span>Wishlist</span>
+                      </li>
+                      <li (click)="logout()">
+                        <img src="/images/header/account.png" alt="Logout" class="menu-icon">
+                        <span>Logout</span>
+                      </li>
+                    </ul>
+                  </ng-container>
+                  
+                  <ng-template #unauthenticatedMenu>
+                    <!-- Unauthenticated Menu -->
+                    <div class="sign-in-button" [routerLink]="['/auth/login']">Sign In</div>
+                    <ul class="account-menu">
+                      <li [routerLink]="['/auth/register']">
+                        <img src="/images/header/account.png" alt="Register" class="menu-icon">
+                        <span>Create Account</span>
+                      </li>
+                      <li [routerLink]="['/auth/register-seller']">
+                        <img src="/images/header/star.png" alt="Seller Registration" class="menu-icon">
+                        <span>Sell on Jumia</span>
+                      </li>
+                    </ul>
+                  </ng-template>
+                </div>
+              </div>
+              
+              <!-- Help -->
+              <div class="help-button">
+                <img src="/images/header/help.png" alt="Help" class="nav-icon">
+                <span>Help</span>
+                <i class="arrow-down"></i>
+              </div>
+              
+              <!-- Cart -->
+              <div class="cart-button" [routerLink]="['/cart']" *ngIf="authService.isAuthenticated()">
+                <img src="/images/header/cart.png" alt="Cart" class="nav-icon">
+                <span>Cart</span>
+                <span class="cart-count" *ngIf="cartItemCount > 0">{{ cartItemCount }}</span>
+              </div>
+            </div>
           </div>
-        </div>
-        
-        <!-- Help -->
-        <div class="help-button">
-          <img src="/images/header/help.png" alt="Help" class="nav-icon">
-          <span>Help</span>
-          <i class="arrow-down"></i>
-        </div>
-        
-        <!-- Cart -->
-        <div class="cart-button">
-          <img src="/images/header/cart.png" alt="Cart" class="nav-icon">
-          <span>Cart</span>
-          <span class="cart-count" *ngIf="cartItemCount > 0">{{ cartItemCount }}</span>
         </div>
       </div>
     </div>

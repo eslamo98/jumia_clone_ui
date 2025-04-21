@@ -148,6 +148,14 @@ export interface DashboardStats {
     isActive: boolean;
     categoryId: number;
   }
+
+  export interface SubcategoryAttribute {
+    attributeId: number;
+    name: string;
+    type: 'text' | 'number' | 'select' | 'boolean';
+    options?: string[];
+    isRequired: boolean;
+  }
   
   // src/app/models/user.model.ts
   export interface User {

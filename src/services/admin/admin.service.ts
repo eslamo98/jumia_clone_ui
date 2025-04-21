@@ -1,7 +1,7 @@
 // src/app/services/admin.service.ts
 import { Injectable } from '@angular/core';
 import { Observable, of, delay, map, catchError } from 'rxjs';
-import { ApiResponse, BasicCategoiesInfo, BasicSellerInfo, BasicSubCategoriesInfo, Category, DashboardStats, Order, Product, ProductQueryParams, ProductsData, Review, Seller, User } from '../../models/admin';
+import { ApiResponse, BasicCategoiesInfo, BasicSellerInfo, BasicSubCategoriesInfo, Category, DashboardStats, Order, Product, ProductQueryParams, ProductsData, Review, Seller, User, SubcategoryAttribute } from '../../models/admin';
 import { environment } from '../../environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { PaginationParams } from '../../models/general';
@@ -88,6 +88,13 @@ export class AdminService {
       .set('pageSize', pageSize.toString())
       .set('pageNumber', pageNumber.toString());
     return this.http.get<ApiResponse<any[]>>(`${this.apiUrl}/api/Subcategory/category/${categoryId}`, { params })
+      .pipe(
+        map(response => response.data)
+      );
+  }
+
+  getSubcategoryAttributes(subcategoryId: number): Observable<SubcategoryAttribute[]> {
+    return this.http.get<ApiResponse<SubcategoryAttribute[]>>(`${this.apiUrl}/api/ProductAttributes/subcategory/${subcategoryId}`)
       .pipe(
         map(response => response.data)
       );

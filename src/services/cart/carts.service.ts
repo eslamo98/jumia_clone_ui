@@ -2,13 +2,13 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { catchError, delay, Observable, of, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { Cart } from '../../models/cart';
+import { Cart, CartResponse } from '../../models/cart';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CartsService {
-  private apiUrl = environment.apiUrl;
+  private apiUrl = `${environment.apiUrl}/api/Carts`;
   
   constructor(private http: HttpClient) { }
   
@@ -19,7 +19,7 @@ export class CartsService {
       variantId: variantId || null // Send null if no variant
     };
   
-    return this.http.post<any>(`${this.apiUrl}/api/Carts/items`, request).pipe(
+    return this.http.post<any>(`${this.apiUrl}/items`, request).pipe(
       tap(response => {
         if (response.success) {
           console.log('Item added successfully:', response.data);
@@ -31,9 +31,15 @@ export class CartsService {
       })
     );
   }
-   // Get the user's cart
-   getCart(): Observable<Cart> {
-    return this.http.get<Cart>(`${this.apiUrl}`);
+   
+  // Get the user's cart
+  getCart(): Observable<CartResponse> {
+    return this.http.get<CartResponse>(`${this.apiUrl}`);
+  }
+
+  // Get cart items
+  getCartItems(): Observable<CartResponse> {
+    return this.http.get<CartResponse>(`${this.apiUrl}/items`);
   }
 
   // Add a new item to the cart
