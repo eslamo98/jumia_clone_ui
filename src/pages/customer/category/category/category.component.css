@@ -1,0 +1,347 @@
+/* category.component.scss */
+.subcategories-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .subcategory-btn {
+    padding: 8px 16px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #f8f8f8;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .subcategory-btn:hover {
+    background-color: #eaeaea;
+  }
+  
+  .subcategory-btn.active {
+    background-color: #007bff;
+    color: white;
+    border-color: #0069d9;
+  }
+  
+  .loading-spinner {
+    text-align: center;
+    padding: 20px;
+  }
+  
+  .error-message {
+    color: #dc3545;
+    text-align: center;
+    padding: 20px;
+  }
+  
+  .no-products {
+    text-align: center;
+    padding: 40px;
+    color: #6c757d;
+  }
+  
+.category-container {
+    width: 100%;
+    margin: 20px 0;
+    font-family: 'Roboto', Arial, sans-serif;
+  }
+  
+  .category-header {
+    padding: 15px 20px;
+    background-color: #fff2d6;
+    border-radius: 8px 8px 0 0;
+    margin-bottom: 20px;
+  }
+  
+  .category-title {
+    font-size: 22px;
+    margin: 0;
+    color: #000000;
+  }
+  
+  .category-description {
+    font-size: 14px;
+    color: #555;
+    margin-top: 5px;
+  }
+  
+  .subcategories-nav {
+    margin-bottom: 20px;
+  }
+  
+  .nav-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 0 20px;
+  }
+  
+  .nav-tabs button {
+    padding: 8px 16px;
+    border: 1px solid #ddd;
+    background-color: #f8f8f8;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+    
+    &:hover {
+      background-color: #f0f0f0;
+    }
+    
+    &.active {
+      background-color: #fff2d6;
+      border-color: #f49932;
+      color: #f49932;
+      font-weight: bold;
+    }
+  }
+  
+  .loading-indicator, .error-message, .no-products {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 50px 20px;
+    text-align: center;
+    font-size: 16px;
+    color: #555;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    
+    i {
+      margin-right: 10px;
+      font-size: 24px;
+    }
+  }
+  
+  .error-message {
+    color: #dc3545;
+  }
+  
+  .no-products {
+    flex-direction: column;
+    
+    i {
+      font-size: 48px;
+      margin-bottom: 20px;
+      color: #ccc;
+    }
+    
+    p {
+      margin: 0;
+    }
+  }
+  
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(225px, 1fr));
+    gap: 20px;
+    padding: 0 20px 20px;
+  }
+  
+  .product-card {
+    height: 350px;
+    border-radius: 5px;
+    overflow: hidden;
+    background-color: #fff;
+    cursor: pointer;
+    position: relative;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+    
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    a {
+      display: block;
+      height: 100%;
+      color: inherit;
+    }
+  }
+  
+  .discount-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #fef3e9;
+    color: #f49932;
+    padding: 3px 8px;
+    border-radius: 2px;
+    font-size: 12px;
+    font-weight: bold;
+  }
+  
+  .product-image {
+    height: 200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    
+    img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+  }
+  
+  .product-info {
+    padding: 15px;
+  }
+  
+  .product-name {
+    font-size: 14px;
+    color: #000000;
+    margin: 0 0 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+  
+  .product-price {
+    margin-bottom: 10px;
+    
+    .final-price {
+      color: #000000;
+      font-weight: bold;
+      font-size: 16px;
+      margin-right: 5px;
+    }
+    
+    .base-price {
+      text-decoration: line-through;
+      color: #999;
+      font-size: 14px;
+    }
+  }
+  
+  .product-rating {
+    margin-top: 10px;
+    
+    .rating-stars {
+      display: flex;
+      
+      i {
+        color: #f49932;
+        font-size: 14px;
+        margin-right: 2px;
+      }
+    }
+  }
+  
+  /* Pagination Styles */
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    margin: 30px auto;
+    width: 100%;
+  }
+  
+  .pagination {
+    display: flex;
+    align-items: center;
+    background-color: #f9f9f9;
+    border-radius: 30px;
+    padding: 8px 12px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+  }
+  
+  .pagination-btn {
+    border: none;
+    background-color: #fff;
+    color: #333;
+    border-radius: 25px;
+    padding: 10px 20px;
+    margin: 0 5px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+  }
+  
+  .pagination-btn.number-btn {
+    min-width: 40px;
+    height: 40px;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .pagination-btn:hover:not(.disabled):not(.active) {
+    background-color: #eef5ff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+  
+  .pagination-btn.active {
+    background-color: #007bff;
+    color: white;
+    font-weight: bold;
+    transform: scale(1.05);
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+  }
+  
+  .pagination-btn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: #e9ecef;
+    box-shadow: none;
+  }
+  
+  .prev-btn, .next-btn {
+    font-weight: bold;
+    background-color: #f0f8ff;
+  }
+  
+  .prev-btn i {
+    margin-right: 5px;
+  }
+  
+  .next-btn i {
+    margin-left: 5px;
+  }
+  
+  .page-numbers {
+    display: flex;
+    align-items: center;
+  }
+  
+  .ellipsis {
+    margin: 0 5px;
+    color: #6c757d;
+    font-weight: bold;
+  }
+  
+  /* لتحسين تجربة المستخدم على الشاشات الصغيرة */
+  @media (max-width: 768px) {
+    .pagination {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    
+    .pagination-btn {
+      margin: 5px;
+      padding: 8px 16px;
+    }
+    
+    .pagination-btn.number-btn {
+      min-width: 35px;
+      height: 35px;
+    }
+    
+    .page-numbers {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+  }

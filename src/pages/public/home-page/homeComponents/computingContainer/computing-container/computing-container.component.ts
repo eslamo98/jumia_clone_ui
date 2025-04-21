@@ -1,12 +1,14 @@
 
 // Computing-container.component.ts
-import { Component, OnInit, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
+import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, Input } from '@angular/core';
+import { Router, RouterModule , RouterLink } from '@angular/router';
 import { interval } from 'rxjs';
 import { map, takeWhile } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
 import { ProductService } from '../../../../../../services/products/product.service';
 import { Helpers } from '../../../../../../Utility/helpers';
+import { NavigationService } from '../../../../../../services/navigations/navigation.services';
+import { environment } from '../../../../../../environments/environment';
 
 interface Product {
   productId: number;
@@ -15,25 +17,31 @@ interface Product {
   basePrice: number;
   discountPercentage: number;
   finalPrice: number;
-  // stockQuantity: number;
   isAvailable: boolean;
   mainImageUrl: string;
   averageRating: number;
   sellerId: number;
   sellerName: string;
+  categoryId?: string; 
+  categoryName?: string; 
+  subcategoryId?: string;
   subcategoryName: string;
-  // Add other properties as needed
 }
 
 @Component({
   selector: 'app-computing-container',
-  imports: [CommonModule , RouterModule],
+  imports: [CommonModule, RouterModule , RouterLink],
   templateUrl: './computing-container.component.html',
   styleUrl: './computing-container.component.css',
   standalone: true
 })
 export class ComputingContainerComponent extends Helpers implements OnInit, AfterViewInit {
   @ViewChild('productContainer') productContainer!: ElementRef;
+  @Input() categoryName: string = 'Computing';
+  @Input() categorySubtitle: string = 'Laptops';
+  @Input() categoryId: string = ''; //7
+  @Input() subcategoryId: string = '';
+  @Input() subcategoryName: string = '';
   
   products: Product[] = [];
   hours: number = 12;
@@ -48,7 +56,8 @@ export class ComputingContainerComponent extends Helpers implements OnInit, Afte
   
   constructor(
     private router: Router,
-    private productService: ProductService
+    private productService: ProductService,
+    private navigationService: NavigationService
   ) { super(); }
 
   ngOnInit(): void {
@@ -67,7 +76,7 @@ export class ComputingContainerComponent extends Helpers implements OnInit, Afte
     this.loading = true;
     this.error = null;
     
-    this.productService.getRandomCategoryProducts("Computing").subscribe({
+    this.productService.getRandomCategoryProducts(this.categoryName, 15).subscribe({
       next: (data) => {
         console.log('API response data:', data);
         
@@ -91,8 +100,8 @@ export class ComputingContainerComponent extends Helpers implements OnInit, Afte
         setTimeout(() => this.checkScrollArrows(), 100);
       },
       error: (err) => {
-        console.error('Error loading flash sale products', err);
-        this.error = 'Failed to load products';
+        console.error('Error loading products', err);
+        this.error = 'Failed to load products. Please try again.';
         this.loading = false;
       }
     });
@@ -160,4 +169,59 @@ export class ComputingContainerComponent extends Helpers implements OnInit, Afte
   getProgressBarColor(quantity: number): string {
     return quantity < 10 ? '#e41e23' : '#ff9900';
   }
+  
+  navigateToCategory(): void {
+    // Log the values we're sending to the navigation service
+    console.log('Navigating to category with ID:', this.categoryId);
+    console.log('Navigating with subcategory ID:', this.subcategoryId);
+    
+    // If categoryId is empty, we might need to find a fallback
+    if (!this.categoryId && this.products.length > 0) {
+      console.log('No categoryId set, attempting to use categoryId from products');
+      this.categoryId = this.products[0].categoryId?.toString() || '';
+    }
+    
+    // Store both category name and ID in the navigation service
+    this.navigationService.setCategoryName(this.categoryName);
+    this.navigationService.setCategoryId(this.categoryId);
+    
+    // Store subcategory information if available
+    if (this.subcategoryId) {
+      this.navigationService.setSubcategoryId(this.subcategoryId);
+    }
+    
+    // Store it as a full category object for convenience
+    this.navigationService.setSelectedCategory({
+      id: this.categoryId,
+      name: this.categoryName,
+      subtitle: this.categorySubtitle
+    });
+    
+    // If we have a subcategory, store that too
+    if (this.subcategoryId) {
+      this.navigationService.setSelectedSubcategory({
+        id: this.subcategoryId,
+        name: this.subcategoryName || this.categorySubtitle
+      });
+    }
+    
+    // Navigate to the category page with the category ID
+    if (this.categoryId) {
+      if (this.subcategoryId) {
+        // You could navigate with both IDs if your routing supports it
+        this.router.navigate(['/category', this.categoryId, 'subcategory', this.subcategoryId]);
+      } else {
+        this.router.navigate(['/category', this.categoryId]);
+      }
+    } else {
+      console.error('No category ID available for navigation');
+      this.router.navigate(['/category']);
+    }
+  
+  // getFullImageUrl(relativePath: string): string {
+  //   if (!relativePath) return 'assets/images/placeholder-product.png';
+  //   if (relativePath.startsWith('http')) return relativePath;
+  //   return `${environment.apiUrl}/${relativePath}`;
+  // }
+}
 }
