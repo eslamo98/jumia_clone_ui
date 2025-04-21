@@ -1,6 +1,8 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CartItem } from '../../../../../../models/cart-item.model';
+import { CartsService } from '../../../../../../services/cart/carts.service';
+import { Cart } from '../../../../../../models/cart.model';
 
 @Component({
   selector: 'app-cart-item',
@@ -16,6 +18,8 @@ export class CartItemComponent {
 
   showRemoveConfirmation = false;
   quantityOptions: number[] = [];
+
+  constructor(private cartsService: CartsService) {}
 
   ngOnInit() {
     this.generateQuantityOptions();
@@ -70,4 +74,5 @@ export class CartItemComponent {
   cancelRemove() {
     this.showRemoveConfirmation = false;
   }
+
 }
