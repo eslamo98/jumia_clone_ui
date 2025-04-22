@@ -1,15 +1,13 @@
-
-
 <div class="cart-item">
   <div class="item-image">
-    <img [src]="item.imageUrl" [alt]="item.name" />
+    <img [src]=" item.productImage || item.imageUrl" [alt]="item.name || item.productName" />
     <div *ngIf="item.isJumiaExpress" class="express-badge">
       <span>Jumia Express</span>
     </div>
   </div>
 
   <div class="item-details">
-    <div class="item-name">{{ item.name }}</div>
+    <div class="item-name">{{ item.name || item.productName }}</div>
 
     <div class="item-attributes" *ngIf="getAttributesDisplay()">
       {{ getAttributesDisplay() }}
@@ -17,8 +15,8 @@
 
     <div class="item-pricing">
       <div class="price-current">{{ item.discountedPrice | currency }}</div>
-      <div class="price-original">{{ item.originalPrice | currency }}</div>
-      <div class="price-discount">-{{ item.percentOff }}%</div>
+      <div class="price-original" *ngIf="item.originalPrice">{{ item.originalPrice | currency }}</div>
+      <div class="price-discount" *ngIf="item.percentOff">-{{ item.percentOff }}%</div>
     </div>
 
     <div class="stock-status" *ngIf="getStockMessage()">
@@ -44,7 +42,7 @@
         </button>
       </div>
 
-      <button class="remove-btn" (click)="confirmRemove()">
+      <button class="remove-btn" (click)="onRemove()">
         <i class="fas fa-trash"></i>
       </button>
     </div>

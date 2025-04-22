@@ -1,7 +1,7 @@
 export interface Cart {
   CartId: number;
 CustomerId : number;
-
+cartItems: CartItem[];
 }
 export interface CartItem {
     CartItemId :number;

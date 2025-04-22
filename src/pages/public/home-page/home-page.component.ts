@@ -21,6 +21,7 @@ import { KeepShoppingComponent } from "./homeComponents/keepShoppingContainer/ke
 import { ElectronicsContainerComponent } from "./homeComponents/electronicsContainer/electronics-container/electronics-container.component";
 import { TopSellingComponent } from "./homeComponents/topSellingContainer/top-selling/top-selling.component";
 import { InfoComponent } from "./homeComponents/infoContainer/info/info.component";
+import { UpArrowComponent } from "./homeComponents/upArrow/up-arrow/up-arrow.component";
 
 
 
@@ -46,7 +47,8 @@ import { InfoComponent } from "./homeComponents/infoContainer/info/info.componen
     KeepShoppingComponent,
     ElectronicsContainerComponent,
     TopSellingComponent,
-    InfoComponent
+    InfoComponent,
+    UpArrowComponent
 ],
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.css'

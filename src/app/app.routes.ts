@@ -24,6 +24,7 @@ import { AdminSellerDetailsComponent } from '../pages/admin/components/admin-sel
 import { AdminReviewsComponent } from '../pages/admin/components/admin-reviews/admin-reviews.component';
 import { ProductDetailsComponent } from '../pages/product-details/product-details.component';
 import { CheckoutComponent } from '../pages/checkout/checkout/checkout.component';
+import { OrdersComponent } from '../pages/seller/seller-orders/orders/orders.component';
 import { AdminSubcategoryFormComponent } from '../pages/admin/components/admin-subcategory-form/admin-subcategory-form.component';
 import { AdminSubcategoriesComponent } from '../pages/admin/components/admin-subcategories/admin-subcategories.component';
 
@@ -62,6 +63,7 @@ export const routes: Routes = [
     children: [
       { path: '', component: SellerDashboardComponent },
       { path: 'products', component: SellerProductsComponent },
+      { path: 'orders', component: OrdersComponent },
     ]
   },
   
