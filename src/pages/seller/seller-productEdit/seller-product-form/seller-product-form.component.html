@@ -1,0 +1,69 @@
+<div class="container mt-4">
+  <h2>Edit Product</h2>
+
+  @if (loading) {
+  <div class="alert alert-info">Loading product data...</div>
+  } @if (error) {
+  <div class="alert alert-danger">{{ error }}</div>
+  }
+
+  <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="mt-4">
+    <div class="mb-3">
+      <label for="name" class="form-label">Product Name</label>
+      <input
+        type="text"
+        class="form-control"
+        id="name"
+        formControlName="name"
+      />
+    </div>
+
+    <div class="mb-3">
+      <label for="basePrice" class="form-label">Base Price</label>
+      <input
+        type="number"
+        class="form-control"
+        id="basePrice"
+        formControlName="basePrice"
+      />
+    </div>
+
+    <div class="mb-3">
+      <label for="finalPrice" class="form-label">Final Price</label>
+      <input
+        type="number"
+        class="form-control"
+        id="finalPrice"
+        formControlName="finalPrice"
+      />
+    </div>
+
+    <div class="mb-3">
+      <label for="stockQuantity" class="form-label">Stock Quantity</label>
+      <input
+        type="number"
+        class="form-control"
+        id="stockQuantity"
+        formControlName="stockQuantity"
+      />
+    </div>
+
+    <div class="mb-3">
+      <label for="description" class="form-label">Description</label>
+      <textarea
+        class="form-control"
+        id="description"
+        formControlName="description"
+        rows="3"
+      ></textarea>
+    </div>
+
+    <button
+      type="submit"
+      class="btn btn-primary"
+      [disabled]="!productForm.valid || loading"
+    >
+      Save Changes
+    </button>
+  </form>
+</div>

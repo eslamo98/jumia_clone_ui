@@ -28,6 +28,8 @@ import { CategoryComponent } from '../pages/customer/category/category/category.
 import { OrdersComponent } from '../pages/seller/seller-orders/orders/orders.component';
 import { AdminSubcategoryFormComponent } from '../pages/admin/components/admin-subcategory-form/admin-subcategory-form.component';
 import { AdminSubcategoriesComponent } from '../pages/admin/components/admin-subcategories/admin-subcategories.component';
+import { SellerProductFormComponent } from '../pages/seller/seller-productEdit/seller-product-form/seller-product-form.component';
+import { ManageproductsComponent } from '../pages/seller/seller-manageproducts/manageproducts/manageproducts.component';
 
 export const routes: Routes = [
   // Public routes
@@ -67,7 +69,9 @@ export const routes: Routes = [
     children: [
       { path: '', component: SellerDashboardComponent },
       { path: 'products', component: SellerProductsComponent },
+      { path: 'manage-products', component: ManageproductsComponent },
       { path: 'orders', component: OrdersComponent },
+      {path: 'products/edit/:id',component: SellerProductFormComponent},
     ]
   },
   

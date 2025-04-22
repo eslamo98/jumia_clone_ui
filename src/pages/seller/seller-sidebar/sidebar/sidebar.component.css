@@ -1,0 +1,154 @@
+/* sidebar.component.scss */
+.sidebar {
+  width: 280px;
+  height: 100vh;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  border-right: 1px solid #eee;
+}
+
+.sidebar.collapsed {
+  width: 70px;
+}
+
+.sidebar-header {
+  padding: 20px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-text {
+  font-size: 24px;
+  font-weight: bold;
+  color: #f68b1e;
+}
+
+.vendor-text {
+  font-size: 12px;
+  color: #666;
+  font-weight: 500;
+}
+
+.collapse-btn {
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  padding: 8px;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 20px 0;
+  overflow-y: auto;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  color: #333;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.nav-item:hover {
+  background-color: #fff8f3;
+  color: #f68b1e;
+}
+
+.nav-item.active {
+  background-color: #fff8f3;
+  color: #f68b1e;
+}
+
+.nav-item i {
+  font-size: 20px;
+  margin-right: 12px;
+}
+
+.sidebar-footer {
+  padding: 20px;
+  border-top: 1px solid #eee;
+}
+
+.shop-btn {
+  width: 100%;
+  padding: 10px;
+  background-color: #fff8f3;
+  color: #f68b1e;
+  border: none;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.shop-btn:hover {
+  background-color: #ffe4cc;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  background-color: #f68b1e;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.username {
+  font-weight: 500;
+  color: #333;
+  font-size: 14px;
+}
+
+.email {
+  color: #666;
+  font-size: 12px;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+
+  .sidebar.show {
+    transform: translateX(0);
+  }
+}
