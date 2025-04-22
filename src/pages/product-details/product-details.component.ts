@@ -7,6 +7,7 @@ import { CartsService } from '../../services/cart/carts.service';
 import { NotificationService } from '../../services/shared/notification.service';
 import { environment } from '../../environments/environment';
 import { ProductService } from '../../services/products/product.service';
+import { AuthService } from '../../services/auth/auth.service';
 
 @Component({
   selector: 'app-product-details',
@@ -53,6 +54,7 @@ export class ProductDetailsComponent implements OnInit {
     private route: ActivatedRoute,
     private productService: ProductService,
     private cartsService: CartsService,
+    public authService: AuthService,
     
     private notificationService: NotificationService
   ) {}
@@ -166,11 +168,23 @@ export class ProductDetailsComponent implements OnInit {
     endDate.setDate(endDate.getDate() + 1);
     return `${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`;
   }
+
+
   isAddedToCart: boolean = false;
+
   public addToCart(): void {
     // Check if the product is available and the quantity is greater than 0
     if (!this.product || this.quantity < 1) return;
+  
+    // Check authentication first
+    if (!this.authService.isAuthenticated()) {
+      this.notificationService.showError('You must be logged in to add items to your cart');
+      return;
+    }
+  
+    // Mark the product as added
     this.isAddedToCart = true;
+  
     // Get the productId and variantId
     const productId = this.product.productId;
     const variantId = this.selectedVariant?.variantId;
@@ -179,26 +193,53 @@ export class ProductDetailsComponent implements OnInit {
     this.cartsService.addItemToCart(productId, this.quantity, variantId).subscribe({
       next: (response) => {
         if (response.success) {
-          // Display a success notification if the item is added to the cart
           this.notificationService.showSuccess('Item added to cart successfully');
           console.log('Item added to cart:', response.data);
         } else {
-          // Display an error notification if the API response indicates failure
           this.notificationService.showError(response.message || 'Failed to add item to cart');
           console.error('Failed to add item to cart:', response.message);
         }
       },
       error: (err) => {
-        // Display a generic error notification in case of network or server issues
-        this.notificationService.showError('Error adding item to cart. Please try again.');
-        console.error('Error adding item to cart:', err);
+        let errorMessage = 'Failed to add item to cart. Please try again later.';
+        
+        // Handle specific error cases
+        if (err.status === 401) {
+          errorMessage = 'Please log in first to add items to your cart';
+        } else if (err.status === 404) {
+          errorMessage = 'Product not found or has been removed';
+        } else if (err.status === 409) {
+          errorMessage = 'This item is already in your shopping cart';
+        } else if (err.status === 429) {
+          errorMessage = 'Too many requests. Please wait before trying again';
+        } else if (err.message.includes('network error')) {
+          errorMessage = 'Network connection issue. Please check your internet connection';
+        }
       
+        // Handle additional business logic errors
+        if (err.error?.outOfStock) {
+          errorMessage = 'This product is currently out of stock';
+        }
       
-      setTimeout(() => {
-        this.isAddedToCart = false; 
-      }, 300);
-    }
-  });
+        if (err.error?.invalidQuantity) {
+          errorMessage = 'The requested quantity is not available';
+        }
+      
+        // Show error notification
+        this.notificationService.showError(errorMessage);
+        
+        // Detailed error logging
+        console.error('Error adding item to cart:', {
+          errorMessage: err.message,
+          statusCode: err.status,
+          requestURL: err.config?.url,
+          timestamp: new Date().toISOString(),
+          errorDetails: err.error
+        });}
+      });
+   
+  
+  
 
   
     // Show the toast notification
