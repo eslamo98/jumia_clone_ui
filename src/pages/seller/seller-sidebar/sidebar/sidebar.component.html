@@ -1,0 +1,49 @@
+<aside class="sidebar" [class.collapsed]="isCollapsed()">
+  <!-- Logo and Header -->
+  <div class="sidebar-header">
+    <div class="logo-container">
+      <span class="logo-text">VC</span>
+      <div class="vendor-text" [class.d-none]="isCollapsed()">
+        <span>VENDOR CENTER</span>
+      </div>
+    </div>
+    <button class="collapse-btn" (click)="toggleSidebar()">
+      <i
+        class="pi"
+        [class.pi-angle-left]="!isCollapsed()"
+        [class.pi-angle-right]="isCollapsed()"
+      ></i>
+    </button>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="sidebar-nav">
+    <a
+      *ngFor="let item of navigationItems"
+      [routerLink]="item.link"
+      routerLinkActive="active"
+      class="nav-item"
+    >
+      <i class="pi {{ item.icon }}"></i>
+      <span class="nav-text" [class.d-none]="isCollapsed()">{{
+        item.label
+      }}</span>
+    </a>
+  </nav>
+
+  <!-- Footer -->
+  <div class="sidebar-footer">
+    <button class="shop-btn">
+      <i class="pi pi-shopping-bag"></i>
+      <span [class.d-none]="isCollapsed()">Choose Shops</span>
+    </button>
+
+    <div class="user-profile">
+      <div class="avatar">M</div>
+      <div class="user-info" [class.d-none]="isCollapsed()">
+        <span class="username">TechTitans</span>
+        <span class="email">medomedoftab@gmail.com</span>
+      </div>
+    </div>
+  </div>
+</aside>
