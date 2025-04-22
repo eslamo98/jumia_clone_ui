@@ -42,7 +42,10 @@ export class AdminProductFormComponent implements OnInit {
   imagePreview: string | null = null;
   mainImageFile: File | null = null;
   subcategoryAttributes: any[] = [];
-
+  additionalImagePreviews: string[] = [];
+  maxAdditionalImages = 6;
+  additionalImageInputs: any[] = [];
+  additionalImageFiles: (File | null)[] = [];
   private categorySearchSubject = new Subject<string>();
   private sellerSearchSubject = new Subject<string>();
 
@@ -146,13 +149,85 @@ export class AdminProductFormComponent implements OnInit {
       discountPercentage: [0, [Validators.min(0), Validators.max(100)]],
       stockQuantity: [0, [Validators.required, Validators.min(0)]],
       sku: ['', Validators.required],
-      variantImageUrl: [''],
+      variantImageFile: [null],
+      variantImageBase64: [''],
       isDefault: [false],
       isAvailable: [true],
       attributeValues: this.fb.array([])
     });
   }
+  onAdditionalImageSelected(event: Event, index: number): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+      
+      // Store the file
+      this.additionalImageFiles[index] = file;
+      
+      // Create preview URL
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.additionalImagePreviews[index] = reader.result as string;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
 
+  addImageInput(): void {
+    if (this.additionalImageInputs.length >= this.maxAdditionalImages) {
+      this.notificationService.showWarning(`Maximum of ${this.maxAdditionalImages} additional images allowed`);
+      return;
+    }
+    
+    this.additionalImageInputs.push({});
+    this.additionalImagePreviews.push('');
+    this.additionalImageFiles.push(null);
+  }
+// Handle image selection for a specific input
+// onAdditionalImageSelected(event: Event, index: number): void {
+//   const input = event.target as HTMLInputElement;
+//   if (input.files && input.files[0]) {
+//     const file = input.files[0];
+    
+//     // Store the file
+//     this.additionalImageFiles[index] = file;
+    
+//     // Create preview URL
+//     const reader = new FileReader();
+//     reader.onload = () => {
+//       this.additionalImagePreviews[index] = reader.result as string;
+//     };
+//     reader.readAsDataURL(file);
+//   }
+// }
+  // Remove an image input
+  removeAdditionalImageInput(index: number): void {
+    this.additionalImageInputs.splice(index, 1);
+    this.additionalImagePreviews.splice(index, 1);
+    this.additionalImageFiles.splice(index, 1);
+  }
+  removeAdditionalImage(index: number): void {
+    this.additionalImageFiles.splice(index, 1);
+    this.additionalImagePreviews.splice(index, 1);
+  }
+  onVariantImageSelected(event: Event, variantIndex: number): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+      const variant = this.getVariantFormGroup(variantIndex);
+      
+      // Create Base64 string
+      const reader = new FileReader();
+      reader.onload = () => {
+        const base64String = reader.result as string;
+        variant.patchValue({ 
+          variantImageFile: file,
+          variantImageBase64: base64String
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+  }
   // Add helper method to setup variant attributes
   private setupVariantAttributes(variant: FormGroup, attributes: any[]): void {
     const attributeValues = variant.get('attributeValues') as FormArray;
@@ -314,7 +389,7 @@ export class AdminProductFormComponent implements OnInit {
     if (!variants || variants.length === 0) {
       return [];
     }
-
+  
     return variants.map((variant: any) => {
       // Format variant attributes
       const variantAttributes = variant.attributeValues
@@ -323,7 +398,7 @@ export class AdminProductFormComponent implements OnInit {
           AttributeName: attr.attributeName,
           AttributeValue: attr.value
         }));
-
+  
       return {
         VariantName: variant.variantName,
         Price: variant.price,
@@ -331,11 +406,12 @@ export class AdminProductFormComponent implements OnInit {
         StockQuantity: variant.stockQuantity,
         Sku: variant.sku,
         IsDefault: variant.isDefault,
-        VariantImageUrl: variant.variantImageUrl,
+        VariantImageBase64: variant.variantImageBase64,
         VariantAttributes: variantAttributes
       };
     });
   }
+  
 
   onSubmit(): void {
     if (this.productForm.invalid) {
@@ -353,7 +429,7 @@ export class AdminProductFormComponent implements OnInit {
         return;
       }
     }
-
+  
     if (this.productForm.get('hasVariants')?.value && !this.hasDefaultVariant()) {
       this.notificationService.showWarning('Please select a default variant');
       return;
@@ -388,16 +464,25 @@ export class AdminProductFormComponent implements OnInit {
     formData.append('SubcategoryId', this.productForm.get('subcategoryId')?.value.toString());
     formData.append('SellerId', productData.sellerId.toString());
     formData.append('HasVariants', productData.hasVariants.toString());
-
-    // Append the actual file
+  
+    // Append the main image file
     if (this.mainImageFile) {
       formData.append('MainImageFile', this.mainImageFile);
     }
-
+    
+    // Append additional image files
+  if (this.additionalImageFiles.length > 0) {
+    this.additionalImageFiles.forEach(file => {
+      if (file) { // Only append if file exists
+        formData.append('AdditionalImageFiles', file);
+      }
+    });
+  }
+  
     const request = this.isEditMode ? 
       this.productsService.updateProduct(this.productId, formData) :
       this.productsService.createProduct(formData);
-
+  
     request.subscribe({
       next: () => {
         this.notificationService.showSuccess(
@@ -413,7 +498,6 @@ export class AdminProductFormComponent implements OnInit {
       }
     });
   }
-
   private prepareProductData(): ProductFormData {
     const formValue = this.productForm.value;
     return {

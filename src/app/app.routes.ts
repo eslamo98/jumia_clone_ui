@@ -24,6 +24,8 @@ import { AdminSellerDetailsComponent } from '../pages/admin/components/admin-sel
 import { AdminReviewsComponent } from '../pages/admin/components/admin-reviews/admin-reviews.component';
 import { ProductDetailsComponent } from '../pages/product-details/product-details.component';
 import { CheckoutComponent } from '../pages/checkout/checkout/checkout.component';
+import { AdminSubcategoryFormComponent } from '../pages/admin/components/admin-subcategory-form/admin-subcategory-form.component';
+import { AdminSubcategoriesComponent } from '../pages/admin/components/admin-subcategories/admin-subcategories.component';
 
 export const routes: Routes = [
   // Public routes
@@ -77,6 +79,9 @@ export const routes: Routes = [
       { path: 'categories', component: AdminCategoriesComponent },
       { path: 'categories/add', component: AdminCategoryFormComponent },
       { path: 'categories/edit/:id', component: AdminCategoryFormComponent },
+      { path: 'subcategories', component: AdminSubcategoriesComponent },
+      { path: 'subcategories/add', component: AdminSubcategoryFormComponent },
+      { path: 'subcategories/edit/:id', component: AdminSubcategoryFormComponent },
       { path: 'orders', component: AdminOrdersComponent },
       { path: 'orders/:id', component: AdminOrderDetailsComponent },
       { path: 'customers', component: AdminCustomersComponent },

@@ -206,10 +206,24 @@
                         </div>
                       </div>
 
-                      <!-- Variant Image URL -->
                       <div class="mb-3">
-                        <label [for]="'variantImageUrl' + i" class="form-label">Image URL</label>
-                        <input type="text" class="form-control" [id]="'variantImageUrl' + i" formControlName="variantImageUrl">
+                        <label [for]="'variantImage' + i" class="form-label">Variant Image</label>
+                        <input type="file" 
+                               class="form-control" 
+                               [id]="'variantImage' + i" 
+                               accept="image/*"
+                               (change)="onVariantImageSelected($event, i)">
+                        
+                        <!-- Variant Image Preview -->
+                        <div class="border rounded p-2 text-center mt-2" *ngIf="getVariantFormGroup(i).get('variantImageBase64')?.value">
+                          <img [src]="getVariantFormGroup(i).get('variantImageBase64')?.value" 
+                               class="img-fluid" 
+                               style="max-height: 100px;"
+                               alt="Variant preview">
+                        </div>
+                        <div class="text-muted small mt-1" *ngIf="!getVariantFormGroup(i).get('variantImageBase64')?.value">
+                          No variant image selected
+                        </div>
                       </div>
 
                       <!-- Default Variant Radio -->
@@ -326,7 +340,7 @@
               </div>
 
               <!-- Image -->
-              <div class="card mb-4">
+              <!-- <div class="card mb-4">
                 <div class="card-header bg-light">
                   <h5 class="mb-0">Product Image</h5>
                 </div>
@@ -344,7 +358,6 @@
                     </div>
                   </div>
 
-                  <!-- Image Preview -->
                   <div class="border rounded p-2 text-center">
                     <img [src]="imagePreview" 
                          class="img-fluid" 
@@ -356,8 +369,91 @@
                     </div>
                   </div>
                 </div>
-              </div>
+              </div> -->
+              <!-- Additional Images Section -->
 
+              <div class="card mb-4">
+                <div class="card-header bg-light">
+                  <h5 class="mb-0">Product Images</h5>
+                </div>
+                <div class="card-body">
+                  <div class="mb-3">
+                    <label for="mainImageFile" class="form-label">Main Image <span class="text-danger">*</span></label>
+                    <input type="file" 
+                           class="form-control" 
+                           id="mainImageFile" 
+                           accept="image/*"
+                           (change)="onImageSelected($event)"
+                           [ngClass]="{'is-invalid': isFieldInvalid('mainImageFile')}">
+                    <div class="invalid-feedback" *ngIf="isFieldInvalid('mainImageFile')">
+                      {{getErrorMessage('mainImageFile')}}
+                    </div>
+                  </div>
+              
+                  <!-- Image Preview -->
+                  <div class="border rounded p-2 text-center mb-3">
+                    <img [src]="imagePreview" 
+                         class="img-fluid" 
+                         style="max-height: 200px;"
+                         *ngIf="imagePreview"
+                         alt="Product preview">
+                    <div class="text-muted py-4" *ngIf="!imagePreview">
+                      No image selected
+                    </div>
+                  </div>
+              
+                  <!-- Additional Images Section -->
+                  <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                      <label class="form-label mb-0">Additional Images (up to 6)</label>
+                      <button type="button" 
+                              class="btn btn-outline-primary btn-sm" 
+                              (click)="addImageInput()"
+                              [disabled]="additionalImageInputs.length >= maxAdditionalImages">
+                        <i class="bi bi-plus-circle me-1"></i>Add Image
+                      </button>
+                    </div>
+                    
+                    <div class="text-muted small mb-2">{{additionalImageInputs.length}}/{{maxAdditionalImages}} images</div>
+                    
+                    <!-- Individual image inputs -->
+                    <div class="mb-3" *ngFor="let image of additionalImageInputs; let i = index">
+                      <div class="card p-2 mb-2">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                          <label class="form-label mb-0">Additional Image #{{i+1}}</label>
+                          <button type="button" 
+                                  class="btn btn-sm btn-outline-danger" 
+                                  (click)="removeAdditionalImageInput(i)">
+                            <i class="bi bi-trash"></i>
+                          </button>
+                        </div>
+                        
+                        <input type="file" 
+                               class="form-control mb-2" 
+                               accept="image/*"
+                               (change)="onAdditionalImageSelected($event, i)">
+                        
+                        <!-- Image Preview -->
+                        <div class="border rounded p-2 text-center" *ngIf="additionalImagePreviews[i]">
+                          <img [src]="additionalImagePreviews[i]" 
+                               class="img-fluid" 
+                               style="max-height: 100px;"
+                               alt="Additional image preview">
+                        </div>
+                        <div class="text-muted small py-2 text-center" *ngIf="!additionalImagePreviews[i]">
+                          No image selected
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <!-- No additional images message -->
+                    <div class="text-muted small" *ngIf="additionalImageInputs.length === 0">
+                      No additional images added. Click "Add Image" to add one.
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
               <!-- Availability -->
               <div class="card mb-4">
                 <div class="card-header bg-light">
