@@ -1,8 +1,7 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CartItem } from '../../../../../../models/cart-item.model';
 import { CartsService } from '../../../../../../services/cart/carts.service';
-import { Cart } from '../../../../../../models/cart.model';
 
 @Component({
   selector: 'app-cart-item',
@@ -11,13 +10,15 @@ import { Cart } from '../../../../../../models/cart.model';
   standalone: true,
   imports: [CommonModule],
 })
-export class CartItemComponent {
+export class CartItemComponent implements OnInit {
   @Input() item!: CartItem;
   @Output() quantityChange = new EventEmitter<number>();
   @Output() onRemoveItem = new EventEmitter<void>();
 
   showRemoveConfirmation = false;
   quantityOptions: number[] = [];
+  isUpdating = false;
+  updateError = '';
 
   constructor(private cartsService: CartsService) {}
 
@@ -26,8 +27,9 @@ export class CartItemComponent {
   }
 
   generateQuantityOptions() {
+    const maxQty = this.item.maxQuantity || 10; // Default to 10 if not specified
     this.quantityOptions = Array.from(
-      { length: this.item.maxQuantity },
+      { length: maxQty },
       (_, i) => i + 1
     );
   }
@@ -40,26 +42,60 @@ export class CartItemComponent {
   }
 
   getStockMessage(): string {
-    return this.item.quantity >= this.item.maxQuantity
+    const maxQty = this.item.maxQuantity || 10; // Default to 10 if not specified
+    return this.item.quantity >= maxQty
       ? 'Maximum quantity reached'
-      : `${this.item.maxQuantity - this.item.quantity} items left`;
+      : `${maxQty - this.item.quantity} items left`;
   }
-
+  
   decreaseQuantity() {
     if (this.item.quantity > 1) {
+      console.log('Decreasing quantity to:', this.item.quantity - 1);
       this.quantityChange.emit(this.item.quantity - 1);
     }
   }
 
   increaseQuantity() {
-    if (this.item.quantity < this.item.maxQuantity) {
+    const maxQty = this.item.maxQuantity || 10;
+    if (this.item.quantity < maxQty) {
+      console.log('Increasing quantity to:', this.item.quantity + 1);
       this.quantityChange.emit(this.item.quantity + 1);
     }
   }
 
+  // onQuantityChange(event: Event) {
+  //   const value = +(event.target as HTMLSelectElement).value;
+  //   this.quantityChange.emit(value);
+  // }
+
   onQuantityChange(event: Event) {
     const value = +(event.target as HTMLSelectElement).value;
-    this.quantityChange.emit(value);
+    this.updateQuantity(value);
+  }
+
+  updateQuantity(newQuantity: number) {
+    if (this.isUpdating) return;
+    
+    this.isUpdating = true;
+    this.updateError = '';
+    
+    // First emit to parent to update UI immediately for better UX
+    this.quantityChange.emit(newQuantity);
+    
+    // Then make the API call
+    this.cartsService.updateCartItem(this.item.cartItemId, newQuantity)
+      .subscribe({
+        next: (response) => {
+          this.isUpdating = false;
+          console.log('Item updated successfully:', response);
+        },
+        error: (error) => {
+          this.isUpdating = false;
+          this.updateError = 'Failed to update item';
+          console.error('Error updating item:', error);
+          // You might want to emit a notification to the parent about the error
+        }
+      });
   }
 
   onRemove() {
@@ -74,5 +110,4 @@ export class CartItemComponent {
   cancelRemove() {
     this.showRemoveConfirmation = false;
   }
-
 }

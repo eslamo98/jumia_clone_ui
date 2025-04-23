@@ -4,8 +4,11 @@ import { CartItem } from '../../../models/cart-item.model';
 import { CartItemComponent } from './cart-item/components/cart-item/cart-item.component';
 import { CartSummaryComponent } from './cart-summary/components/cart-summary/cart-summary.component';
 import { CartsService } from '../../../services/cart/carts.service';
-import { Cart } from '../../../models/cart';
-import { CartResponse } from '../../../models/cart';
+import { catchError, finalize, of } from 'rxjs';
+import { Cart } from '../../../models/cart.model';
+import { CartSummary } from '../../../models/cart-summary.model';
+import { environment } from '../../../environments/environment';
+
 
 @Component({
   selector: 'app-cart',
@@ -18,7 +21,9 @@ export class CartComponent implements OnInit {
   cartItems: CartItem[] = [];
   isLoading: boolean = true;
   error: string | null = null;
-  showEmptyCartMessage: boolean = false;
+  totalAmount: number = 0;
+  itemCount: number = 0;
+  hasExpressItems: boolean = false;
 
   constructor(private cartService: CartsService) {}
 
@@ -26,102 +31,220 @@ export class CartComponent implements OnInit {
     this.loadCart();
   }
 
+  // loadCart() {
+  //   this.isLoading = true;
+  //   this.cartService.getCart().pipe(
+  //     finalize(() => this.isLoading = false)
+  //   ).subscribe({
+  //     next: (cart: Cart) => {
+  //       if (cart && cart.cartItems) {
+  //         this.cartItems = cart.cartItems;
+  //         this.calculateCartTotals();
+  //         this.checkForExpressItems();
+  //       } else {
+  //         this.cartItems = [];
+  //       }
+  //     },
+  //     error: (err) => {
+  //       console.error('Error loading cart:', err);
+  //       this.error = 'Failed to load your cart. Please try again.';
+  //     },
+  //   });
+  // }
   loadCart() {
     this.isLoading = true;
-    this.cartService.getCart().subscribe({
-      next: (response: any) => {
-        console.log('Cart response:', response);
-        console.log('Received cart items:', this.cartItems);
-        // Simplify the response handling
-       // التحقق من صحة الاستجابة
-       if (response && response.data && Array.isArray(response.data.cartItems)) {
-        this.cartItems = response.data.cartItems;
-
-        // إذا كانت العربة فارغة
-        if (this.cartItems.length === 0) {
-          this.showEmptyCartMessage = true;
+    this.cartService.getCart().pipe(
+      finalize(() => this.isLoading = false)
+    ).subscribe({
+      next: (cart: Cart) => {
+        if (cart && cart.cartItems) {
+          // Map API response to expected CartItem format
+          this.cartItems = cart.cartItems.map(item => {
+            // Create the attributes object properly
+            const attributes: {[key: string]: string} = {};
+            if (item.variantName) {
+              attributes['Variant'] = item.variantName;
+            }
+            
+            // Transform image URL by adding base URL if it's a relative path
+            let imageUrl = item.productImage || '';
+            if (imageUrl && !imageUrl.startsWith('http')) {
+              imageUrl = `${environment.apiUrl}/${imageUrl}`;
+            }
+            
+            return {
+              ...item,
+              name: item.productName || '',
+              imageUrl: imageUrl,
+              productImage: imageUrl, // Update this property too
+              discountedPrice: item.priceAtAddition || 0,
+              originalPrice: null,
+              percentOff: null,
+              isJumiaExpress: item.productId % 3 === 0,
+              maxQuantity: 10,
+              attributes: attributes
+            };
+          });
+          this.calculateCartTotals();
+          this.checkForExpressItems();
         } else {
-          this.showEmptyCartMessage = false;
+          this.cartItems = [];
         }
-      } else {
-        // إذا لم تكن هناك بيانات صالحة
-        this.cartItems = [];
-        this.showEmptyCartMessage = true;
-      }
-      this.isLoading = false;
       },
       error: (err) => {
         console.error('Error loading cart:', err);
         this.error = 'Failed to load your cart. Please try again.';
-        this.isLoading = false;
-        this.showEmptyCartMessage = true; // عرض رسالة إذا حدث خطأ
       },
     });
+  }
+
+  // calculateCartTotals() {
+  //   this.totalAmount = this.cartItems.reduce(
+  //     (sum, item) => sum + (item.discountedPrice * item.quantity), 
+  //     0
+  //   );
+    
+  //   this.itemCount = this.cartItems.reduce(
+  //     (sum, item) => sum + item.quantity, 
+  //     0
+  //   );
+  // }
+
+  calculateCartTotals() {
+    // Calculate total price - ensure we're using consistent properties
+    this.totalAmount = this.cartItems.reduce(
+      (sum, item) => sum + ((item.discountedPrice || 0) * (item.quantity || 1)), 
+      0
+    );
+    
+    // Calculate total quantity of items
+    this.itemCount = this.cartItems.reduce(
+      (sum, item) => sum + (item.quantity || 1), 
+      0
+    );
+  }
+
+  checkForExpressItems() {
+    this.hasExpressItems = this.cartItems.some(item => item.isJumiaExpress);
   }
 
   updateItemQuantity(itemId: number, quantity: number) {
+    console.log(`Updating item ${itemId} to quantity ${quantity}`);
+    
+    // Find the item in the cart
+    const itemIndex = this.cartItems.findIndex(item => item.cartItemId === itemId);
+    
+    if (itemIndex === -1) {
+      console.error(`Item with ID ${itemId} not found in cart`);
+      return;
+    }
+    
+    const item = this.cartItems[itemIndex];
+    const maxQty = item.maxQuantity || 10;
+    
+    // Validate quantity against constraints
+    if (quantity < 1) {
+      quantity = 1;
+      console.log(`Quantity adjusted to minimum (1)`);
+    } else if (quantity > maxQty) {
+      quantity = maxQty;
+      console.log(`Quantity adjusted to maximum (${maxQty})`);
+    }
+    
+    // Update locally first for immediate feedback
+    this.cartItems[itemIndex].quantity = quantity;
+    this.calculateCartTotals();
+    
+    // Then update on the server
     this.isLoading = true;
-    const updateItem: any = { quantity }; // Only send the quantity
-    this.cartService.updateCartItem(itemId, updateItem).subscribe({
-      next: () => {
-        this.loadCart();
-      },
-      error: (err) => {
+    this.cartService.updateCartItem(itemId, quantity).pipe(
+      finalize(() => this.isLoading = false),
+      catchError(err => {
         console.error('Error updating item quantity:', err);
         this.error = 'Failed to update item quantity. Please try again.';
-        this.isLoading = false;
+        // Revert the local change since the server update failed
+        this.loadCart(); // Reload to get the original state
+        return of(null);
+      })
+    ).subscribe(response => {
+      if (response) {
+        console.log(`Quantity updated successfully to ${quantity}`);
       }
     });
   }
+
 
   removeItem(itemId: number) {
+    // Show a loading state
     this.isLoading = true;
-    this.cartService.removeCartItem(itemId).subscribe({
-      next: () => {
-        this.loadCart();
-      },
-      error: (err) => {
+
+    // First update UI for immediate feedback
+    this.cartItems = this.cartItems.filter(item => item.cartItemId !== itemId);
+    this.calculateCartTotals();
+    this.checkForExpressItems();
+
+    // Then remove from server
+    this.cartService.removeCartItem(itemId).pipe(
+      finalize(() => this.isLoading = false),
+      catchError(err => {
         console.error('Error removing item:', err);
         this.error = 'Failed to remove item from cart. Please try again.';
-        this.isLoading = false;
+        // Reload cart since the operation failed
+        this.loadCart();
+        return of(null);
+      })
+    ).subscribe(response => {
+      if (response) {
+        console.log(`Item ${itemId} removed successfully`);
       }
     });
   }
 
-  clearCart() {
+
+   clearCart() {
     if (this.cartItems.length === 0) return;
     
     this.isLoading = true;
-    this.cartService.clearCart().subscribe({
-      next: () => {
-        this.cartItems = [];
-        this.isLoading = false;
-      },
-      error: (err) => {
+    this.cartService.clearCart().pipe(
+      finalize(() => this.isLoading = false),
+      catchError(err => {
         console.error('Error clearing cart:', err);
         this.error = 'Failed to clear your cart. Please try again.';
-        this.isLoading = false;
+        return of(null);
+      })
+    ).subscribe(response => {
+      if (response !== null) {
+        this.cartItems = [];
+        this.totalAmount = 0;
+        this.itemCount = 0;
+        this.hasExpressItems = false;
       }
     });
   }
 
+
   getCartItemCount(): number {
-    return this.cartItems.reduce((sum, item) => sum + item.quantity, 0);
+    return this.itemCount;
   }
 
   getTotalPrice(): number {
-    return this.cartItems.reduce((sum, item) => sum + item.totalPrice, 0);
+    return this.totalAmount;
   }
 
   hasJumiaExpressItems(): boolean {
-    return this.cartItems.some((item) => item.isJumiaExpress);
+    return this.hasExpressItems;
   }
 
-  handleQuantityChange(item: CartItem, newQuantity: number): void {
-    this.updateItemQuantity(item.cartItemId, newQuantity);
+  // Method to refresh the cart
+  refreshCart() {
+    this.loadCart();
   }
 
-  handleRemoveItem(itemId: number): void {
-    this.removeItem(itemId);
+  // Method to handle checkout
+  checkout() {
+    // You can add navigation logic here
+    console.log('Proceeding to checkout with total amount:', this.totalAmount);
+    // This would typically navigate to a checkout page
+    // For example: this.router.navigate(['/checkout']);
   }
 }

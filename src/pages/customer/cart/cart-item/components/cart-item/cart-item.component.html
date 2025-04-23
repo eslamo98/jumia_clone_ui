@@ -1,13 +1,13 @@
 <div class="cart-item">
   <div class="item-image">
-    <img [src]=" item.productImage || item.imageUrl" [alt]="item.name || item.productName" />
+    <img [src]="item.productImage || item.imageUrl" [alt]="item.productName || item.name" />
     <div *ngIf="item.isJumiaExpress" class="express-badge">
       <span>Jumia Express</span>
     </div>
   </div>
 
   <div class="item-details">
-    <div class="item-name">{{ item.name || item.productName }}</div>
+    <div class="item-name">{{ item.productName || item.name }}</div>
 
     <div class="item-attributes" *ngIf="getAttributesDisplay()">
       {{ getAttributesDisplay() }}
@@ -26,23 +26,25 @@
     <div class="item-actions">
       <div class="quantity-controls">
         <button
+          type="button"
           class="quantity-btn"
-          [disabled]="item.quantity === 1"
+          [disabled]="item.quantity <= 1"
           (click)="decreaseQuantity()"
         >
           <i class="fas fa-minus"></i>
         </button>
         <span class="quantity-value">{{ item.quantity }}</span>
         <button
+          type="button"
           class="quantity-btn"
-          [disabled]="item.quantity >= item.maxQuantity"
+          [disabled]="item.quantity >= (item.maxQuantity || 10)"
           (click)="increaseQuantity()"
         >
           <i class="fas fa-plus"></i>
         </button>
       </div>
 
-      <button class="remove-btn" (click)="onRemove()">
+      <button type="button" class="remove-btn" (click)="onRemove()">
         <i class="fas fa-trash"></i>
       </button>
     </div>
@@ -55,11 +57,11 @@
       <h4>Remove Item</h4>
     </div>
     <div class="dialog-content">
-      <p>Are you sure you want to remove "{{ item.name }}" from your cart?</p>
+      <p>Are you sure you want to remove "{{ item.name || item.productName }}" from your cart?</p>
     </div>
     <div class="dialog-actions">
-      <button class="cancel-btn" (click)="cancelRemove()">Cancel</button>
-      <button class="confirm-btn" (click)="confirmRemove()">
+      <button type="button" class="cancel-btn" (click)="cancelRemove()">Cancel</button>
+      <button type="button" class="confirm-btn" (click)="confirmRemove()">
         Confirm Remove
       </button>
     </div>

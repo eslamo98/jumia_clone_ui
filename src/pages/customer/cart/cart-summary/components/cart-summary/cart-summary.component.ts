@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -8,10 +8,21 @@ import { CommonModule } from '@angular/common';
   templateUrl: './cart-summary.component.html',
   styleUrls: ['./cart-summary.component.css'], })
 export class CartSummaryComponent {
-  qualifiesForFreeShipping(): boolean {
-    return this.totalPrice >= 250; // Assuming free shipping threshold is 250
-  }
   @Input() totalPrice: number = 0;
   @Input() hasExpressItems: boolean = false;
   @Input() itemCount: number = 0;
+  @Output() refreshCart = new EventEmitter<void>();
+  @Output() proceedToCheckout = new EventEmitter<void>();
+
+  qualifiesForFreeShipping(): boolean {
+    return this.totalPrice >= 250; // Assuming free shipping threshold is 250
+  }
+
+  onRefreshCart() {
+    this.refreshCart.emit();
+  }
+
+  onProceedToCheckout() {
+    this.proceedToCheckout.emit();
+  }
 }

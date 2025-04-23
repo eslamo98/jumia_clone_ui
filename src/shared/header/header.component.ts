@@ -5,7 +5,9 @@ import { Component, HostListener, OnInit, ElementRef } from '@angular/core';
 import { AuthService } from '../../services/auth/auth.service';
 import { Router } from '@angular/router';
 import { CartsService } from '../../services/cart/carts.service';
-import { Cart, CartItem, CartResponse } from '../../models/cart';
+import { Cart } from '../../models/cart';
+import{ CartItem } from '../../models/cart-item.model';
+
 
 @Component({
   selector: 'app-header',
@@ -27,18 +29,18 @@ export class HeaderComponent implements OnInit {
 
   ngOnInit(): void {
     // Initialize cart count if user is authenticated
-    if (this.authService.isAuthenticated()) {
-      this.loadCartCount();
-    }
+    // if (this.authService.isAuthenticated()) {
+    //   this.loadCartCount();
+    // }
 
-    // Subscribe to auth state changes
-    this.authService.currentUser$.subscribe(user => {
-      if (user) {
-        this.loadCartCount();
-      } else {
-        this.cartItemCount = 0;
-      }
-    });
+    // // Subscribe to auth state changes
+    // this.authService.currentUser$.subscribe(user => {
+    //   if (user) {
+    //     this.loadCartCount();
+    //   } else {
+    //     this.cartItemCount = 0;
+    //   }
+    // });
   }
 
   toggleAccountDropdown(event?: Event) {
@@ -59,22 +61,22 @@ export class HeaderComponent implements OnInit {
     this.closeAccountDropdown();
   }
 
-  private loadCartCount(): void {
-    this.cartService.getCartItems().subscribe({
-      next: (response: CartResponse) => {
-        if (response.success && response.data) {
-          const items = response.data as unknown as CartItem[];
-          this.cartItemCount = items.reduce((total: number, item: CartItem) => total + item.Quantity, 0);
-        } else {
-          this.cartItemCount = 0;
-        }
-      },
-      error: (error) => {
-        console.error('Error loading cart items:', error);
-        this.cartItemCount = 0;
-      }
-    });
-  }
+  // private loadCartCount(): void {
+  //   this.cartService.getCartItems().subscribe({
+  //     next: (response: CartResponse) => {
+  //       if (response.success && response.data) {
+  //         const items = response.data as unknown as CartItem[];
+  //         this.cartItemCount = items.reduce((total: number, item: CartItem) => total + item.Quantity, 0);
+  //       } else {
+  //         this.cartItemCount = 0;
+  //       }
+  //     },
+  //     error: (error) => {
+  //       console.error('Error loading cart items:', error);
+  //       this.cartItemCount = 0;
+  //     }
+  //   });
+  // }
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
