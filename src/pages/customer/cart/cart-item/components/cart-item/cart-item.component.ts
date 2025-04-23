@@ -1,7 +1,6 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CartItem } from '../../../../../../models/cart-item.model';
-import { CartsService } from '../../../../../../services/cart/carts.service';
 
 @Component({
   selector: 'app-cart-item',
@@ -17,10 +16,6 @@ export class CartItemComponent implements OnInit {
 
   showRemoveConfirmation = false;
   quantityOptions: number[] = [];
-  isUpdating = false;
-  updateError = '';
-
-  constructor(private cartsService: CartsService) {}
 
   ngOnInit() {
     this.generateQuantityOptions();
@@ -63,39 +58,9 @@ export class CartItemComponent implements OnInit {
     }
   }
 
-  // onQuantityChange(event: Event) {
-  //   const value = +(event.target as HTMLSelectElement).value;
-  //   this.quantityChange.emit(value);
-  // }
-
   onQuantityChange(event: Event) {
     const value = +(event.target as HTMLSelectElement).value;
-    this.updateQuantity(value);
-  }
-
-  updateQuantity(newQuantity: number) {
-    if (this.isUpdating) return;
-    
-    this.isUpdating = true;
-    this.updateError = '';
-    
-    // First emit to parent to update UI immediately for better UX
-    this.quantityChange.emit(newQuantity);
-    
-    // Then make the API call
-    this.cartsService.updateCartItem(this.item.cartItemId, newQuantity)
-      .subscribe({
-        next: (response) => {
-          this.isUpdating = false;
-          console.log('Item updated successfully:', response);
-        },
-        error: (error) => {
-          this.isUpdating = false;
-          this.updateError = 'Failed to update item';
-          console.error('Error updating item:', error);
-          // You might want to emit a notification to the parent about the error
-        }
-      });
+    this.quantityChange.emit(value);
   }
 
   onRemove() {

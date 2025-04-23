@@ -1,13 +1,11 @@
 // shared/header/header.component.ts
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { Component, HostListener, OnInit, ElementRef } from '@angular/core';
+import { Component, HostListener, OnInit, OnDestroy, ElementRef } from '@angular/core';
 import { AuthService } from '../../services/auth/auth.service';
 import { Router } from '@angular/router';
 import { CartsService } from '../../services/cart/carts.service';
-import { Cart } from '../../models/cart';
-import{ CartItem } from '../../models/cart-item.model';
-
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-header',
@@ -16,9 +14,11 @@ import{ CartItem } from '../../models/cart-item.model';
   standalone: true,
   imports: [CommonModule, RouterModule]
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent implements OnInit, OnDestroy {
   isAccountDropdownOpen = false;
   cartItemCount = 0;
+  private cartSubscription: Subscription | null = null;
+  private authSubscription: Subscription | null = null;
   
   constructor(
     public authService: AuthService,
@@ -28,19 +28,32 @@ export class HeaderComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    // Initialize cart count if user is authenticated
-    // if (this.authService.isAuthenticated()) {
-    //   this.loadCartCount();
-    // }
+    // Subscribe to the cartItemCount$ observable for real-time updates
+    this.cartSubscription = this.cartService.cartItemCount$.subscribe(count => {
+      this.cartItemCount = count;
+    });
 
-    // // Subscribe to auth state changes
-    // this.authService.currentUser$.subscribe(user => {
-    //   if (user) {
-    //     this.loadCartCount();
-    //   } else {
-    //     this.cartItemCount = 0;
-    //   }
-    // });
+    // Subscribe to auth state changes
+    // Note: You'll need to ensure authService.currentUser$ is properly implemented
+    this.authSubscription = this.authService.currentUser$.subscribe(user => {
+      if (user) {
+        // If user logs in, refresh the cart count
+        this.cartService.refreshCartCount();
+      } else {
+        // If user logs out, reset the cart count
+        this.cartItemCount = 0;
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    // Clean up subscriptions to prevent memory leaks
+    if (this.cartSubscription) {
+      this.cartSubscription.unsubscribe();
+    }
+    if (this.authSubscription) {
+      this.authSubscription.unsubscribe();
+    }
   }
 
   toggleAccountDropdown(event?: Event) {
@@ -60,23 +73,6 @@ export class HeaderComponent implements OnInit {
     this.cartItemCount = 0;
     this.closeAccountDropdown();
   }
-
-  // private loadCartCount(): void {
-  //   this.cartService.getCartItems().subscribe({
-  //     next: (response: CartResponse) => {
-  //       if (response.success && response.data) {
-  //         const items = response.data as unknown as CartItem[];
-  //         this.cartItemCount = items.reduce((total: number, item: CartItem) => total + item.Quantity, 0);
-  //       } else {
-  //         this.cartItemCount = 0;
-  //       }
-  //     },
-  //     error: (error) => {
-  //       console.error('Error loading cart items:', error);
-  //       this.cartItemCount = 0;
-  //     }
-  //   });
-  // }
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {

@@ -54,15 +54,19 @@
 <div class="confirmation-overlay" *ngIf="showRemoveConfirmation">
   <div class="confirmation-dialog">
     <div class="dialog-header">
-      <h4>Remove Item</h4>
+      <h4>Remove from cart</h4>
+      <button type="button" class="close-btn" (click)="cancelRemove()">
+        <i class="fas fa-times"></i>
+      </button>
     </div>
     <div class="dialog-content">
-      <p>Are you sure you want to remove "{{ item.name || item.productName }}" from your cart?</p>
+      <p>Do you really want to remove this item from cart?</p>
     </div>
     <div class="dialog-actions">
       <button type="button" class="cancel-btn" (click)="cancelRemove()">Cancel</button>
       <button type="button" class="confirm-btn" (click)="confirmRemove()">
-        Confirm Remove
+        <i class="fas fa-trash trash-icon"></i>
+        Remove Item
       </button>
     </div>
   </div>
