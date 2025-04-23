@@ -22,6 +22,8 @@ import { ElectronicsContainerComponent } from "./homeComponents/electronicsConta
 import { TopSellingComponent } from "./homeComponents/topSellingContainer/top-selling/top-selling.component";
 import { InfoComponent } from "./homeComponents/infoContainer/info/info.component";
 import { UpArrowComponent } from "./homeComponents/upArrow/up-arrow/up-arrow.component";
+import { Router } from '@angular/router';
+import { NavigationService } from '../../../services/navigations/navigation.services';
 
 
 
@@ -66,20 +68,22 @@ export class HomeComponent implements OnInit {
   
   // Side menu categories
   sidebarCategories = [
-    { name: 'Fashion', icon: 'fashion-icon' },
-    { name: 'Phones & Tablets', icon: 'phone-icon' },
-    { name: 'Health & Beauty', icon: 'health-icon' },
-    { name: 'Home & Furniture', icon: 'home-icon' },
-    { name: 'Appliances', icon: 'appliance-icon' },
-    { name: 'Televisions & Audio', icon: 'tv-icon' },
-    { name: 'Baby Products', icon: 'baby-icon' },
-    { name: 'Supermarket', icon: 'supermarket-icon' },
-    { name: 'Computing', icon: 'computing-icon' },
-    { name: 'Sporting Goods', icon: 'sporting-icon' },
-    { name: 'Gaming', icon: 'gaming-icon' },
-    { name: 'Other categories', icon: 'other-icon' }
+    { name: 'Fashion', icon: 'fas fa-tshirt', id: '2' },
+    { name: 'Phones & Tablets', icon: 'fas fa-mobile-alt', id: '1' },
+    { name: 'Health & Beauty', icon: 'fas fa-heartbeat', id: '4' },
+    { name: 'Home & Furniture', icon: 'fas fa-couch', id: '3' },
+    { name: 'Appliances', icon: 'fas fa-blender', id: '3' },
+    { name: 'Televisions & Audio', icon: 'fas fa-tv', id: '1' },
+    { name: 'Baby Products', icon: 'fas fa-baby', id: '5' },
+    { name: 'Supermarket', icon: 'fas fa-shopping-basket', id: '9' },
+    { name: 'Computing', icon: 'fas fa-laptop', id: '1' },
+    { name: 'Sporting Goods', icon: 'fas fa-running', id: '10' },
+    { name: 'Gaming', icon: 'fas fa-gamepad', id: '8' },
+    { name: 'Other categories', icon: 'fas fa-ellipsis-h', id: '1' }
   ];
   
+ 
+
   // Right sidebar options
   sidebarOptions = [
     { 
@@ -104,7 +108,8 @@ export class HomeComponent implements OnInit {
   // Main banner carousel current slide index
   currentSlide: number = 0;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private router: Router,
+    private navigationService: NavigationService) { }
 
   ngOnInit(): void {
     // Load categories from API
@@ -124,6 +129,8 @@ export class HomeComponent implements OnInit {
     // Start automatic banner slider
     this.startSlideShow();
   }
+
+  
 
   fetchCategories(): void {
     this.isLoading = true;
@@ -212,5 +219,14 @@ export class HomeComponent implements OnInit {
 
   setCurrentSlide(index: number): void {
     this.currentSlide = index;
+  }
+
+  navigateToCategory(category: {name: string, icon: string, id: string}): void {
+    // Store both the category name and ID in navigation service
+    this.navigationService.setCategoryName(category.name);
+    this.navigationService.setCategoryId(category.id);
+    
+    // Navigate using only the ID
+    this.router.navigate(['/category', category.id]);
   }
 }

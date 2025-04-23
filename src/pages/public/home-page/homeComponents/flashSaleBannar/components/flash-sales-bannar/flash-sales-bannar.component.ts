@@ -1,11 +1,13 @@
 // flash-sales-banner.component.ts
-import { Component, OnInit, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, Input } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { interval } from 'rxjs';
 import { map, takeWhile } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
 import { ProductService } from '../../../../../../../services/products/product.service';
 import { Helpers } from '../../../../../../../Utility/helpers';
+import { NavigationService } from '../../../../../../../services/navigations/navigation.services';
+
 
 interface Product {
   productId: number;
@@ -14,14 +16,16 @@ interface Product {
   basePrice: number;
   discountPercentage: number;
   finalPrice: number;
-  stockQuantity: number;
   isAvailable: boolean;
   mainImageUrl: string;
   averageRating: number;
   sellerId: number;
   sellerName: string;
+  categoryId?: string; 
+  categoryName?: string; 
+  subcategoryId?: string;
   subcategoryName: string;
-  // Add other properties as needed
+  stockQuantity: number;
 }
 
 @Component({
@@ -33,6 +37,11 @@ interface Product {
 })
 export class FlashSalesBannerComponent extends Helpers implements OnInit, AfterViewInit {
   @ViewChild('productContainer') productContainer!: ElementRef;
+  @Input() categoryName: string = 'Computing';
+  @Input() categorySubtitle: string = 'Laptops';
+  @Input() categoryId: string = ''; 
+  @Input() subcategoryId: string = '';
+  @Input() subcategoryName: string = '';
   
   products: Product[] = [];
   hours: number = 12;
@@ -47,7 +56,8 @@ export class FlashSalesBannerComponent extends Helpers implements OnInit, AfterV
   
   constructor(
     private router: Router,
-    private productService: ProductService
+    private productService: ProductService,
+    private navigationService: NavigationService
   ) { super(); }
 
   ngOnInit(): void {
@@ -159,4 +169,28 @@ export class FlashSalesBannerComponent extends Helpers implements OnInit, AfterV
   getProgressBarColor(quantity: number): string {
     return quantity < 10 ? '#e41e23' : '#ff9900';
   }
+
+  // Function to navigate to the category page
+navigateToCategory(): void {
+  console.log('Navigating to category:', this.categoryName, 'with ID:', this.categoryId);
+  
+  // Store category information in the navigation service
+  this.navigationService.setCategoryName(this.categoryName);
+  this.navigationService.setCategoryId(this.categoryId);
+  
+  // If categoryId is not set, try to get it from the first product
+  if (!this.categoryId && this.products.length > 0 && this.products[0].categoryId) {
+    const categoryId = this.products[0].categoryId.toString();
+    this.navigationService.setCategoryId(categoryId);
+    console.log('Using categoryId from products:', categoryId);
+    this.router.navigate(['/category', categoryId]);
+  } else if (this.categoryId) {
+    // Navigate with the available categoryId
+    this.router.navigate(['/category', this.categoryId]);
+  } else {
+    console.error('Cannot navigate: No categoryId available');
+    // Fallback navigation to general category page
+    this.router.navigate(['/category']);
+  }
+}
 }

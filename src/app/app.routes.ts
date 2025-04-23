@@ -24,6 +24,7 @@ import { AdminSellerDetailsComponent } from '../pages/admin/components/admin-sel
 import { AdminReviewsComponent } from '../pages/admin/components/admin-reviews/admin-reviews.component';
 import { ProductDetailsComponent } from '../pages/product-details/product-details.component';
 import { CheckoutComponent } from '../pages/checkout/checkout/checkout.component';
+import { CategoryComponent } from '../pages/customer/category/category/category.component';
 import { OrdersComponent } from '../pages/seller/seller-orders/orders/orders.component';
 import { AdminSubcategoryFormComponent } from '../pages/admin/components/admin-subcategory-form/admin-subcategory-form.component';
 import { AdminSubcategoriesComponent } from '../pages/admin/components/admin-subcategories/admin-subcategories.component';
@@ -31,6 +32,8 @@ import { AdminSellersFormComponent } from '../pages/admin/components/admin-selle
 import { AdminCustomersFormComponent } from '../pages/admin/components/admin-customers-form/admin-customers-form.component';
 import { AdminProductAttributesComponent } from '../pages/admin/components/admin-product-attributes/admin-product-attributes.component';
 import { AdminProductAttributeFormComponent } from '../pages/admin/components/admin-product-attribute-form/admin-product-attribute-form.component';
+import { SellerProductFormComponent } from '../pages/seller/seller-productEdit/seller-product-form/seller-product-form.component';
+import { ManageproductsComponent } from '../pages/seller/seller-manageproducts/manageproducts/manageproducts.component';
 
 export const routes: Routes = [
   // Public routes
@@ -58,6 +61,9 @@ export const routes: Routes = [
     component: CartComponent,
     canActivate: [authGuard]
   },
+  { path: 'category/:id',
+    component: CategoryComponent
+  },
 
   // Seller routes
   {
@@ -67,7 +73,9 @@ export const routes: Routes = [
     children: [
       { path: '', component: SellerDashboardComponent },
       { path: 'products', component: SellerProductsComponent },
+      { path: 'manage-products', component: ManageproductsComponent },
       { path: 'orders', component: OrdersComponent },
+      {path: 'products/edit/:id',component: SellerProductFormComponent},
     ]
   },
   

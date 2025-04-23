@@ -4,7 +4,7 @@
 
 <div class="jumia-container">
   <!-- Left Sidebar Navigation -->
-  <div class="sidebar">
+  <!-- <div class="sidebar">
     <ul class="category-list">
       <li><i class="fas fa-tshirt"></i>&nbsp; Fashion</li>
       <li><i class="fas fa-mobile-alt"></i>&nbsp; Phones & Tablets</li>
@@ -18,6 +18,17 @@
       <li><i class="fas fa-running"></i>&nbsp; Sporting Goods</li>
       <li><i class="fas fa-gamepad"></i>&nbsp; Gaming</li>
       <li><i class="fas fa-ellipsis-h"></i>&nbsp; Other categories</li>
+    </ul>
+  </div> -->
+
+  
+  <div class="sidebar">
+    <ul class="category-list">
+      <li *ngFor="let category of sidebarCategories" 
+          (click)="navigateToCategory(category)"
+          class="category-item">
+        <i [class]="category.icon"></i>&nbsp; {{ category.name }}
+      </li>
     </ul>
   </div>
 
@@ -97,6 +108,7 @@
 <app-phones-container></app-phones-container>
 
 <app-decor-container></app-decor-container>
+
 
 <app-computing-container></app-computing-container>
 

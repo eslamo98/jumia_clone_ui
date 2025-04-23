@@ -1,0 +1,17 @@
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.form-control.ng-invalid.ng-touched {
+  border-color: #dc3545;
+}
+
+.form-label {
+  font-weight: 500;
+}
+
+.alert {
+  margin-bottom: 20px;
+}
