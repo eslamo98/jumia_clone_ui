@@ -117,6 +117,7 @@ export interface DashboardStats {
   export interface BasicSubCategoriesInfo {
     subcategoryId: number;
     name: string;
+    categoryName: string;
   }
   
   // src/app/models/category.model.ts

@@ -148,28 +148,21 @@ createCategoryWithImage(categoryData: FormData): Observable<Category> {
   // Sellers
 
   getSellers(): Observable<Seller[]> {
-    return this.http.get<ApiResponse<Seller[]>>(`${this.apiUrl}/api/users/sellers`)
+    return this.http.get<ApiResponse<Seller[]>>(`${this.apiUrl}/api/api/Users/sellers`)
       .pipe(
         map(response => response.data)
       );
   }
 
   getBasicSellers(): Observable<BasicSellerInfo[]> {
-    return this.http.get<ApiResponse<BasicSellerInfo[]>>(`${this.apiUrl}/api/Users/sellers/basic-info`)
-      .pipe(
-        map(response => response.data)
-      );
-  }
-
-  getSellerById(id: number): Observable<Seller> {
-    return this.http.get<ApiResponse<Seller>>(`${this.apiUrl}/api/users/sellers/${id}`)
+    return this.http.get<ApiResponse<BasicSellerInfo[]>>(`${this.apiUrl}/api/api/Users/sellers/basic-info`)
       .pipe(
         map(response => response.data)
       );
   }
 
   updateSellerStatus(id: number, status: boolean): Observable<Seller> {
-    return this.http.patch<ApiResponse<Seller>>(`${this.apiUrl}/api/users/sellers/${id}/verify`, status)
+    return this.http.patch<ApiResponse<Seller>>(`${this.apiUrl}/api/api/Users/sellers/${id}/verify`, status)
       .pipe(
         map(response => response.data)
       );
@@ -181,12 +174,120 @@ createCategoryWithImage(categoryData: FormData): Observable<Category> {
       ...(rejectionReason && { rejectionReason })
     };
 
-    return this.http.patch<ApiResponse<Seller>>(`${this.apiUrl}/api/users/sellers/${id}/verification`, data)
+    return this.http.patch<ApiResponse<Seller>>(`${this.apiUrl}/api/api/Users/sellers/${id}/verification`, data)
       .pipe(
         map(response => response.data)
       );
   }
 
+  getAllSellers(pageNumber: number = 1, pageSize: number = 10, searchTerm?: string, isVerified?: boolean): Observable<any> {
+    let params = new HttpParams()
+      .set('pageNumber', pageNumber.toString())
+      .set('pageSize', pageSize.toString());
+    
+    if (searchTerm) {
+      params = params.set('searchTerm', searchTerm);
+    }
+    
+    if (isVerified !== undefined) {
+      params = params.set('isVerified', isVerified.toString());
+    }
+    
+    return this.http.get(`${this.apiUrl}/api/Users/sellers`, { params });
+  }
+
+  getSellerById(id: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/api/Users/sellers/${id}`);
+  }
+  registerSeller(formData: FormData): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/api/Users/sellers/register`, formData)
+      .pipe(
+        catchError(error => {
+          console.error('Error registering seller:', error);
+          return throwError(() => new Error('Failed to register seller. Please try again.'));
+        })
+      );
+  }
+  updateSeller(id: number, sellerData: FormData): Observable<any> {
+    return this.http.put(`${this.apiUrl}/api/Users/sellers/${id}`, sellerData);
+  }
+
+  verifySeller(id: number, verify: boolean): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/api/Users/sellers/${id}/verify`, verify);
+  }
+
+  // Add this method to the AdminService class
+deleteSeller(id: number): Observable<any> {
+  return this.http.delete(`${this.apiUrl}/api/Users/sellers/${id}`);
+}
+
+
+// Get all customers with pagination and search
+getAllCustomers(pageNumber: number = 1, pageSize: number = 10, searchTerm: string = ''): Observable<any> {
+  let params = new HttpParams()
+    .set('pageNumber', pageNumber.toString())
+    .set('pageSize', pageSize.toString());
+    
+  if (searchTerm) {
+    params = params.set('searchTerm', searchTerm);
+  }
+  
+  return this.http.get<any>(`${this.apiUrl}/api/Users/customers`, { params });
+}
+
+// Get customer by ID
+getCustomerById(id: number): Observable<any> {
+  return this.http.get<any>(`${this.apiUrl}/api/Users/customers/${id}`);
+}
+
+// Register new customer
+registerCustomer(formData: FormData): Observable<any> {
+  return this.http.post<any>(`${this.apiUrl}/api/Users/customers/register`, formData);
+}
+
+// Update existing customer
+updateCustomer(id: number, formData: FormData): Observable<any> {
+  return this.http.put<any>(`${this.apiUrl}/api/Users/customers/${id}`, formData);
+}
+
+// Delete (deactivate) customer
+deleteCustomer(id: number): Observable<any> {
+  return this.http.delete<any>(`${this.apiUrl}/api/Users/customers/${id}`);
+}
+
+
+//product attributes 
+getAllProductAttributes(pageNumber: number = 1, pageSize: number = 10, searchTerm: string = ''): Observable<any> {
+  let params = new HttpParams()
+    .set('pageNumber', pageNumber.toString())
+    .set('pageSize', pageSize.toString());
+    
+  if (searchTerm) {
+    params = params.set('searchTerm', searchTerm);
+  }
+  
+  return this.http.get<any>(`${this.apiUrl}/api/ProductAttributes`, { params });
+}
+
+// Get product attribute by ID
+getProductAttributeById(id: number): Observable<any> {
+  return this.http.get<any>(`${this.apiUrl}/api/ProductAttributes/${id}`);
+}
+
+// Create new product attribute
+createProductAttribute(attributeData: any): Observable<any> {
+  return this.http.post<any>(`${this.apiUrl}/api/ProductAttributes/attribute`, attributeData);
+}
+
+// Update existing product attribute
+updateProductAttribute(id: number, attributeData: any): Observable<any> {
+  return this.http.put<any>(`${this.apiUrl}/api/ProductAttributes/${id}`, attributeData);
+}
+
+// Delete product attribute
+deleteProductAttribute(id: number): Observable<any> {
+  return this.http.delete<any>(`${this.apiUrl}/api/ProductAttributes/${id}`);
+}
   // Mock data for dashboard stats
   private mockDashboardStats: DashboardStats = {
     revenue: 2567890,
@@ -344,10 +445,7 @@ createCategoryWithImage(categoryData: FormData): Observable<Category> {
     return of(this.mockCustomers).pipe(delay(800));
   }
 
-  getCustomerById(id: number): Observable<User | undefined> {
-    const customer = this.mockCustomers.find(c => c.id === id);
-    return of(customer).pipe(delay(500));
-  }
+
 
   updateCustomerStatus(id: number, status: User['status']): Observable<User> {
     const index = this.mockCustomers.findIndex(c => c.id === id);

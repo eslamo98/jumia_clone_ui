@@ -111,7 +111,7 @@
                       <td>
                         <div class="d-flex align-items-center">
                           <img 
-                            [src]="subcategory.image || 'assets/images/categories/placeholder.jpg'" 
+                            [src]="getFullImageUrl(subcategory.imageUrl) || 'assets/images/placeholder.jpg'" 
                             class="img-thumbnail me-3" 
                             width="50" 
                             [alt]="subcategory.name"
