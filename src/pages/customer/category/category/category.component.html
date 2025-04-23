@@ -1,71 +1,62 @@
+<!-- category.component.html -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-<!-- <app-computing-container></app-computing-container> -->
+<app-up-arrow> </app-up-arrow>
 
-<div class="category-container">
+<div class="category-page-container">
   <!-- Category Header -->
   <div class="category-header">
     <h1 class="category-title">{{ categoryName }}</h1>
-    <div class="category-description" *ngIf="category?.description">
-      {{ category.description }}
+    <div class="breadcrumb">
+      <a [routerLink]="['/']">Home</a> / <span>{{ categoryName }}</span>
     </div>
   </div>
 
+  <!-- Subcategories buttons -->
   <div class="subcategories-container">
-    <!-- Show a button to view all products from the main category -->
     <button 
       class="subcategory-btn" 
-      [class.active]="selectedSubcategoryId === null"
-      (click)="loadProductsByCategory(categoryId)">
+      [class.active]="selectedSubcategoryId === ''"
+      (click)="showAllProducts()">
       All
     </button>
-    
-    <!-- Loop through subcategories and create a button for each -->
     <button 
       *ngFor="let subcategory of subcategories" 
-      class="subcategory-btn"
-      [class.active]="selectedSubcategoryId === subcategory.id"
-      (click)="loadProductsBySubcategory(subcategory.id)">
+      class="subcategory-btn" 
+      [class.active]="selectedSubcategoryId === subcategory.subcategoryId.toString()"
+      (click)="filterBySubcategory(subcategory.subcategoryId.toString())">
       {{ subcategory.name }}
     </button>
   </div>
-  
-  <!-- Products display area -->
-  <div class="products-container">
-    <div *ngIf="loading" class="loading-spinner">Loading...</div>
-    <div *ngIf="error" class="error-message">{{ error }}</div>
-    
-    <div *ngIf="!loading && !error" class="products-grid">
-      <div *ngFor="let product of products" class="product-card">
-        <!-- Your product display code here -->
-      </div>
-    </div>
-    
-    <div *ngIf="!loading && !error && products.length === 0" class="no-products">
-No Product Found In This Category
-    </div>
-  </div>
 
-  <!-- Loading State -->
+  <!-- Loading indicator -->
   <div *ngIf="loading" class="loading-indicator">
     <i class="fas fa-spinner fa-spin"></i> Loading products...
   </div>
 
-  <!-- Error State -->
+  <!-- Error message -->
   <div *ngIf="error" class="error-message">
     <i class="fas fa-exclamation-triangle"></i> {{ error }}
   </div>
 
-  <!-- Products Grid -->
+  <!-- Products grid -->
   <div *ngIf="!loading && !error" class="products-grid">
-    <div 
-    *ngFor="let product of products" 
-    class="product-card"
-    (click)="navigateToProductDetails(product.productId)">
-    <a class="text-decoration-none" (click)="navigateToProductDetails(product.productId); $event.preventDefault()">
+    <!-- No products message -->
+    <div *ngIf="filteredProducts.length === 0" class="no-products">
+      No products found in this category.
+    </div>
+
+    <!-- Product cards -->
+    <div *ngFor="let product of displayedProducts" class="product-card">
+      <div (click)="navigateToProductDetails(product.productId)">
         <!-- Discount badge -->
         <div class="discount-badge" *ngIf="product.discountPercentage > 0">
           -{{ product.discountPercentage }}%
+        </div>
+        
+        <!-- Wishlist icon -->
+        <div class="wishlist-icon" (click)="toggleWishlist($event, product.productId)">
+          <i class="far fa-heart"></i>
         </div>
         
         <!-- Product image -->
@@ -76,86 +67,70 @@ No Product Found In This Category
         <!-- Product info -->
         <div class="product-info">
           <h3 class="product-name">{{ product.name }}</h3>
+          
+          <!-- Star rating -->
+          <div class="product-rating" *ngIf="product.averageRating">
+            <ng-container *ngFor="let i of [1, 2, 3, 4, 5]">
+              <i class="fas fa-star star" [class.filled]="i <= product.averageRating"></i>
+            </ng-container>
+            <span *ngIf="product.averageRating" class="rating-count">({{ product.averageRating }})</span>
+          </div>
+          
           <div class="product-price">
             <span class="final-price">EGP {{ product.finalPrice }}</span>
-            <br>
             <span class="base-price" *ngIf="product.discountPercentage > 0">EGP {{ product.basePrice }}</span>
           </div>
           
-          <!-- Rating (if available) -->
-          <div class="product-rating" *ngIf="product.averageRating">
-            <div class="rating-stars">
-              <i class="fas fa-star" *ngFor="let star of [1,2,3,4,5].slice(0, product.averageRating)"></i>
-              <i class="far fa-star" *ngFor="let star of [1,2,3,4,5].slice(product.averageRating)"></i>
-            </div>
+          <!-- Seller info -->
+          <div class="seller-info" *ngIf="product.sellerName">
+            Sold by: {{ product.sellerName }}
           </div>
         </div>
-      </a>
+      </div>
+      
+      <!-- Add to cart button -->
+      <button class="add-to-cart-btn" (click)="addToCart($event, product.productId)">
+        Add to cart
+      </button>
     </div>
   </div>
 
-  <!-- Empty State -->
-  <div *ngIf="!loading && !error && products.length === 0" class="no-products">
-    <i class="fas fa-box-open"></i>
-    <p>No products available in this category at the moment.</p>
-  </div>
-
-  <!-- تعديل قسم الترقيم في category.component.html -->
-<div class="pagination-container" *ngIf="totalItems > 0">
-    <div class="pagination">
-      <!-- زر السابق -->
+  <!-- Pagination Controls -->
+  <div *ngIf="!loading && !error && totalItems > 0" class="pagination-container">
+    <div class="pagination-info">
+      Showing {{ (currentPage - 1) * pageSize + 1 }} - {{ Math.min(currentPage * pageSize, totalItems) }} of {{ totalItems }} products
+    </div>
+    
+    <div class="pagination-controls">
+      <!-- Previous page button -->
       <button 
-        class="pagination-btn prev-btn" 
-        [disabled]="currentPage === 1" 
-        [class.disabled]="currentPage === 1"
-        (click)="changePage(currentPage - 1)">
-        <i class="fas fa-chevron-left"></i> Prev
+        class="pagination-btn prev" 
+        [disabled]="currentPage === 1"
+        (click)="prevPage()">
+        <i class="fas fa-chevron-left"></i>
       </button>
       
-      <!-- أرقام الصفحات -->
+      <!-- Page numbers -->
       <div class="page-numbers">
-        <!-- زر الصفحة الأولى -->
         <button 
-          *ngIf="currentPage > 3"
-          class="pagination-btn number-btn" 
-          [class.active]="currentPage === 1"
-          (click)="changePage(1)">
-          1
-        </button>
-        
-        <!-- إظهار ... إذا كانت الصفحة الحالية بعيدة عن البداية -->
-        <span class="ellipsis" *ngIf="currentPage > 3">...</span>
-        
-        <!-- أرقام الصفحات الرئيسية -->
-        <button 
-          *ngFor="let pageNum of getPageNumbers()"
-          class="pagination-btn number-btn"
-          [class.active]="currentPage === pageNum"
-          (click)="changePage(pageNum)">
-          {{ pageNum }}
-        </button>
-        
-        <!-- إظهار ... إذا كانت الصفحة الحالية بعيدة عن النهاية -->
-        <span class="ellipsis" *ngIf="currentPage < Math.ceil(totalItems / pageSize) - 2">...</span>
-        
-        <!-- زر الصفحة الأخيرة -->
-        <button 
-          *ngIf="currentPage < Math.ceil(totalItems / pageSize) - 2"
-          class="pagination-btn number-btn" 
-          [class.active]="currentPage === Math.ceil(totalItems / pageSize)"
-          (click)="changePage(Math.ceil(totalItems / pageSize))">
-          {{ Math.ceil(totalItems / pageSize) }}
+          *ngFor="let page of pages" 
+          class="page-number" 
+          [class.active]="page === currentPage"
+          [class.ellipsis]="page < 0"
+          [disabled]="page < 0"
+          (click)="goToPage(page)">
+          <span *ngIf="page > 0">{{ page }}</span>
+          <span *ngIf="page < 0">...</span>
         </button>
       </div>
       
-      <!-- زر التالي -->
+      <!-- Next page button -->
       <button 
-        class="pagination-btn next-btn" 
-        [disabled]="currentPage >= Math.ceil(totalItems / pageSize)" 
-        [class.disabled]="currentPage >= Math.ceil(totalItems / pageSize)"
-        (click)="changePage(currentPage + 1)">
-        Next <i class="fas fa-chevron-right"></i>
+        class="pagination-btn next" 
+        [disabled]="currentPage === totalPages"
+        (click)="nextPage()">
+        <i class="fas fa-chevron-right"></i>
       </button>
     </div>
-  </div> 
+  </div>
 </div>

@@ -1,11 +1,13 @@
 // Top-Picks-Container.component.ts
-import { Component, OnInit, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, Input } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { interval } from 'rxjs';
 import { map, takeWhile } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
 import { ProductService } from '../../../../../../services/products/product.service';
 import { Helpers } from '../../../../../../Utility/helpers';
+import { NavigationService } from '../../../../../../services/navigations/navigation.services';
+
 
 interface Product {
   productId: number;
@@ -14,14 +16,15 @@ interface Product {
   basePrice: number;
   discountPercentage: number;
   finalPrice: number;
-  // stockQuantity: number;
   isAvailable: boolean;
   mainImageUrl: string;
   averageRating: number;
   sellerId: number;
   sellerName: string;
+  categoryId?: string; 
+  categoryName?: string; 
+  subcategoryId?: string;
   subcategoryName: string;
-  // Add other properties as needed
 }
 
 @Component({
@@ -33,22 +36,28 @@ interface Product {
 })
 export class TopPicksContainerComponent extends Helpers implements OnInit, AfterViewInit {
   @ViewChild('productContainer') productContainer!: ElementRef;
-  
+  @Input() categoryName: string = 'Fashion';
+  @Input() categorySubtitle: string = 'Footwear';
+  @Input() categoryId: string = ''; 
+  @Input() subcategoryId: string = '';
+  @Input() subcategoryName: string = '';
   products: Product[] = [];
-  hours: number = 12;
-  minutes: number = 47;
-  seconds: number = 33;
-  timeLeft: string = '';
-  showLeftArrow: boolean = false;
-  showRightArrow: boolean = true;
-  scrollAmount: number = 250;
-  loading: boolean = true;
-  error: string | null = null;
-  
-  constructor(
-    private router: Router,
-    private productService: ProductService
-  ) { super(); }
+   hours: number = 12;
+   minutes: number = 47;
+   seconds: number = 33;
+   timeLeft: string = '';
+   showLeftArrow: boolean = false;
+   showRightArrow: boolean = true;
+   scrollAmount: number = 250;
+   loading: boolean = true;
+   error: string | null = null;
+   
+   constructor(
+     private router: Router,
+     private productService: ProductService,
+     private navigationService: NavigationService
+   ) { super(); }
+
 
   ngOnInit(): void {
     // Load products from API
@@ -159,4 +168,30 @@ export class TopPicksContainerComponent extends Helpers implements OnInit, After
   getProgressBarColor(quantity: number): string {
     return quantity < 10 ? '#e41e23' : '#ff9900';
   }
+
+ // Function to navigate to the category page
+ navigateToCategory(): void {
+  console.log('Navigating to category:', this.categoryName, 'with ID:', this.categoryId);
+  
+  // Store category information in the navigation service
+  this.navigationService.setCategoryName(this.categoryName);
+  this.navigationService.setCategoryId(this.categoryId);
+  
+  // If categoryId is not set, try to get it from the first product
+  if (!this.categoryId && this.products.length > 0 && this.products[0].categoryId) {
+    const categoryId = this.products[0].categoryId.toString();
+    this.navigationService.setCategoryId(categoryId);
+    console.log('Using categoryId from products:', categoryId);
+    this.router.navigate(['/category', categoryId]);
+  } else if (this.categoryId) {
+    // Navigate with the available categoryId
+    this.router.navigate(['/category', this.categoryId]);
+  } else {
+    console.error('Cannot navigate: No categoryId available');
+    // Fallback navigation to general category page
+    this.router.navigate(['/category']);
+  }
+}
+
+
 }

@@ -104,7 +104,7 @@ getAllProducts(page: number = 1, pageSize: number = 10): Observable<any> {
   }
 
   // Updated to match backend URL pattern with CategoryId as query parameter
-  getProductsByCategory(categoryId: string, page: number = 1, pageSize: number = 20): Observable<any> {
+  getProductsByCategory(categoryId: string, page: number = 0, pageSize: number = 20): Observable<any> {
     if (!categoryId) {
       console.error('Invalid categoryId provided:', categoryId);
       return throwError(() => new Error('Invalid categoryId'));
@@ -128,7 +128,7 @@ getAllProducts(page: number = 1, pageSize: number = 10): Observable<any> {
   }
 
 // Updated to match backend URL pattern with SubcategoryId as query parameter
-getProductsBySubcategory(subcategoryId: string, page: number = 1, pageSize: number = 20): Observable<any> {
+getProductsBySubcategory(subcategoryId: string, page: number = 0, pageSize: number = 20): Observable<any> {
   const params = new HttpParams()
     .set('SubcategoryId', subcategoryId)
     .set('pageNumber', page.toString())
@@ -148,4 +148,60 @@ getProductsBySubcategory(subcategoryId: string, page: number = 1, pageSize: numb
       })
     );
 }
+
+/**
+ * Get subcategories for a specific category
+ * @param categoryId The ID of the parent category
+ * @returns Observable of Subcategory array
+ */
+getSubcategoriesByCategoryId(categoryId: string): Observable<any[]> {
+  return this.http.get<any[]>(`${this.apiUrl}/api/Subcategory/category/${categoryId}`);
+}
+
+/**
+ * Get category details by ID
+ * @param categoryId The ID of the category
+ * @returns Observable of Category object
+ */
+getCategoryById(categoryId: string): Observable<any> {
+  return this.http.get<any>(`${this.apiUrl}/api/Categories/${categoryId}`);
+}
+
+/**
+ * Get categoryId by category name
+ * @param categoryName The name of the category
+ * @returns Observable of Category object
+ */
+getCategoryByName(categoryName: string): Observable<any> {
+  // Assuming your API has an endpoint to search categories by name
+  // If not, you might need to get all categories and filter client-side
+  const params = new HttpParams().set('name', categoryName);
+  return this.http.get<any>(`${this.apiUrl}/api/Categories/Search`, { params })
+    .pipe(
+      catchError(err => {
+        console.error('Error fetching category by name:', err);
+        throw err;
+      })
+    );
+}
+
+// Alternative implementation if your API doesn't have a search by name endpoint
+// This method gets all categories and filters by name client-side
+getAllCategoriesAndFindByName(categoryName: string): Observable<any> {
+  return this.http.get<any>(`${this.apiUrl}/api/Categories`)
+    .pipe(
+      map(response => {
+        const categories = response.data || response;
+        const foundCategory = categories.find((cat: any) => 
+          cat.name.toLowerCase() === categoryName.toLowerCase()
+        );
+        return { data: foundCategory || null };
+      }),
+      catchError(err => {
+        console.error('Error fetching categories:', err);
+        throw err;
+      })
+    );
+}
+
 }
