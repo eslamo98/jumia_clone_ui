@@ -8,6 +8,7 @@ import { NotificationService } from '../../services/shared/notification.service'
 import { environment } from '../../environments/environment';
 import { ProductService } from '../../services/products/product.service';
 import { AuthService } from '../../services/auth/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-product-details',
@@ -55,7 +56,9 @@ export class ProductDetailsComponent implements OnInit {
     private productService: ProductService,
     private cartsService: CartsService,
     public authService: AuthService,
-    
+    private router: Router,
+
+
     private notificationService: NotificationService
   ) {}
 
@@ -179,6 +182,11 @@ export class ProductDetailsComponent implements OnInit {
     // Check authentication first
     if (!this.authService.isAuthenticated()) {
       this.notificationService.showError('You must be logged in to add items to your cart');
+      const currentUrl = this.router.url;
+      this.router.navigate(['auth/login'], {
+        queryParams: { returnUrl: currentUrl },
+        state: { errorMessage: 'You must be logged in to add items to your cart' }
+      });
       return;
     }
   
@@ -202,11 +210,16 @@ export class ProductDetailsComponent implements OnInit {
       },
       error: (err) => {
         let errorMessage = 'Failed to add item to cart. Please try again later.';
-        
+        const currentUrl = this.router.url;
+
         // Handle specific error cases
         if (err.status === 401) {
           errorMessage = 'Please log in first to add items to your cart';
-        } else if (err.status === 404) {
+          this.router.navigate(['/login'], {
+            queryParams: { returnUrl: currentUrl },
+            state: { errorMessage: errorMessage }
+          });
+          } else if (err.status === 404) {
           errorMessage = 'Product not found or has been removed';
         } else if (err.status === 409) {
           errorMessage = 'This item is already in your shopping cart';
@@ -255,4 +268,3 @@ export class ProductDetailsComponent implements OnInit {
     this.activeTab = tab;
   }
 }
-
