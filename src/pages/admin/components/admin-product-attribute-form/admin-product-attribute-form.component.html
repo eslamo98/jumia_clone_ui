@@ -40,23 +40,36 @@
                 <div class="row">
                   <div class="col-md-6">
                     <!-- Subcategory -->
-                    <div class="mb-3">
-                      <label for="subcategoryId" class="form-label">Subcategory <span class="text-danger">*</span></label>
-                      <select 
-                        class="form-select" 
-                        id="subcategoryId" 
-                        formControlName="subcategoryId"
-                        [ngClass]="{'is-invalid': attributeForm.get('subcategoryId')?.invalid && attributeForm.get('subcategoryId')?.touched}"
-                      >
-                        <option value="">Select a subcategory</option>
-                        <option *ngFor="let subcategory of subcategories" [value]="subcategory.subcategoryId">
-                          {{ subcategory.name }} ({{ subcategory.categoryName }})
-                        </option>
-                      </select>
-                      <div class="invalid-feedback" *ngIf="attributeForm.get('subcategoryId')?.invalid && attributeForm.get('subcategoryId')?.touched">
-                        <span *ngIf="attributeForm.get('subcategoryId')?.errors?.['required']">Subcategory is required</span>
-                      </div>
-                    </div>
+<div class="mb-3">
+  <label for="subcategoryId" class="form-label">Subcategory </label>
+  
+  <ng-container *ngIf="isEditMode; else subcategorySelect">
+    <div class="form-control-plaintext d-flex align-items-center" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; background-color: #ddd; padding: 0 10px; height: 39px; border-radius: 5px;">
+      <span class="fw-medium">
+        {{ getSubcategoryName(attributeForm.get('subcategoryId')?.value) }}
+      </span>
+      <input type="hidden" formControlName="subcategoryId">
+    </div>
+  </ng-container>
+  
+  <ng-template #subcategorySelect>
+    <select 
+      class="form-select" 
+      id="subcategoryId" 
+      formControlName="subcategoryId"
+      [ngClass]="{'is-invalid': attributeForm.get('subcategoryId')?.invalid && attributeForm.get('subcategoryId')?.touched}"
+    >
+      <option value="">Select a subcategory</option>
+      <option *ngFor="let subcategory of subcategories" [value]="subcategory.subcategoryId">
+        {{ subcategory.name }} ({{ subcategory.categoryName }})
+      </option>
+    </select>
+  </ng-template>
+  
+  <div class="invalid-feedback" *ngIf="attributeForm.get('subcategoryId')?.invalid && attributeForm.get('subcategoryId')?.touched">
+    <span *ngIf="attributeForm.get('subcategoryId')?.errors?.['required']">Subcategory is required</span>
+  </div>
+</div>
                     
                     <!-- Attribute Name -->
                     <div class="mb-3">

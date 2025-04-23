@@ -155,7 +155,7 @@ createCategoryWithImage(categoryData: FormData): Observable<Category> {
   }
 
   getBasicSellers(): Observable<BasicSellerInfo[]> {
-    return this.http.get<ApiResponse<BasicSellerInfo[]>>(`${this.apiUrl}/api/api/Users/sellers/basic-info`)
+    return this.http.get<ApiResponse<BasicSellerInfo[]>>(`${this.apiUrl}/api/Users/sellers/basic-info`)
       .pipe(
         map(response => response.data)
       );
@@ -271,7 +271,7 @@ getAllProductAttributes(pageNumber: number = 1, pageSize: number = 10, searchTer
 
 // Get product attribute by ID
 getProductAttributeById(id: number): Observable<any> {
-  return this.http.get<any>(`${this.apiUrl}/api/ProductAttributes/${id}`);
+  return this.http.get<any>(`${this.apiUrl}/api/ProductAttributes/attribute/${id}`);
 }
 
 // Create new product attribute
@@ -281,12 +281,67 @@ createProductAttribute(attributeData: any): Observable<any> {
 
 // Update existing product attribute
 updateProductAttribute(id: number, attributeData: any): Observable<any> {
-  return this.http.put<any>(`${this.apiUrl}/api/ProductAttributes/${id}`, attributeData);
+  return this.http.put<any>(`${this.apiUrl}/api/ProductAttributes/attribute/${id}`, attributeData);
+}
+// Add these methods to your AdminService class
+
+// Get all orders with pagination and filters
+getOrders(params: any): Observable<ApiResponse<any>> {
+  return this.http.get<ApiResponse<any>>(`${this.apiUrl}/api/Orders`, { params })
+    .pipe(
+      map(response => response)
+    );
+}
+
+// Get order by ID
+getOrderById(id: number): Observable<ApiResponse<any>> {
+  return this.http.get<ApiResponse<any>>(`${this.apiUrl}/api/Orders/${id}`)
+    .pipe(
+      map(response => response)
+    );
+}
+cancelOrder(orderId: number): Observable<ApiResponse<any>> {
+  return this.http.post<ApiResponse<any>>(`${this.apiUrl}/api/Orders/${orderId}/cancel`, {})
+    .pipe(
+      map(response => response)
+    );
+}
+
+// Cancel a specific suborder
+cancelSubOrder(subOrderId: number, sellerId: number): Observable<ApiResponse<any>> {
+  return this.http.post<ApiResponse<any>>(`${this.apiUrl}/api/Orders/suborders/${subOrderId}/cancel?sellerId=${sellerId}`, {})
+    .pipe(
+      map(response => response)
+    );
+}
+
+// Fix the updateOrderStatus method to use PUT instead of PATCH
+updateOrderStatus(id: number, statusDto: any): Observable<ApiResponse<any>> {
+  return this.http.put<ApiResponse<any>>(`${this.apiUrl}/api/Orders/${id}/status`, statusDto)
+    .pipe(
+      map(response => response)
+    );
+}
+
+// Fix the updateSubOrderStatus method to use PUT instead of PATCH
+updateSubOrderStatus(subOrderId: number, statusDto: any): Observable<ApiResponse<any>> {
+  return this.http.put<ApiResponse<any>>(`${this.apiUrl}/api/Orders/suborders/${subOrderId}/status`, statusDto)
+    .pipe(
+      map(response => response)
+    );
+}
+
+// Update order payment status
+updateOrderPaymentStatus(id: number, paymentStatus: string): Observable<ApiResponse<any>> {
+  return this.http.patch<ApiResponse<any>>(`${this.apiUrl}/api/Orders/${id}/payment-status`, { paymentStatus })
+    .pipe(
+      map(response => response)
+    );
 }
 
 // Delete product attribute
 deleteProductAttribute(id: number): Observable<any> {
-  return this.http.delete<any>(`${this.apiUrl}/api/ProductAttributes/${id}`);
+  return this.http.delete<any>(`${this.apiUrl}/api/ProductAttributes/attribute/${id}`);
 }
   // Mock data for dashboard stats
   private mockDashboardStats: DashboardStats = {
@@ -412,32 +467,8 @@ deleteProductAttribute(id: number): Observable<any> {
   }
 
   // Order methods
-  getOrders(filters?: any): Observable<Order[]> {
-    // TODO: Implement filtering logic
-    return of(this.mockOrders).pipe(delay(800));
-  }
 
-  getOrderById(id: number): Observable<Order | undefined> {
-    const order = this.mockOrders.find(o => o.id === id);
-    return of(order).pipe(delay(500));
-  }
 
-  updateOrderStatus(id: number, status: Order['status']): Observable<Order> {
-    const index = this.mockOrders.findIndex(o => o.id === id);
-    if (index === -1) {
-      throw new Error('Order not found');
-    }
-    
-    const updatedOrder: Order = {
-      ...this.mockOrders[index],
-      status
-    };
-    
-    // In a real application, we would update the array
-    // this.mockOrders[index] = updatedOrder;
-    
-    return of(updatedOrder).pipe(delay(800));
-  }
 
   // Customer methods
   getCustomers(filters?: any): Observable<User[]> {

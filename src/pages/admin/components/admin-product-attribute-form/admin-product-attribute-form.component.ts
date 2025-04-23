@@ -36,7 +36,7 @@ export class AdminProductAttributeFormComponent implements OnInit {
   ];
   
   // Types that require possible values
-  typesRequiringValues: string[] = ['dropdown', 'multiselect', 'radio'];
+  typesRequiringValues: string[] = ['dropdown', 'multiselect', 'radio', 'text'];
   
   constructor(
     private fb: FormBuilder,
@@ -168,6 +168,16 @@ export class AdminProductAttributeFormComponent implements OnInit {
   needsPossibleValues(): boolean {
     const type = this.attributeForm.get('type')?.value;
     return this.typesRequiringValues.includes(type);
+  }
+
+  getSubcategoryName(subcategoryId: number): string {
+    if (!subcategoryId || !this.subcategories) return 'Unknown Subcategory';
+    
+    const subcategory = this.subcategories.find(s => s.subcategoryId === +subcategoryId);
+    if (subcategory) {
+      return `${subcategory.name} (${subcategory.categoryName})`;
+    }
+    return 'Unknown Subcategory';
   }
   
   onSubmit(): void {

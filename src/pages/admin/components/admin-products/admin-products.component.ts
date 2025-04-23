@@ -10,6 +10,7 @@ import { ProductsService } from '../../../../services/admin/products.service';
 import { LoadingService } from '../../../../services/shared/loading.service';
 import { NotificationService } from '../../../../services/shared/notification.service';
 import { AdminHeaderComponent } from '../admin-header/admin-header.component';
+import { Helpers } from '../../../../Utility/helpers';
 
 @Component({
   selector: 'app-admin-products',
@@ -23,7 +24,7 @@ import { AdminHeaderComponent } from '../admin-header/admin-header.component';
   ],
   templateUrl: './admin-products.component.html'
 })
-export class AdminProductsComponent implements OnInit {
+export class AdminProductsComponent extends Helpers implements OnInit {
   products: Product[] = [];
   isLoading = false;
   
@@ -47,7 +48,7 @@ export class AdminProductsComponent implements OnInit {
     private productsService: ProductsService,
     private loadingService: LoadingService,
     private notificationService: NotificationService
-  ) {}
+  ) {super()}
 
   ngOnInit(): void {
     this.loadProducts();
