@@ -215,7 +215,7 @@ export class ProductDetailsComponent implements OnInit {
         // Handle specific error cases
         if (err.status === 401) {
           errorMessage = 'Please log in first to add items to your cart';
-          this.router.navigate(['/login'], {
+          this.router.navigate(['auth/login'], {
             queryParams: { returnUrl: currentUrl },
             state: { errorMessage: errorMessage }
           });
