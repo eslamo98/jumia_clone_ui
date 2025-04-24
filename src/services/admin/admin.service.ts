@@ -148,7 +148,7 @@ createCategoryWithImage(categoryData: FormData): Observable<Category> {
   // Sellers
 
   getSellers(): Observable<Seller[]> {
-    return this.http.get<ApiResponse<Seller[]>>(`${this.apiUrl}/api/users/sellers`)
+    return this.http.get<ApiResponse<Seller[]>>(`${this.apiUrl}/api/api/Users/sellers`)
       .pipe(
         map(response => response.data)
       );
@@ -161,15 +161,8 @@ createCategoryWithImage(categoryData: FormData): Observable<Category> {
       );
   }
 
-  getSellerById(id: number): Observable<Seller> {
-    return this.http.get<ApiResponse<Seller>>(`${this.apiUrl}/api/users/sellers/${id}`)
-      .pipe(
-        map(response => response.data)
-      );
-  }
-
   updateSellerStatus(id: number, status: boolean): Observable<Seller> {
-    return this.http.patch<ApiResponse<Seller>>(`${this.apiUrl}/api/users/sellers/${id}/verify`, status)
+    return this.http.patch<ApiResponse<Seller>>(`${this.apiUrl}/api/api/Users/sellers/${id}/verify`, status)
       .pipe(
         map(response => response.data)
       );
@@ -181,12 +174,218 @@ createCategoryWithImage(categoryData: FormData): Observable<Category> {
       ...(rejectionReason && { rejectionReason })
     };
 
-    return this.http.patch<ApiResponse<Seller>>(`${this.apiUrl}/api/users/sellers/${id}/verification`, data)
+    return this.http.patch<ApiResponse<Seller>>(`${this.apiUrl}/api/api/Users/sellers/${id}/verification`, data)
       .pipe(
         map(response => response.data)
       );
   }
 
+  getAllSellers(pageNumber: number = 1, pageSize: number = 10, searchTerm?: string, isVerified?: boolean): Observable<any> {
+    let params = new HttpParams()
+      .set('pageNumber', pageNumber.toString())
+      .set('pageSize', pageSize.toString());
+    
+    if (searchTerm) {
+      params = params.set('searchTerm', searchTerm);
+    }
+    
+    if (isVerified !== undefined) {
+      params = params.set('isVerified', isVerified.toString());
+    }
+    
+    return this.http.get(`${this.apiUrl}/api/Users/sellers`, { params });
+  }
+
+  getSellerById(id: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/api/Users/sellers/${id}`);
+  }
+  registerSeller(formData: FormData): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/api/Users/sellers/register`, formData)
+      .pipe(
+        catchError(error => {
+          console.error('Error registering seller:', error);
+          return throwError(() => new Error('Failed to register seller. Please try again.'));
+        })
+      );
+  }
+  updateSeller(id: number, sellerData: FormData): Observable<any> {
+    return this.http.put(`${this.apiUrl}/api/Users/sellers/${id}`, sellerData);
+  }
+
+  verifySeller(id: number, verify: boolean): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/api/Users/sellers/${id}/verify`, verify);
+  }
+
+  // Add this method to the AdminService class
+deleteSeller(id: number): Observable<any> {
+  return this.http.delete(`${this.apiUrl}/api/Users/sellers/${id}`);
+}
+
+
+// Get all customers with pagination and search
+getAllCustomers(pageNumber: number = 1, pageSize: number = 10, searchTerm: string = ''): Observable<any> {
+  let params = new HttpParams()
+    .set('pageNumber', pageNumber.toString())
+    .set('pageSize', pageSize.toString());
+    
+  if (searchTerm) {
+    params = params.set('searchTerm', searchTerm);
+  }
+  
+  return this.http.get<any>(`${this.apiUrl}/api/Users/customers`, { params });
+}
+
+// Get customer by ID
+getCustomerById(id: number): Observable<any> {
+  return this.http.get<any>(`${this.apiUrl}/api/Users/customers/${id}`);
+}
+
+// Register new customer
+registerCustomer(formData: FormData): Observable<any> {
+  return this.http.post<any>(`${this.apiUrl}/api/Users/customers/register`, formData);
+}
+
+// Update existing customer
+updateCustomer(id: number, formData: FormData): Observable<any> {
+  return this.http.put<any>(`${this.apiUrl}/api/Users/customers/${id}`, formData);
+}
+
+// Delete (deactivate) customer
+deleteCustomer(id: number): Observable<any> {
+  return this.http.delete<any>(`${this.apiUrl}/api/Users/customers/${id}`);
+}
+
+  // Get products with pagination and filters
+  getProducts(page: number = 1, pageSize: number = 10, filter?: any): Observable<ApiResponse<any>> {
+    let params = new HttpParams()
+      .set('pageNumber', page.toString())
+      .set('pageSize', pageSize.toString());
+    
+    if (filter) {
+      Object.keys(filter).forEach(key => {
+        if (filter[key] !== null && filter[key] !== undefined && filter[key] !== '') {
+          params = params.set(key, filter[key].toString());
+        }
+      });
+    }
+    
+    return this.http.get<ApiResponse<any>>(`${this.apiUrl}/api/products`, { params });
+  }
+
+  // Get product by ID
+  getProductById(id: number): Observable<ApiResponse<any>> {
+    return this.http.get<ApiResponse<any>>(`${this.apiUrl}/api/products/${id}`);
+  }
+
+  // Create new product
+  createProduct(formData: FormData): Observable<ApiResponse<any>> {
+    return this.http.post<ApiResponse<any>>(`${this.apiUrl}/api/products`, formData);
+  }
+
+  // Update existing product
+  updateProduct(id: number, formData: FormData): Observable<ApiResponse<any>> {
+    return this.http.put<ApiResponse<any>>(`${this.apiUrl}/api/products/${id}`, formData);
+  }
+
+  // Delete product
+  deleteProduct(id: number): Observable<boolean> {
+    return this.http.delete<ApiResponse<any>>(`${this.apiUrl}/api/products/${id}`).pipe(
+      map(() => true),
+      catchError(error => {
+        console.error('Error deleting product:', error);
+        return throwError(() => new Error('Failed to delete product'));
+      })
+    );
+  }
+
+// ... existing code ...
+//product attributes 
+getAllProductAttributes(pageNumber: number = 1, pageSize: number = 10, searchTerm: string = ''): Observable<any> {
+  let params = new HttpParams()
+    .set('pageNumber', pageNumber.toString())
+    .set('pageSize', pageSize.toString());
+    
+  if (searchTerm) {
+    params = params.set('searchTerm', searchTerm);
+  }
+  
+  return this.http.get<any>(`${this.apiUrl}/api/ProductAttributes`, { params });
+}
+
+// Get product attribute by ID
+getProductAttributeById(id: number): Observable<any> {
+  return this.http.get<any>(`${this.apiUrl}/api/ProductAttributes/attribute/${id}`);
+}
+
+// Create new product attribute
+createProductAttribute(attributeData: any): Observable<any> {
+  return this.http.post<any>(`${this.apiUrl}/api/ProductAttributes/attribute`, attributeData);
+}
+
+// Update existing product attribute
+updateProductAttribute(id: number, attributeData: any): Observable<any> {
+  return this.http.put<any>(`${this.apiUrl}/api/ProductAttributes/attribute/${id}`, attributeData);
+}
+// Add these methods to your AdminService class
+
+// Get all orders with pagination and filters
+getOrders(params: any): Observable<ApiResponse<any>> {
+  return this.http.get<ApiResponse<any>>(`${this.apiUrl}/api/Orders`, { params })
+    .pipe(
+      map(response => response)
+    );
+}
+
+// Get order by ID
+getOrderById(id: number): Observable<ApiResponse<any>> {
+  return this.http.get<ApiResponse<any>>(`${this.apiUrl}/api/Orders/${id}`)
+    .pipe(
+      map(response => response)
+    );
+}
+cancelOrder(orderId: number): Observable<ApiResponse<any>> {
+  return this.http.post<ApiResponse<any>>(`${this.apiUrl}/api/Orders/${orderId}/cancel`, {})
+    .pipe(
+      map(response => response)
+    );
+}
+
+// Cancel a specific suborder
+cancelSubOrder(subOrderId: number, sellerId: number): Observable<ApiResponse<any>> {
+  return this.http.post<ApiResponse<any>>(`${this.apiUrl}/api/Orders/suborders/${subOrderId}/cancel?sellerId=${sellerId}`, {})
+    .pipe(
+      map(response => response)
+    );
+}
+
+// Fix the updateOrderStatus method to use PUT instead of PATCH
+updateOrderStatus(id: number, statusDto: any): Observable<ApiResponse<any>> {
+  return this.http.put<ApiResponse<any>>(`${this.apiUrl}/api/Orders/${id}/status`, statusDto)
+    .pipe(
+      map(response => response)
+    );
+}
+
+// Fix the updateSubOrderStatus method to use PUT instead of PATCH
+updateSubOrderStatus(subOrderId: number, statusDto: any): Observable<ApiResponse<any>> {
+  return this.http.put<ApiResponse<any>>(`${this.apiUrl}/api/Orders/suborders/${subOrderId}/status`, statusDto)
+    .pipe(
+      map(response => response)
+    );
+}
+
+// Update order payment status
+updateOrderPaymentStatus(id: number, paymentStatus: string): Observable<ApiResponse<any>> {
+  return this.http.patch<ApiResponse<any>>(`${this.apiUrl}/api/Orders/${id}/payment-status`, { paymentStatus })
+    .pipe(
+      map(response => response)
+    );
+}
+
+// Delete product attribute
+deleteProductAttribute(id: number): Observable<any> {
+  return this.http.delete<any>(`${this.apiUrl}/api/ProductAttributes/attribute/${id}`);
+}
   // Mock data for dashboard stats
   private mockDashboardStats: DashboardStats = {
     revenue: 2567890,
@@ -311,32 +510,8 @@ createCategoryWithImage(categoryData: FormData): Observable<Category> {
   }
 
   // Order methods
-  getOrders(filters?: any): Observable<Order[]> {
-    // TODO: Implement filtering logic
-    return of(this.mockOrders).pipe(delay(800));
-  }
 
-  getOrderById(id: number): Observable<Order | undefined> {
-    const order = this.mockOrders.find(o => o.id === id);
-    return of(order).pipe(delay(500));
-  }
 
-  updateOrderStatus(id: number, status: Order['status']): Observable<Order> {
-    const index = this.mockOrders.findIndex(o => o.id === id);
-    if (index === -1) {
-      throw new Error('Order not found');
-    }
-    
-    const updatedOrder: Order = {
-      ...this.mockOrders[index],
-      status
-    };
-    
-    // In a real application, we would update the array
-    // this.mockOrders[index] = updatedOrder;
-    
-    return of(updatedOrder).pipe(delay(800));
-  }
 
   // Customer methods
   getCustomers(filters?: any): Observable<User[]> {
@@ -344,10 +519,7 @@ createCategoryWithImage(categoryData: FormData): Observable<Category> {
     return of(this.mockCustomers).pipe(delay(800));
   }
 
-  getCustomerById(id: number): Observable<User | undefined> {
-    const customer = this.mockCustomers.find(c => c.id === id);
-    return of(customer).pipe(delay(500));
-  }
+
 
   updateCustomerStatus(id: number, status: User['status']): Observable<User> {
     const index = this.mockCustomers.findIndex(c => c.id === id);

@@ -75,21 +75,22 @@ export class AdminCustomerDetailsComponent implements OnInit {
   }
 
   loadCustomerOrders(customerId: number): void {
-    this.adminService.getOrders().subscribe({
-      next: (orders) => {
-        // Filter orders for this customer
-        this.customerOrders = orders.filter(order => order.customerId === customerId);
-        
-        // Sort by date, newest first
-        this.customerOrders.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-        
+    this.adminService.getOrders({ customerId: this.customerId }).subscribe({
+      next: (response) => {
+        if (response.success) {
+          // Access the data property of the ApiResponse and then filter
+          this.customerOrders = response.data.items.filter((order: any) => 
+            order.customerId === this.customerId
+          );
+        } else {
+          this.notificationService.showError('Failed to load customer orders');
+        }
         this.isLoading = false;
-        this.loadingService.hide();
       },
       error: (error) => {
-        console.error('Error loading customer orders', error);
+        this.notificationService.showError('Failed to load customer orders');
+        console.error(error);
         this.isLoading = false;
-        this.loadingService.hide();
       }
     });
   }

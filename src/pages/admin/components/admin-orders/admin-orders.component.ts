@@ -1,18 +1,16 @@
-// src/app/pages/admin/admin-orders/admin-orders.component.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { AdminService } from '../../../../services/admin/admin.service';
+import { NotificationService } from '../../../../services/shared/notification.service';
 import { AdminSidebarComponent } from '../admin-sidebar/admin-sidebar.component';
 import { AdminHeaderComponent } from '../admin-header/admin-header.component';
-import { Order } from '../../../../models/admin';
-import { AdminService } from '../../../../services/admin/admin.service';
-import { LoadingService } from '../../../../services/shared/loading.service';
-import { NotificationService } from '../../../../services/shared/notification.service';
-
 
 @Component({
   selector: 'app-admin-orders',
+  templateUrl: './admin-orders.component.html',
+  styleUrls: ['./admin-orders.component.css'],
   standalone: true,
   imports: [
     CommonModule,
@@ -20,154 +18,107 @@ import { NotificationService } from '../../../../services/shared/notification.se
     FormsModule,
     AdminSidebarComponent,
     AdminHeaderComponent
-  ],
-  templateUrl: './admin-orders.component.html'
+  ]
 })
 export class AdminOrdersComponent implements OnInit {
-  orders: Order[] = [];
-  isLoading = false;
+  orders: any[] = [];
+  loading: boolean = false;
+  totalCount: number = 0;
+  pageNumber: number = 1;
+  pageSize: number = 10;
+  totalPages: number = 0;
   
-  // Filtering and pagination
-  searchTerm = '';
-  statusFilter = '';
-  startDate: string | null = null;
-  endDate: string | null = null;
-  currentPage = 1;
-  pageSize = 10;
-  totalItems = 0;
+  // Filters
+  statusFilter: string = '';
+  paymentStatusFilter: string = '';
   
-  // Make Math available to template
-  Math = Math;
+  // Status options
+  orderStatuses: string[] = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
+  paymentStatuses: string[] = ['pending', 'paid', 'failed', 'refunded'];
 
   constructor(
     private adminService: AdminService,
-    private loadingService: LoadingService,
     private notificationService: NotificationService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadOrders();
   }
 
   loadOrders(): void {
-    this.isLoading = true;
-    this.loadingService.show();
+    this.loading = true;
     
-    this.adminService.getOrders().subscribe({
-      next: (orders) => {
-        this.orders = orders;
-        this.totalItems = orders.length;
-        
-        // Apply filtering
-        if (this.searchTerm) {
-          this.orders = this.orders.filter(o => 
-            o.id.toString().toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-            o.customerName.toLowerCase().includes(this.searchTerm.toLowerCase())
-          );
+    // Build query parameters
+    const params: any = {
+      pageNumber: this.pageNumber,
+      pageSize: this.pageSize
+    };
+    
+    // Add filters if selected
+    if (this.statusFilter) {
+      params.status = this.statusFilter;
+    }
+    
+    if (this.paymentStatusFilter) {
+      params.paymentStatus = this.paymentStatusFilter;
+    }
+    
+    this.adminService.getOrders(params).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.orders = response.data.items;
+          this.totalCount = response.data.totalCount;
+          this.totalPages = response.data.totalPages;
+        } else {
+          this.notificationService.showError('Failed to load orders');
         }
-        
-        if (this.statusFilter) {
-          this.orders = this.orders.filter(o => o.status === this.statusFilter);
-        }
-        
-        if (this.startDate) {
-          const start = new Date(this.startDate);
-          this.orders = this.orders.filter(o => new Date(o.date) >= start);
-        }
-        
-        if (this.endDate) {
-          const end = new Date(this.endDate);
-          end.setHours(23, 59, 59); // End of day
-          this.orders = this.orders.filter(o => new Date(o.date) <= end);
-        }
-        
-        // Sort by date, newest first
-        this.orders.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-        
-        // Apply pagination
-        const startIndex = (this.currentPage - 1) * this.pageSize;
-        this.orders = this.orders.slice(startIndex, startIndex + this.pageSize);
-        
-        this.isLoading = false;
-        this.loadingService.hide();
+        this.loading = false;
       },
       error: (error) => {
-        console.error('Error loading orders', error);
         this.notificationService.showError('Failed to load orders');
-        this.isLoading = false;
-        this.loadingService.hide();
+        console.error(error);
+        this.loading = false;
       }
     });
   }
-
-  onSearch(): void {
-    this.currentPage = 1;
+  
+  applyFilters(): void {
+    this.pageNumber = 1; // Reset to first page when applying filters
     this.loadOrders();
   }
-
-  onFilterChange(): void {
-    this.currentPage = 1;
+  
+  resetFilters(): void {
+    this.statusFilter = '';
+    this.paymentStatusFilter = '';
+    this.pageNumber = 1;
     this.loadOrders();
   }
-
-  onPageChange(page: number): void {
-    this.currentPage = page;
+  
+  changePage(page: number): void {
+    if (page < 1 || page > this.totalPages) {
+      return;
+    }
+    this.pageNumber = page;
     this.loadOrders();
   }
-
-  updateOrderStatus(id: number, status: Order['status']): void {
-    this.loadingService.show();
-    
-    this.adminService.updateOrderStatus(id, status).subscribe({
-      next: () => {
-        this.notificationService.showSuccess('Order status updated successfully');
-        this.loadOrders();
-      },
-      error: (error) => {
-        console.error('Error updating order status', error);
-        this.notificationService.showError('Failed to update order status');
-        this.loadingService.hide();
-      }
-    });
-  }
-
-  getStatusBadgeClass(status: Order['status']): string {
-    switch (status) {
-      case 'pending':
-        return 'bg-warning';
-      case 'processing':
-        return 'bg-info';
-      case 'shipped':
-        return 'bg-primary';
-      case 'delivered':
-        return 'bg-success';
-      case 'cancelled':
-        return 'bg-danger';
-      case 'completed':
-        return 'bg-success';
-      default:
-        return 'bg-secondary';
+  
+  // Helper method to count total items in an order
+  getTotalItems(order: any): number {
+    let totalItems = 0;
+    if (order.subOrders) {
+      order.subOrders.forEach((subOrder: any) => {
+        if (subOrder.orderItems) {
+          subOrder.orderItems.forEach((item: any) => {
+            totalItems += item.quantity;
+          });
+        }
+      });
     }
+    return totalItems;
   }
-
-  get totalPages(): number {
-    return Math.ceil(this.totalItems / this.pageSize);
-  }
-
-  get pages(): number[] {
-    const pages: number[] = [];
-    const maxPages = 5;
-    let startPage = Math.max(1, this.currentPage - Math.floor(maxPages / 2));
-    let endPage = Math.min(this.totalPages, startPage + maxPages - 1);
-    
-    if (endPage - startPage + 1 < maxPages) {
-      startPage = Math.max(1, endPage - maxPages + 1);
-    }
-    
-    for (let i = startPage; i <= endPage; i++) {
-      pages.push(i);
-    }
-    
-    return pages;
+  
+  // Helper method to count suborders
+  getSubOrderCount(order: any): number {
+    return order.subOrders ? order.subOrders.length : 0;
   }
 }

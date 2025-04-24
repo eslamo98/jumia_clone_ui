@@ -1,5 +1,5 @@
 // src/app/pages/admin/admin-product-form/admin-product-form.component.ts
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -28,7 +28,7 @@ import { DynamicAttributeInputComponent } from '../../../../shared/dynamic-attri
   ],
   templateUrl: './admin-product-form.component.html'
 })
-export class AdminProductFormComponent implements OnInit {
+export class AdminProductFormComponent implements OnInit, OnDestroy {
   productForm: FormGroup;
   categories: BasicCategoiesInfo[] = [];
   filteredCategories: BasicCategoiesInfo[] = [];
@@ -366,25 +366,22 @@ export class AdminProductFormComponent implements OnInit {
     }
   }
 
-  // Add these methods after the onSubmit method
-  
-  // Helper method to format attribute values according to backend DTO
   private formatAttributeValues(): any[] {
-    const attributeValues = this.attributeValues.value;
+    const attributeValues = this.productForm.get('attributeValues')?.value;
+
     if (!attributeValues || attributeValues.length === 0) {
-      return [];
+        return [];
     }
 
     return attributeValues
-      .filter((attr: any) => attr.value && attr.value.trim() !== '')
-      .map((attr: any) => ({
-        AttributeId: attr.attributeId,
-        Value: attr.value
-      }));
-  }
+        .filter((attr: any) => attr.value !== null && attr.value !== undefined && attr.value.toString().trim() !== '')
+        .map((attr: any) => ({
+            AttributeId: parseInt(attr.attributeId),
+            Value: attr.value.toString()
+        }));
+}
 
-  // Helper method to format variants according to backend DTO
-  private formatVariants(): any[] {
+private formatVariants(): any[] {
     const variants = this.variants.value;
     if (!variants || variants.length === 0) {
       return [];
@@ -412,92 +409,111 @@ export class AdminProductFormComponent implements OnInit {
     });
   }
   
+  onMainImageSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      this.mainImageFile = input.files[0];
+      
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.imagePreview = reader.result as string;
+      };
+      reader.readAsDataURL(this.mainImageFile);
+    }
+  }
 
-  onSubmit(): void {
-    if (this.productForm.invalid) {
+  ngOnDestroy(): void {
+    // Clean up subscriptions
+    this.categorySearchSubject.complete();
+    this.sellerSearchSubject.complete();
+  }
+
+
+onSubmit(): void {
+  if (this.productForm.invalid) {
       // Check if the form is invalid only because of attributeValues
       const formWithoutAttributes = { ...this.productForm.controls };
       delete formWithoutAttributes['attributeValues'];
       
       const isOtherFieldsValid = Object.values(formWithoutAttributes).every(
-        control => !control.invalid
+          control => !control.invalid
       );
       
       if (!isOtherFieldsValid) {
-        this.markFormGroupTouched(this.productForm);
-        this.notificationService.showWarning('Please fix the form errors');
-        return;
+          this.markFormGroupTouched(this.productForm);
+          this.notificationService.showWarning('Please fix the form errors');
+          return;
       }
-    }
-  
-    if (this.productForm.get('hasVariants')?.value && !this.hasDefaultVariant()) {
+  }
+
+  if (this.productForm.get('hasVariants')?.value && !this.hasDefaultVariant()) {
       this.notificationService.showWarning('Please select a default variant');
       return;
-    }
-    
-    this.isLoading = true;
-    this.loadingService.show();
-    
-    const formData = new FormData();
-    const productData = this.prepareProductData();
-    
-    // Format attribute values according to backend DTO
-    const attributeValuesForBackend = this.formatAttributeValues();
-    if (attributeValuesForBackend.length > 0) {
-      formData.append('ProductAttributeValuesJson', JSON.stringify(attributeValuesForBackend));
-    }
-    
-    // Format variants according to backend DTO
-    if (productData.hasVariants && productData.variants && productData.variants.length > 0) {
-      const variantsForBackend = this.formatVariants();
-      formData.append('ProductVariantsJson', JSON.stringify(variantsForBackend));
-    }
-    
-    // Append all other product data to FormData
-    formData.append('Name', productData.name);
-    formData.append('Description', productData.description);
-    formData.append('BasePrice', productData.basePrice.toString());
-    if (productData.discountPercentage !== null && productData.discountPercentage !== undefined) {
-      formData.append('DiscountPercentage', productData.discountPercentage.toString());
-    }
-    formData.append('StockQuantity', productData.stockQuantity.toString());
-    formData.append('SubcategoryId', this.productForm.get('subcategoryId')?.value.toString());
-    formData.append('SellerId', productData.sellerId.toString());
-    formData.append('HasVariants', productData.hasVariants.toString());
-  
-    // Append the main image file
-    if (this.mainImageFile) {
-      formData.append('MainImageFile', this.mainImageFile);
-    }
-    
-    // Append additional image files
-  if (this.additionalImageFiles.length > 0) {
-    this.additionalImageFiles.forEach(file => {
-      if (file) { // Only append if file exists
-        formData.append('AdditionalImageFiles', file);
-      }
-    });
   }
   
-    const request = this.isEditMode ? 
+  this.isLoading = true;
+  this.loadingService.show();
+  
+  const formData = new FormData();
+  const productData = this.prepareProductData();
+  
+  const attributeValuesForBackend = this.formatAttributeValues();
+  console.log(attributeValuesForBackend);
+  if (attributeValuesForBackend.length > 0) {
+      formData.append('ProductAttributeValuesJson', JSON.stringify(attributeValuesForBackend));
+  }
+  
+  if (productData.hasVariants && productData.variants && productData.variants.length > 0) {
+      const variantsForBackend = this.formatVariants();   
+      formData.append('ProductVariantsJson', JSON.stringify(variantsForBackend));
+  }
+  formData.append('Name', productData.name);
+  formData.append('Description', productData.description);
+  formData.append('BasePrice', productData.basePrice.toString());
+  if (productData.discountPercentage !== null && productData.discountPercentage !== undefined) {
+      formData.append('DiscountPercentage', productData.discountPercentage.toString());
+  }
+  formData.append('StockQuantity', productData.stockQuantity.toString());
+  formData.append('SubcategoryId', this.productForm.get('subcategoryId')?.value.toString());
+  formData.append('SellerId', productData.sellerId.toString());
+  formData.append('HasVariants', productData.hasVariants.toString());
+  formData.append('IsAvailable', productData.isAvailable.toString());
+
+  if (this.mainImageFile) {
+      formData.append('MainImageFile', this.mainImageFile);
+  }
+  
+  if (this.additionalImageFiles.length > 0) {
+      this.additionalImageFiles.forEach(file => {
+          if (file) {
+              formData.append('AdditionalImageFiles', file);
+          }
+      });
+  }
+
+  const request = this.isEditMode ? 
       this.productsService.updateProduct(this.productId, formData) :
       this.productsService.createProduct(formData);
-  
-    request.subscribe({
+
+  request.subscribe({
       next: () => {
-        this.notificationService.showSuccess(
-          `Product ${this.isEditMode ? 'updated' : 'created'} successfully`
-        );
-        this.router.navigate(['/admin/products']);
+          this.notificationService.showSuccess(
+              `Product ${this.isEditMode ? 'updated' : 'created'} successfully`
+          );
+          this.router.navigate(['/admin/products']);
       },
       error: (error) => {
-        console.error('Error saving product', error);
-        this.notificationService.showError(`Failed to ${this.isEditMode ? 'update' : 'create'} product`);
-        this.isLoading = false;
-        this.loadingService.hide();
+          console.error('Error saving product', error);
+          this.notificationService.showError(`Failed to ${this.isEditMode ? 'update' : 'create'} product`);
+          this.isLoading = false;
+          this.loadingService.hide();
+      },
+      complete: () => {
+          this.isLoading = false;
+          this.loadingService.hide();
       }
-    });
-  }
+  });
+}
   private prepareProductData(): ProductFormData {
     const formValue = this.productForm.value;
     return {
@@ -518,17 +534,6 @@ export class AdminProductFormComponent implements OnInit {
       }
     });
   }
-
-  // isFieldInvalid(fieldName: string): boolean {
-  //   const control = this.productForm.get(fieldName);
-  //   return !!control && control.invalid && (control.dirty || control.touched);
-  // }
-
-  // isVariantFieldInvalid(variantIndex: number, fieldName: string): boolean {
-  //   const control = this.variants.at(variantIndex).get(fieldName);
-  //   return !!control && control.invalid && (control.dirty || control.touched);
-  // }
-
   getErrorMessage(fieldName: string): string {
     const control = this.productForm.get(fieldName);
     if (!control) return '';
@@ -619,7 +624,6 @@ export class AdminProductFormComponent implements OnInit {
     this.adminService.getSubcategoryAttributes(subcategoryId).subscribe({
       next: (attributes) => {
         this.subcategoryAttributes = attributes;
-        // Setup attributes for both product and variants
         this.setupAttributeValues(attributes);
         this.updateVariantsAttributes();
         this.isLoading = false;

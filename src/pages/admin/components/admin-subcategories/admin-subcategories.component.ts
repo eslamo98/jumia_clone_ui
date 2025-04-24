@@ -7,6 +7,7 @@ import { AdminHeaderComponent } from '../admin-header/admin-header.component';
 import { AdminService } from '../../../../services/admin/admin.service';
 import { LoadingService } from '../../../../services/shared/loading.service';
 import { NotificationService } from '../../../../services/shared/notification.service';
+import { Helpers } from '../../../../Utility/helpers';
 
 @Component({
   selector: 'app-admin-subcategories',
@@ -20,7 +21,7 @@ import { NotificationService } from '../../../../services/shared/notification.se
   ],
   templateUrl: './admin-subcategories.component.html'
 })
-export class AdminSubcategoriesComponent implements OnInit {
+export class AdminSubcategoriesComponent extends Helpers implements OnInit {
   subcategories: any[] = [];
   categories: any[] = [];
   isLoading = false;
@@ -39,7 +40,9 @@ export class AdminSubcategoriesComponent implements OnInit {
     private adminService: AdminService,
     private loadingService: LoadingService,
     private notificationService: NotificationService
-  ) {}
+  ) {
+    super();
+  }
 
   ngOnInit(): void {
     this.loadCategories();
@@ -70,6 +73,7 @@ export class AdminSubcategoriesComponent implements OnInit {
     ).subscribe({
       next: (response) => {
         this.subcategories = response.data;
+        console.log(response)
         this.totalItems = response.totalItems;
         this.totalPages = Math.ceil(this.totalItems / this.pageSize);
         this.isLoading = false;

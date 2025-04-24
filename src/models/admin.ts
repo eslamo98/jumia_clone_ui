@@ -117,6 +117,7 @@ export interface DashboardStats {
   export interface BasicSubCategoriesInfo {
     subcategoryId: number;
     name: string;
+    categoryName: string;
   }
   
   // src/app/models/category.model.ts
@@ -223,7 +224,7 @@ export interface DashboardStats {
     maxPrice?: number;
     sellerId?: number;
     searchTerm?: string;
-    approvalStatus?: 'pending' | 'approved' | 'rejected' | 'deleted' | 'pending_review';
+    approvalStatus?: 'pending' | 'approved' | 'rejected' | 'deleted' | 'pending_review' | null;
     sortBy?: string;
     sortDirection?: 'asc' | 'desc';
   }

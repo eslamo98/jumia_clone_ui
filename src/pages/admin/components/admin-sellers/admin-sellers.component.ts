@@ -1,216 +1,136 @@
-// src/app/pages/admin/admin-sellers/admin-sellers.component.ts
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { FormsModule } from '@angular/forms';
-import { AdminSidebarComponent } from '../admin-sidebar/admin-sidebar.component';
-import { AdminHeaderComponent } from '../admin-header/admin-header.component';
-import { Seller } from '../../../../models/admin';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { AdminService } from '../../../../services/admin/admin.service';
-import { LoadingService } from '../../../../services/shared/loading.service';
 import { NotificationService } from '../../../../services/shared/notification.service';
-
+import { RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { AdminSidebarComponent } from "../admin-sidebar/admin-sidebar.component";
+import { AdminHeaderComponent } from "../admin-header/admin-header.component";
 
 @Component({
   selector: 'app-admin-sellers',
   standalone: true,
   imports: [
-    CommonModule,
-    RouterModule,
-    FormsModule,
-    AdminSidebarComponent,
-    AdminHeaderComponent
-  ],
+    RouterModule, 
+    CommonModule, 
+    ReactiveFormsModule, 
+    FormsModule, 
+    AdminHeaderComponent, 
+    AdminSidebarComponent],
   templateUrl: './admin-sellers.component.html',
   styleUrls: ['./admin-sellers.component.css']
 })
 export class AdminSellersComponent implements OnInit {
-  sellers: Seller[] = [];
-  isLoading = false;
-  
-  // Filtering and pagination
-  searchTerm = '';
-  statusFilter = '';
-  verificationFilter = '';
-  currentPage = 1;
-  pageSize = 10;
-  totalItems = 0;
-  
-  // Sorting
-  sortField = 'createdAt';
-  sortDirection: 'asc' | 'desc' = 'desc';
-  
-  // Make Math available to template
-  Math = Math;
-
+  sellers: any[] = [];
+  totalItems: number = 0;
+  pageNumber: number = 1;
+  pageSize: number = 10;
+  totalPages: number = 0;
+  searchTerm: string = '';
+  isVerifiedFilter: boolean | undefined = undefined;
+  loading: boolean = false;
+Math=Math;
   constructor(
     private adminService: AdminService,
-    private loadingService: LoadingService,
-    private notificationService: NotificationService
-  ) {}
+    private notificationService: NotificationService,
+    private cdr: ChangeDetectorRef
+  ) { }
 
   ngOnInit(): void {
     this.loadSellers();
   }
 
   loadSellers(): void {
-    this.isLoading = true;
-    this.loadingService.show();
-    
-    this.adminService.getSellers().subscribe({
-      next: (sellers) => {
-        this.sellers = sellers;
-        this.totalItems = sellers.length;
-        
-        // Apply filtering
-        if (this.searchTerm) {
-          this.sellers = this.sellers.filter(s => 
-            s.storeName.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-            s.email.toLowerCase().includes(this.searchTerm.toLowerCase())
-          );
+    this.loading = true;
+    this.adminService.getAllSellers(this.pageNumber, this.pageSize, this.searchTerm, this.isVerifiedFilter)
+      .subscribe({
+        next: (response) => {
+          if (response.success) {
+            this.sellers = response.data.items;
+            this.totalItems = response.data.totalCount;
+            this.totalPages = response.data.totalPages;
+          } else {
+            this.notificationService.showError(response.message);
+          }
+          this.loading = false;
+        },
+        error: (error) => {
+          this.notificationService.showError('Failed to load sellers');
+          console.error(error);
+          this.loading = false;
         }
-        
-        if (this.statusFilter) {
-          this.sellers = this.sellers.filter(s => s.status === this.statusFilter);
-        }
-        
-        if (this.verificationFilter) {
-          this.sellers = this.sellers.filter(s => s.verificationStatus === this.verificationFilter);
-        }
-        
-        // Apply sorting
-        this.sortSellers();
-        
-        // Apply pagination
-        const startIndex = (this.currentPage - 1) * this.pageSize;
-        this.sellers = this.sellers.slice(startIndex, startIndex + this.pageSize);
-        
-        this.isLoading = false;
-        this.loadingService.hide();
-      },
-      error: (error: Error) => {
-        console.error('Error loading sellers:', error);
-        this.notificationService.showError('Failed to load sellers');
-        this.isLoading = false;
-        this.loadingService.hide();
-      }
-    });
+      });
+  }
+
+  deleteSeller(id: number, sellerName: string): void {
+    if (confirm(`Are you sure you want to deactivate seller "${sellerName}"? This will hide their account and products.`)) {
+      this.adminService.deleteSeller(id)
+        .subscribe({
+          next: (response) => {
+            if (response.success) {
+              this.notificationService.showSuccess(response.message || 'Seller deactivated successfully');
+              this.loadSellers(); // Reload the list
+            } else {
+              this.notificationService.showError(response.message || 'Failed to deactivate seller');
+            }
+          },
+          error: (error) => {
+            this.notificationService.showError('Failed to deactivate seller');
+            console.error(error);
+          }
+        });
+    }
   }
 
   onSearch(): void {
-    this.currentPage = 1;
+    this.pageNumber = 1;
     this.loadSellers();
   }
 
-  onSort(field: string): void {
-    if (this.sortField === field) {
-      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
-    } else {
-      this.sortField = field;
-      this.sortDirection = 'asc';
-    }
-    
+  clearSearch(): void {
+    this.searchTerm = '';
+    this.pageNumber = 1;
+    this.loadSellers();
+  }
+
+  setVerifiedFilter(value: boolean | undefined): void {
+    this.isVerifiedFilter = value;
+    this.pageNumber = 1;
     this.loadSellers();
   }
 
   onPageChange(page: number): void {
-    this.currentPage = page;
+    this.pageNumber = page;
     this.loadSellers();
   }
 
-  onFilterChange(): void {
-    this.currentPage = 1;
-    this.loadSellers();
-  }
-
-  sortSellers(): void {
-    this.sellers.sort((a, b) => {
-      let compareResult = 0;
-      if (this.sortField === 'name') {
-        compareResult = a.storeName.localeCompare(b.storeName);
-      } else if (this.sortField === 'date') {
-        compareResult = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-      }
-      return this.sortDirection === 'asc' ? compareResult : -compareResult;
-    });
-  }
-
-  updateSellerStatus(id: number, status: boolean): void {
-    this.loadingService.show();
-    
-    this.adminService.updateSellerStatus(id, status).subscribe({
-      next: () => {
-        this.notificationService.showSuccess('Seller status updated successfully');
-        this.loadSellers();
-      },
-      error: (error: Error) => {
-        console.error('Error updating seller status:', error);
-        this.notificationService.showError('Failed to update seller status');
-        this.loadingService.hide();
-      }
-    });
-  }
-
-  updateVerificationStatus(id: number, status: 'pending' | 'verified' | 'rejected', reason?: string): void {
-    this.loadingService.show();
-    
-    this.adminService.updateSellerVerification(id, status, reason).subscribe({
-      next: () => {
-        this.notificationService.showSuccess('Seller verification status updated successfully');
-        this.loadSellers();
-      },
-      error: (error) => {
-        console.error('Error updating seller verification status', error);
-        this.notificationService.showError('Failed to update seller verification status');
-        this.loadingService.hide();
-      }
-    });
-  }
-
-  getStatusBadgeClass(status: Seller['status']): string {
-    switch (status) {
-      case 'active':
-        return 'bg-success';
-      case 'inactive':
-        return 'bg-secondary';
-      case 'banned':
-        return 'bg-danger';
-      default:
-        return 'bg-secondary';
-    }
-  }
-
-  getVerificationBadgeClass(status: Seller['verificationStatus']): string {
-    switch (status) {
-      case 'verified':
-        return 'bg-success';
-      case 'pending':
-        return 'bg-warning';
-      case 'rejected':
-        return 'bg-danger';
-      default:
-        return 'bg-secondary';
-    }
+  verifySeller(id: number, verify: boolean): void {
+    this.adminService.verifySeller(id, verify)
+      .subscribe({
+        next: (response) => {
+          if (response.success) {
+            this.notificationService.showSuccess(response.message);
+            this.loadSellers();
+            
+            // Find and update the seller
+            const sellerIndex = this.sellers.findIndex(seller => seller.sellerId === id);
+            if (sellerIndex !== -1) {
+              this.sellers[sellerIndex] = {
+                ...this.sellers[sellerIndex],
+                isVerified: verify
+              };
+              // Force change detection
+              this.cdr.detectChanges();
+            }
+          } else {
+            this.notificationService.showError(response.message);
+          }
+        },
+        error: (error) => {
+          this.notificationService.showError('Failed to update seller verification status');
+          console.error(error);
+        }
+      });
   }
   
-  get totalPages(): number {
-    return Math.ceil(this.totalItems / this.pageSize);
-  }
-
-  get pages(): number[] {
-    const pages: number[] = [];
-    const maxPages = 5;
-    let startPage = Math.max(1, this.currentPage - Math.floor(maxPages / 2));
-    let endPage = Math.min(this.totalPages, startPage + maxPages - 1);
-    
-    if (endPage - startPage + 1 < maxPages) {
-      startPage = Math.max(1, endPage - maxPages + 1);
-    }
-    
-    for (let i = startPage; i <= endPage; i++) {
-      pages.push(i);
-    }
-    
-    return pages;
-  }
 }
