@@ -9,11 +9,12 @@ import { environment } from '../../environments/environment';
 import { ProductService } from '../../services/products/product.service';
 import { AuthService } from '../../services/auth/auth.service';
 import { Router } from '@angular/router';
+import { KeepShoppingComponent } from "../public/home-page/homeComponents/keepShoppingContainer/keep-shopping/keep-shopping.component";
 
 @Component({
   selector: 'app-product-details',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, KeepShoppingComponent],
   templateUrl: './product-details.component.html',
   styleUrls: ['./product-details.component.css']
 })
@@ -64,6 +65,7 @@ export class ProductDetailsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    window.scrollTo(0, 0);
     const id = Number(this.route.snapshot.paramMap.get('id'));
     
     if (isNaN(id)) {
