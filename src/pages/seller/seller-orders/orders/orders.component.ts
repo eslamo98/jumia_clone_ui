@@ -10,7 +10,6 @@ import {
 } from '@angular/material/paginator';
 import { MatSortModule, MatSort, Sort } from '@angular/material/sort';
 import { NgbModule, NgbDropdown } from '@ng-bootstrap/ng-bootstrap';
-import { OrderService } from '../../../../services/orders/order.service';
 import { AuthService } from '../../../../services/auth/auth.service';
 import { NotificationService } from '../../../../services/notification/notification.service';
 import {
@@ -23,6 +22,7 @@ import {
   StatusTab,
   Column,
 } from '../../../../models/order.model';
+import { OrderService } from '../../../../services/orders/order.service';
 
 @Component({
   selector: 'app-orders',

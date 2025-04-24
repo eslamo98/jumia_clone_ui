@@ -1,80 +1,77 @@
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
- import {AddressStepComponent } from '../address-step/address-step.component';
+import { AddressStepComponent } from '../address-step/address-step.component';
 import { DeliveryStepComponent } from '../delivery-step/delivery-step.component';
 import { PaymentStepComponent } from '../payment-step/payment-step.component';
- import { OrderSummaryComponent } from '../order-summary/order-summary.component';
-
-
+import { OrderSummaryComponent } from '../order-summary/order-summary.component';
+import { AuthService } from '../../../services/auth/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-checkout',
-  imports: [ AddressStepComponent,DeliveryStepComponent,PaymentStepComponent,OrderSummaryComponent,CommonModule],
-  
+  standalone: true,
+  imports: [
+    CommonModule,
+    AddressStepComponent,
+    DeliveryStepComponent,
+    PaymentStepComponent,
+    OrderSummaryComponent
+  ],
   templateUrl: './checkout.component.html',
   styleUrls: ['./checkout.component.css']
 })
-export class CheckoutComponent {
-  currentStep: number =1;
-  
-   
+export class CheckoutComponent implements OnInit {
+  currentStep: number = 1;
+  isAddressConfirmed: boolean = false;
+  isDeliveryConfirmed: boolean = false;
+  isPaymentConfirmed: boolean = false;
+  selectedDeliveryOption: string = '';
+  deliveryFee: number = 0;
+  selectedPaymentMethod: string = '';
+  selectedAddressId: number = 0;
+  onPaymentConfirmed(paymentMethod: string) {
+    this.isPaymentConfirmed = true;
+    this.selectedPaymentMethod = paymentMethod;
+  }
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
-  goToStep(step: number) {
-    this.currentStep = step;
+  ngOnInit() {
+    if (!this.authService.isAuthenticated()) {
+      this.router.navigate(['/auth/login'], { 
+        queryParams: { returnUrl: '/checkout' } 
+      });
+    }
   }
 
-goToNextStep() {
-  if (this.currentStep < 3) {
-    this.currentStep++;
-  } else {
- 
-    console.log('Place Order');
+  onAddressConfirmed(addressId: number) {  
+    this.isAddressConfirmed = true;
+    this.selectedAddressId = addressId;  
+    this.currentStep = 2;
   }
-}
 
-goToPreviousStep() {
-  if (this.currentStep > 1) {
-    this.currentStep--;
+  onDeliveryConfirmed() {
+    this.isDeliveryConfirmed = true;
+    this.currentStep = 3;
   }
-}
-customerAddress: string = '';
-phoneNumber: string = '';
-deliveryOption: string = 'Standard Delivery';
-paymentMethod: string = 'credit-card';
-
-itemsTotal: number = 0;
-deliveryFee: number = 0;
-total: number = 0;
 
 
+  onDeliveryOptionSelected(option: string) {
+    this.selectedDeliveryOption = option;
+    this.deliveryFee = option === 'Express Delivery' ? 100 : 50;
+  }
 
+  goToNextStep() {
+    if (this.currentStep < 3) {
+      this.currentStep++;
+    }
+  }
 
-
-constructor() {
-  this.calculateSummary();
-}
-
-setStep(step: number): void {
-  this.currentStep = step;
-}
-
-confirmOrder(): void {
-  // Example confirmation logic
-  console.log('Order confirmed!');
-  console.log('Address:', this.customerAddress);
-  console.log('Phone:', this.phoneNumber);
-  console.log('Delivery Option:', this.deliveryOption);
-  console.log('Payment Method:', this.paymentMethod);
-}
-
-calculateSummary(): void {
-  // Dummy values for now
-  this.itemsTotal = 500;
-  this.deliveryFee = this.deliveryOption === 'Express Delivery' ? 100 : 50;
-  this.total = this.itemsTotal + this.deliveryFee;
-}
-onDeliveryOptionSelected(option: string) {
-  console.log('Selected Delivery Option: ', option);}
-  onPaymentMethodSelected(method: string) {
-    console.log('Selected Payment Method: ', method);}
+  goToPreviousStep() {
+    if (this.currentStep > 1) {
+      this.currentStep--;
+    }
+  }
 }

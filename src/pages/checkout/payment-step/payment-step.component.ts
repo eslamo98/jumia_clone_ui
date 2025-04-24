@@ -1,24 +1,38 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Output ,Input} from '@angular/core';
+import { Component, EventEmitter, Output, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-payment-step',
-  imports: [CommonModule,FormsModule],  
+  standalone: true,
+  imports: [CommonModule, FormsModule],
   templateUrl: './payment-step.component.html',
-  styleUrls: [ './payment-step.component.css','../checkout/checkout.component.css'],
+  styleUrls: ['./payment-step.component.css', '../checkout/checkout.component.css']
 })
 export class PaymentStepComponent {
-  selectedPaymentMethod: string = 'credit-card';
+  isEditingPayment: boolean = false;
   @Input() currentStep: number = 0;
-  @Output() paymentMethodSelected = new EventEmitter<string>();
+  @Input() isDeliveryConfirmed: boolean = false;
+  @Output() nextStep = new EventEmitter<string>();
 
+  selectedPaymentMethod: string = 'CreditCard';
+  isStepCompleted: boolean = false;
   onPaymentMethodChange() {
-    this.paymentMethodSelected.emit(this.selectedPaymentMethod);
+    // Reset completion if editing
+    if (this.isStepCompleted) {
+      this.isStepCompleted = false;
+    }
   }
-  confirmPaymentMethod(){
-    // Example confirmation logic
-    console.log('Order confirmed!');
-    console.log('Payment Method:', this.selectedPaymentMethod);
+
+  confirmPaymentMethod() {
+    if (this.selectedPaymentMethod) {
+      this.isStepCompleted = true;
+      this.nextStep.emit(this.selectedPaymentMethod);
+    }
+  }
+
+  editPayment() {
+    this.isEditingPayment = true;
+    this.isStepCompleted = false;
   }
 }

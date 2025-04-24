@@ -74,7 +74,8 @@ export class CartsService {
 
   // Get cart items
   getCartItems(): Observable<CartItem[]> {
-    return this.http.get<CartItem[]>(`${this.apiUrl}/items`).pipe(
+    return this.http.get<any>(`${this.apiUrl}`).pipe(
+      map(response => response.data.cartItems),
       catchError(error => {
         console.error('Error fetching cart items:', error);
         return throwError(() => error);
