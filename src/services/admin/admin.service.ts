@@ -255,7 +255,50 @@ deleteCustomer(id: number): Observable<any> {
   return this.http.delete<any>(`${this.apiUrl}/api/Users/customers/${id}`);
 }
 
+  // Get products with pagination and filters
+  getProducts(page: number = 1, pageSize: number = 10, filter?: any): Observable<ApiResponse<any>> {
+    let params = new HttpParams()
+      .set('pageNumber', page.toString())
+      .set('pageSize', pageSize.toString());
+    
+    if (filter) {
+      Object.keys(filter).forEach(key => {
+        if (filter[key] !== null && filter[key] !== undefined && filter[key] !== '') {
+          params = params.set(key, filter[key].toString());
+        }
+      });
+    }
+    
+    return this.http.get<ApiResponse<any>>(`${this.apiUrl}/api/products`, { params });
+  }
 
+  // Get product by ID
+  getProductById(id: number): Observable<ApiResponse<any>> {
+    return this.http.get<ApiResponse<any>>(`${this.apiUrl}/api/products/${id}`);
+  }
+
+  // Create new product
+  createProduct(formData: FormData): Observable<ApiResponse<any>> {
+    return this.http.post<ApiResponse<any>>(`${this.apiUrl}/api/products`, formData);
+  }
+
+  // Update existing product
+  updateProduct(id: number, formData: FormData): Observable<ApiResponse<any>> {
+    return this.http.put<ApiResponse<any>>(`${this.apiUrl}/api/products/${id}`, formData);
+  }
+
+  // Delete product
+  deleteProduct(id: number): Observable<boolean> {
+    return this.http.delete<ApiResponse<any>>(`${this.apiUrl}/api/products/${id}`).pipe(
+      map(() => true),
+      catchError(error => {
+        console.error('Error deleting product:', error);
+        return throwError(() => new Error('Failed to delete product'));
+      })
+    );
+  }
+
+// ... existing code ...
 //product attributes 
 getAllProductAttributes(pageNumber: number = 1, pageSize: number = 10, searchTerm: string = ''): Observable<any> {
   let params = new HttpParams()

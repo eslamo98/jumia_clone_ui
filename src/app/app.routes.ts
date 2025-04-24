@@ -123,6 +123,8 @@ export const routes: Routes = [
     {
       path: 'checkout',
       component: CheckoutComponent,
+      canActivate: [roleGuard],
+      data: { role: 'customer' },
     },
 
   // Utility routes
