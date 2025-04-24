@@ -1,8 +1,6 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CartItem } from '../../../../../../models/cart-item.model';
-import { CartsService } from '../../../../../../services/cart/carts.service';
-import { Cart } from '../../../../../../models/cart.model';
 
 @Component({
   selector: 'app-cart-item',
@@ -11,7 +9,7 @@ import { Cart } from '../../../../../../models/cart.model';
   standalone: true,
   imports: [CommonModule],
 })
-export class CartItemComponent {
+export class CartItemComponent implements OnInit {
   @Input() item!: CartItem;
   @Output() quantityChange = new EventEmitter<number>();
   @Output() onRemoveItem = new EventEmitter<void>();
@@ -19,15 +17,14 @@ export class CartItemComponent {
   showRemoveConfirmation = false;
   quantityOptions: number[] = [];
 
-  constructor(private cartsService: CartsService) {}
-
   ngOnInit() {
     this.generateQuantityOptions();
   }
 
   generateQuantityOptions() {
+    const maxQty = this.item.maxQuantity || 10; // Default to 10 if not specified
     this.quantityOptions = Array.from(
-      { length: this.item.maxQuantity },
+      { length: maxQty },
       (_, i) => i + 1
     );
   }
@@ -40,19 +37,23 @@ export class CartItemComponent {
   }
 
   getStockMessage(): string {
-    return this.item.quantity >= this.item.maxQuantity
+    const maxQty = this.item.maxQuantity || 10; // Default to 10 if not specified
+    return this.item.quantity >= maxQty
       ? 'Maximum quantity reached'
-      : `${this.item.maxQuantity - this.item.quantity} items left`;
+      : `${maxQty - this.item.quantity} items left`;
   }
-
+  
   decreaseQuantity() {
     if (this.item.quantity > 1) {
+      console.log('Decreasing quantity to:', this.item.quantity - 1);
       this.quantityChange.emit(this.item.quantity - 1);
     }
   }
 
   increaseQuantity() {
-    if (this.item.quantity < this.item.maxQuantity) {
+    const maxQty = this.item.maxQuantity || 10;
+    if (this.item.quantity < maxQty) {
+      console.log('Increasing quantity to:', this.item.quantity + 1);
       this.quantityChange.emit(this.item.quantity + 1);
     }
   }
@@ -74,5 +75,4 @@ export class CartItemComponent {
   cancelRemove() {
     this.showRemoveConfirmation = false;
   }
-
 }
