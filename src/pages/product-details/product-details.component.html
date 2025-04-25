@@ -1,4 +1,5 @@
-<div class="container mt-5 pt-5">
+<div class="product-details-container">
+<div class="container">
   <!-- Loading State -->
   <div *ngIf="isLoading" class="text-center py-5">
     <div class="spinner-border" role="status">
@@ -13,7 +14,7 @@
   </div>
 
   <!-- Product Content -->
-  <div *ngIf="product && !isLoading && !errorMessage" class="container mt-5 pt-5">
+  <div *ngIf="product && !isLoading && !errorMessage" class="container">
     <div class="row">
       <!-- Images Column -->
       <div class="col-md-6 text-center">
@@ -226,4 +227,11 @@
       </div>
     </div>
   </div>
+</div>
+
+<div class="keep-shopping-section text-center mt-4">
+  <p class="keep-shopping-section-text">Explore more products that you might like</p>
+</div>
+<app-keep-shopping></app-keep-shopping>
+
 </div>

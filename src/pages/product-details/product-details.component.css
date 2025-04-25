@@ -1,3 +1,13 @@
+.product-details-container {
+  max-width: 1200px;
+  margin: 10px auto;
+  border-radius: 8px;
+  padding: 20px;
+  font-family: 'Roboto', Arial, sans-serif;
+  background-color: white;
+}
+
+
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -29,7 +39,7 @@
 }
 
 .thumbnail.active {
-  border-color: #ff9900;
+  border-color: #f68b1e;
   transform: scale(1.1);
 }
 
@@ -41,7 +51,7 @@
 }
 
 .stars .bi {
-  color: #ff9900;
+  color: #f68b1e;
   font-size: 20px;
 }
 
@@ -70,7 +80,7 @@
 }
 
 .btn-primary {
-  background-color: #ff9900;
+  background-color: #f68b1e;
   border: none;
   padding: 12px 30px;
   font-weight: 600;
@@ -82,8 +92,8 @@
 }
 
 .btn-outline-primary {
-  border-color: #ff9900;
-  color: #ff9900;
+  border-color: #f68b1e;
+  color: #f68b1e;
 }
 
 .btn-outline-primary:hover {
@@ -94,11 +104,12 @@
   color: #666;
   border: none;
   font-weight: 500;
+  cursor: pointer;
 }
 
 .nav-tabs .nav-link.active {
-  color: #ff9900;
-  border-bottom: 3px solid #ff9900;
+  color: #f68b1e;
+  border-bottom: 3px solid #f68b1e;
 }
 
 .card {
@@ -114,7 +125,7 @@
 }
 
 .form-control:focus {
-  border-color: #ff9900;
+  border-color: #f68b1e;
   box-shadow: none;
 }
 
@@ -142,7 +153,7 @@
   width: 3rem;
   height: 3rem;
   border-width: 0.2em;
-  color: #ff9900;
+  color: #f68b1e;
 }
 
 
@@ -178,8 +189,8 @@
 }
 
 .seller-info button.btn-outline-primary {
-  border-color: #ff9900;
-  color: #ff9900;
+  border-color: #f68b1e;
+  color: #f68b1e;
   padding: 4px 12px;
   font-size: 14px;
   border-radius: 15px;
@@ -188,8 +199,8 @@
 
 .seller-info button.btn-outline-primary:hover {
   background: #fff8f0;
-  border-color: #ff8c00;
-  color: #ff8c00;
+  border-color: #f68b1e;
+  color: #f68b1e;
 }
 
 .delivery-options > div {
@@ -207,7 +218,7 @@
 }
 
 .delivery-options .text-primary {
-  color: #ff9900 !important;
+  color: #f68b1e !important;
   font-weight: 600;
 }
 
@@ -218,7 +229,7 @@
 }
 
 .form-select:focus {
-  border-color: #ff9900;
+  border-color: #f68b1e;
   box-shadow: none;
 }
 
@@ -246,7 +257,7 @@
 }
 
 .review-card .bi-star-fill {
-  color: #ff9900;
+  color: #f68b1e;
   font-size: 16px;
 }
 
@@ -257,7 +268,7 @@
 
 .product-details .nav-link.active {
   font-weight: 600;
-  color: #ff9900 !important;
+  color: #f68b1e !important;
 }
 
 .product-details .text-muted {
@@ -335,7 +346,7 @@
 }
 
 .btn-primary {
-  background: linear-gradient(to bottom, #ff9900, #ff8c00);
+  background: linear-gradient(to bottom, #f68b1e, #ff8c00);
   border: none;
   text-transform: uppercase;
   font-weight: 600;
@@ -434,7 +445,7 @@
   font-size: 0.95rem;
 }
 .btn-add-to-cart {
-  background: #ff5100; 
+  background: #f68b1e; 
   color: white;
   border: none;
   border-radius: 4px;
@@ -469,4 +480,19 @@
 .btn-add-to-cart[disabled] {
   background: #cccccc;
   cursor: not-allowed;
+}
+
+.keep-shopping-section {
+ background-color: #f68b1e;
+ border-radius: 8px;
+
+}
+.keep-shopping-section-text{
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  cursor: unset;
 }

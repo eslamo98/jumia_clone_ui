@@ -53,7 +53,7 @@ interface ProductsData {
 @Component({
   selector: 'app-category',
   standalone: true,
-  imports: [CommonModule, RouterModule, ComputingContainerComponent, UpArrowComponent],
+  imports: [CommonModule, RouterModule , UpArrowComponent],
   templateUrl: './category.component.html',
   styleUrl: './category.component.css'
 })
@@ -115,34 +115,7 @@ export class CategoryComponent  extends Helpers implements OnInit {
       this.loadCategoryProducts();
     });
 
-  //      // Get category ID and/or name from route parameters
-  // this.route.params.subscribe(params => {
-  //   // If 'id' parameter is 'by-name', then we'll use the 'name' parameter
-  //   if (params['id'] === 'by-name' && params['name']) {
-  //     this.categoryName = params['name'];
-  //     this.loadCategoryByName(this.categoryName);
-  //   } 
-  //   // Regular ID-based navigation
-  //   else if (params['id']) {
-  //     this.categoryId = params['id'];
-      
-  //     // Check if we already have the category name from the navigation service
-  //     const storedCategoryName = this.navigationService.getCategoryName();
-  //     if (storedCategoryName) {
-  //       this.categoryName = storedCategoryName;
-  //     }
-      
-  //     // If no category name is available, fetch it using the ID
-  //     if (!this.categoryName && this.categoryId) {
-  //       this.fetchCategoryDetails(this.categoryId);
-  //     }
-      
-  //     // Load subcategories and products
-  //     this.loadSubcategories();
-  //     this.loadCategoryProducts();
-  //   }
-  // });
-
+  
    
   }
 
@@ -286,9 +259,11 @@ export class CategoryComponent  extends Helpers implements OnInit {
     this.totalPages = Math.ceil(this.totalItems / this.pageSize);
     this.updateDisplayedProducts();
     this.generatePageNumbers();
+    
   }
 
   updateDisplayedProducts(): void {
+    window.scrollTo(0, 0);
     const startIndex = (this.currentPage - 1) * this.pageSize;
     const endIndex = Math.min(startIndex + this.pageSize, this.totalItems);
     this.displayedProducts = this.filteredProducts.slice(startIndex, endIndex);

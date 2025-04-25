@@ -293,3 +293,120 @@ border-radius: 8px;
     margin-bottom: 10px;
   }
 }
+
+/* Add these media queries to the end of your home-page.component.css file */
+
+/* For tablets and smaller screens */
+@media (max-width: 1024px) {
+  .jumia-container {
+    flex-direction: column;
+  }
+  
+  .sidebar {
+    width: 100%;
+    height: auto;
+    margin-right: 0;
+    margin-bottom: 20px;
+  }
+  
+  .category-list li {
+    padding: 8px 20px;
+  }
+  
+  .main-content {
+    width: 100%;
+  }
+  
+  .wrapper-right-sidebar {
+    width: 100%;
+    margin-left: 0;
+    margin-top: 20px;
+    flex-direction: row;
+    height: auto;
+  }
+  
+  .right-sidebar {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+  
+  .sidebar-section {
+    width: calc(33.33% - 10px);
+    margin-bottom: 10px;
+  }
+  
+  .sidebar-banner {
+    width: 100%;
+  }
+}
+
+/* For mobile devices */
+@media (max-width: 768px) {
+  .mainHomeContainer {
+    padding: 10px 0;
+  }
+  
+  .jumia-container {
+    flex-direction: column;
+  }
+  
+  .sidebar {
+    width: 100%;
+    height: auto;
+    overflow-x: auto;
+    white-space: nowrap;
+    margin-bottom: 15px;
+  }
+  
+  .category-list {
+    display: flex;
+    padding: 0 10px;
+  }
+  
+  .category-list li {
+    padding: 8px 15px;
+    flex-shrink: 0;
+  }
+  
+  .main-content {
+    width: 100%;
+  }
+  
+  .wrapper-right-sidebar {
+    width: 100%;
+    margin-left: 0;
+    margin-top: 15px;
+  }
+  
+  .right-sidebar {
+    width: 100%;
+    flex-direction: column;
+  }
+  
+  .sidebar-section {
+    width: 100%;
+  }
+}
+
+/* For very small mobile devices */
+@media (max-width: 480px) {
+  .sidebar-section {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .icon-container {
+    margin-right: 0;
+    margin-bottom: 10px;
+  }
+  
+  .section-content h3 {
+    font-size: 14px;
+  }
+  
+  .section-content p {
+    font-size: 11px;
+  }
+}
