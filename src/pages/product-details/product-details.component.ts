@@ -211,15 +211,18 @@ export class ProductDetailsComponent implements OnInit {
       error: (err) => {
         let errorMessage = 'Failed to add item to cart. Please try again later.';
         const currentUrl = this.router.url;
-
-        // Handle specific error cases
+      
         if (err.status === 401) {
-          errorMessage = 'Please log in first to add items to your cart';
+          errorMessage = 'Please log in to add items to your cart';
           this.router.navigate(['auth/login'], {
             queryParams: { returnUrl: currentUrl },
             state: { errorMessage: errorMessage }
           });
-          } else if (err.status === 404) {
+          return;
+        }
+      
+        // Other error handling remains the same
+        if (err.status === 404) {
           errorMessage = 'Product not found or has been removed';
         } else if (err.status === 409) {
           errorMessage = 'This item is already in your shopping cart';
@@ -229,26 +232,17 @@ export class ProductDetailsComponent implements OnInit {
           errorMessage = 'Network connection issue. Please check your internet connection';
         }
       
-        // Handle additional business logic errors
-        if (err.error?.outOfStock) {
-          errorMessage = 'This product is currently out of stock';
-        }
-      
-        if (err.error?.invalidQuantity) {
-          errorMessage = 'The requested quantity is not available';
-        }
-      
         // Show error notification
         this.notificationService.showError(errorMessage);
         
-        // Detailed error logging
-        console.error('Error adding item to cart:', {
-          errorMessage: err.message,
-          statusCode: err.status,
-          requestURL: err.config?.url,
-          timestamp: new Date().toISOString(),
-          errorDetails: err.error
-        });}
+        // Log error
+        console.error('Cart error:', {
+          status: err.status,
+          message: err.message,
+          path: currentUrl,
+          timestamp: new Date().toISOString()
+        });
+      }
       });
    
   
