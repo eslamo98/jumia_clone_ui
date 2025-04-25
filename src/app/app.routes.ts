@@ -34,6 +34,7 @@ import { AdminProductAttributesComponent } from '../pages/admin/components/admin
 import { AdminProductAttributeFormComponent } from '../pages/admin/components/admin-product-attribute-form/admin-product-attribute-form.component';
 import { SellerProductFormComponent } from '../pages/seller/seller-productEdit/seller-product-form/seller-product-form.component';
 import { ManageproductsComponent } from '../pages/seller/seller-manageproducts/manageproducts/manageproducts.component';
+import { WarrantyComponent } from '../pages/customer/warranty/warranty/warranty.component';
 
 export const routes: Routes = [
   // Public routes
@@ -64,6 +65,8 @@ export const routes: Routes = [
   { path: 'category/:id',
     component: CategoryComponent
   },
+  { path: 'warranty', 
+    component: WarrantyComponent },
 
   // Seller routes
   {
