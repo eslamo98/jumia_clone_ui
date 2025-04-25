@@ -350,20 +350,31 @@ this.products.forEach(product => {
     }
   }
 
+  // nextPage(): void {
+  //   if (this.currentPage < this.totalPages) {
+  //     this.currentPage++;
+  //     this.updateDisplayedProducts();
+  //   }
+  // }
+
+  // prevPage(): void {
+  //   if (this.currentPage > 1) {
+  //     this.currentPage--;
+  //     this.updateDisplayedProducts();
+  //   }
+  // }
+
   nextPage(): void {
     if (this.currentPage < this.totalPages) {
-      this.currentPage++;
-      this.updateDisplayedProducts();
+      this.goToPage(this.currentPage + 1);
     }
   }
-
+  
   prevPage(): void {
     if (this.currentPage > 1) {
-      this.currentPage--;
-      this.updateDisplayedProducts();
+      this.goToPage(this.currentPage - 1);
     }
   }
-
   override getFullImageUrl(relativePath: string): string {
     if (!relativePath) return 'assets/images/placeholder-product.png';
     if (relativePath.startsWith('http')) return relativePath;

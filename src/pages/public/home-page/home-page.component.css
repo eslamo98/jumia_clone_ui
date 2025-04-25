@@ -123,9 +123,13 @@ border-radius: 8px;
   cursor: pointer;
 }
 
+
+
+
 .banner-image {
   width: 100%;
   display: block;
+  cursor: default;
 }
 .sidebar-banner:hover {
   transform: scale(1.01);
