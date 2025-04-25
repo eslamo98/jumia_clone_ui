@@ -25,15 +25,11 @@ export class CartsService {
   // Method to refresh the cart count
   refreshCartCount(): void {
     // Only proceed if we have a token (user is logged in)
-    if (localStorage.getItem('token')) {
-      this.getCart().subscribe({
-        next: (cart: Cart) => {
-          if (cart && cart.cartItems) {
-            const count = cart.cartItems.reduce((sum, item) => sum + item.quantity, 0);
-            this.cartItemCountSubject.next(count);
-          } else {
-            this.cartItemCountSubject.next(0);
-          }
+    const currentUser = localStorage.getItem('currentUser');
+    if (currentUser) {
+      this.getCartItemCount().subscribe({
+        next: (count) => {
+          this.cartItemCountSubject.next(count);
         },
         error: () => {
           this.cartItemCountSubject.next(0);
@@ -49,11 +45,15 @@ export class CartsService {
     return this.http.get<any>(`${this.apiUrl}`).pipe(
       map(response => {
         // Check if response has the wrapper structure
-        if (response && response.success && response.data) {
-          return response.data; // Return the actual cart data
+        const cart = response && response.success && response.data ? response.data : response;
+        
+        // Update the cart count after successful fetch
+        if (cart && cart.cartItems) {
+          const count = cart.cartItems.reduce((sum: any, item: { quantity: any; }) => sum + (item.quantity || 1), 0);
+          this.cartItemCountSubject.next(count);
         }
-        // If the API returns the cart directly
-        return response;
+        
+        return cart;
       }),
       catchError(error => {
         console.error('Error fetching cart:', error);
@@ -65,6 +65,13 @@ export class CartsService {
   // Get cart summary (count, total, etc.)
   getCartSummary(): Observable<CartSummary> {
     return this.http.get<CartSummary>(`${this.apiUrl}/summary`).pipe(
+      map(response => {
+        // Update cart count if summary contains the item count
+        if (response && response.itemsCount !== undefined) {
+          this.cartItemCountSubject.next(response.itemsCount);
+        }
+        return response;
+      }),
       catchError(error => {
         console.error('Error fetching cart summary:', error);
         return throwError(() => error);
@@ -75,7 +82,15 @@ export class CartsService {
   // Get cart items
   getCartItems(): Observable<CartItem[]> {
     return this.http.get<any>(`${this.apiUrl}`).pipe(
-      map(response => response.data.cartItems),
+      map(response => {
+        const items = response.data?.cartItems || [];
+        
+        // Update cart count
+        const count = items.reduce((sum: any, item: { quantity: any; }) => sum + (item.quantity || 1), 0);
+        this.cartItemCountSubject.next(count);
+        
+        return items;
+      }),
       catchError(error => {
         console.error('Error fetching cart items:', error);
         return throwError(() => error);
@@ -93,7 +108,10 @@ export class CartsService {
   
     return this.http.post<any>(`${this.apiUrl}/items`, cartItem).pipe(
       map(response => {
-        this.refreshCartCount(); // Update cart count after adding item
+        // Update cart count after adding an item
+        this.getCartItemCount().subscribe(count => {
+          this.cartItemCountSubject.next(count);
+        });
         return response;
       }),
       catchError(error => {
@@ -113,7 +131,10 @@ export class CartsService {
     
     return this.http.put(`${this.apiUrl}/items/${cartItemId}`, updateData).pipe(
       map(response => {
-        this.refreshCartCount(); // Update cart count after modifying item
+        // Get updated cart count after modifying an item
+        this.getCartItemCount().subscribe(count => {
+          this.cartItemCountSubject.next(count);
+        });
         return response;
       }),
       catchError(error => {
@@ -127,7 +148,10 @@ export class CartsService {
   removeCartItem(cartItemId: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/items/${cartItemId}`).pipe(
       map(response => {
-        this.refreshCartCount(); // Update cart count after removing item
+        // Update cart count after removing an item
+        this.getCartItemCount().subscribe(count => {
+          this.cartItemCountSubject.next(count);
+        });
         return response;
       }),
       catchError(error => {
@@ -141,7 +165,8 @@ export class CartsService {
   clearCart(): Observable<any> {
     return this.http.delete(`${this.apiUrl}/clear`).pipe(
       map(response => {
-        this.cartItemCountSubject.next(0); // Reset cart count to zero
+        // Reset cart count to zero
+        this.cartItemCountSubject.next(0);
         return response;
       }),
       catchError(error => {
@@ -153,18 +178,10 @@ export class CartsService {
 
   // Get the total number of items in cart
   getCartItemCount(): Observable<number> {
-    // First try to use the cached count
-    if (this.cartItemCountSubject.value > 0) {
-      return this.cartItemCount$;
-    }
-    
-    // If no cached count, fetch from API
     return this.getCart().pipe(
       map((cart: Cart) => {
         if (cart && cart.cartItems) {
-          const count = cart.cartItems.reduce((sum, item) => sum + item.quantity, 0);
-          // Update the subject with the new count
-          this.cartItemCountSubject.next(count);
+          const count = cart.cartItems.reduce((sum, item) => sum + (item.quantity || 1), 0);
           return count;
         }
         return 0;
@@ -181,7 +198,11 @@ export class CartsService {
     return this.getCart().pipe(
       map((cart: Cart) => {
         if (cart && cart.cartItems) {
-           return cart.cartItems.reduce((sum: number, item: { discountedPrice: number; quantity: number; }) => sum + (item.discountedPrice * item.quantity), 0);
+          return cart.cartItems.reduce(
+            (sum: number, item: { discountedPrice: number; quantity: number; }) => 
+              sum + ((item.discountedPrice || 0) * (item.quantity || 1)), 
+            0
+          );
         }
         return 0;
       }),

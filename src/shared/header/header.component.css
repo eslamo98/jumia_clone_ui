@@ -64,6 +64,9 @@
     color: #555;
     cursor: pointer;
   }
+  .sell-on-jumia-link{
+    text-decoration: none;
+  }
   .sell-on-jumia:hover {
     text-decoration: underline;
     color: #f68b1e;

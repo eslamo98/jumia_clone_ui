@@ -3,13 +3,17 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { CategoryService } from '../../../../services/categories/categories.service';
 import { ProductService } from '../../../../services/products/product.service';
-import { NavigationService } from '../../../../services/navigations/navigation.services';
+import { NavigationService } from '../../../../services/navigations/navigation.services'
 import { environment } from '../../../../environments/environment';
-import { switchMap } from 'rxjs/operators';
+import { finalize, switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { ComputingContainerComponent } from "../../../public/home-page/homeComponents/computingContainer/computing-container/computing-container.component";
 import { Helpers } from '../../../../Utility/helpers';
 import { UpArrowComponent } from "../../../public/home-page/homeComponents/upArrow/up-arrow/up-arrow.component";
+import { CartsService } from '../../../../services/cart/carts.service';
+import { NotificationService } from '../../../../services/notification/notification.service';
+import { WishlistService } from '../../../../services/wishlist/wishlist.service';
+
 
 interface Product {
   productId: number;
@@ -79,13 +83,19 @@ export class CategoryComponent  extends Helpers implements OnInit {
    // Wishlist and cart
    wishlistItems: number[] = [];
 
+   processingCartItems: Set<number> = new Set(); // Track products being added to cart
+   addingToCart: { [productId: number]: boolean } = {};
+
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private categoryService: CategoryService,
     private productService: ProductService,
-    private navigationService: NavigationService
+    private cartsService: CartsService,
+    private navigationService: NavigationService,
+     private notificationService: NotificationService,
+     private wishlistService: WishlistService
   ) {
     super(); 
    }
@@ -115,9 +125,12 @@ export class CategoryComponent  extends Helpers implements OnInit {
       this.loadCategoryProducts();
     });
 
-  
-   
+    this.products.forEach(product => {
+      this.addingToCart[product.productId] = false;
+    });
   }
+
+  
 
   fetchCategoryDetails(categoryId: string): void {
     this.productService.getCategoryById(categoryId).subscribe(
@@ -168,6 +181,15 @@ export class CategoryComponent  extends Helpers implements OnInit {
         if (response && response.success && response.data && response.data.products) {
           this.products = response.data.products;
           this.totalItems = response.data.totalItems || this.products.length;
+
+
+
+// Initialize addingToCart for all products   //newwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
+this.products.forEach(product => {
+  this.addingToCart[product.productId] = false;
+});
+
+
         } else {
           console.error('Unexpected API response format for products:', response);
           this.error = 'Invalid data format received from API';
@@ -212,6 +234,11 @@ export class CategoryComponent  extends Helpers implements OnInit {
           // Format 1: { data: { products: [...] } }
           this.filteredProducts = response.data.products;
           this.totalItems = response.data.totalItems || this.filteredProducts.length;
+
+          // Initialize addingToCart for filtered products  //newwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
+      this.filteredProducts.forEach(product => {
+        this.addingToCart[product.productId] = false;})
+
         } else if (response && response.products) {
           // Format 2: { products: [...] }
           this.filteredProducts = response.products;
@@ -360,40 +387,74 @@ export class CategoryComponent  extends Helpers implements OnInit {
     localStorage.setItem('wishlist', JSON.stringify(this.wishlistItems));
   }
   
-  isInWishlist(productId: number): boolean {
-    return this.wishlistItems.includes(productId);
-  }
-  
+
+
   toggleWishlist(event: Event, productId: number): void {
     event.stopPropagation(); // Prevent navigation to product details
     
-    const index = this.wishlistItems.indexOf(productId);
-    if (index === -1) {
-      // Add to wishlist
-      this.wishlistItems.push(productId);
-    } else {
-      // Remove from wishlist
-      this.wishlistItems.splice(index, 1);
+    // Check if user is logged in
+    const currentUser = localStorage.getItem('currentUser');
+    if (!currentUser) {
+      this.notificationService.warning('Please log in to add items to your wishlist');
+      return;
     }
     
-    this.saveWishlistItems();
+    this.wishlistService.toggleWishlistItem(productId).subscribe({
+      next: (response) => {
+        const isAdded = this.wishlistService.isInWishlist(productId);
+        if (isAdded) {
+          this.notificationService.success('Product added to wishlist');
+        } else {
+          this.notificationService.success('Product removed from wishlist');
+        }
+      },
+      error: (error) => {
+        console.error('Error toggling wishlist item:', error);
+        this.notificationService.error('Failed to update wishlist. Please try again.');
+      }
+    });
   }
+ // Add this method to check if a product is in the wishlist
+ isInWishlist(productId: number): boolean {
+  return this.wishlistService.isInWishlist(productId);
+}
   
   // Cart functionality
   addToCart(event: Event, productId: number): void {
+    console.log('Add to cart clicked for product:', productId);
     event.stopPropagation(); // Prevent navigation to product details
     
-    // Here you would typically call a cart service to add the product
-    // For demonstration, we'll just log to console
-    console.log(`Adding product ${productId} to cart`);
+    // If already processing, skip
+    if (this.addingToCart[productId]) {
+      return;
+    }
     
-    // Add your cart service logic here
-    // For example:
-    // this.cartService.addToCart(productId, 1);
+    // Mark as processing
+    this.addingToCart[productId] = true;
     
-    // Show user feedback
-    alert('Product added to cart!');
+    // Check if user is logged in - properly check authentication status
+    const currentUser = localStorage.getItem('currentUser');
+    if (!currentUser) {
+      this.notificationService.warning('Please log in to add items to your cart');
+      this.addingToCart[productId] = false;
+      return;
+    }
+    
+    // Add the product to cart
+    this.cartsService.addItemToCart(productId, 1).subscribe({
+      next: (response) => {
+        console.log('Item added to cart:', response);
+        this.notificationService.success('Item added to cart successfully');
+        this.addingToCart[productId] = false;
+      },
+      error: (error) => {
+        console.error('Error adding item to cart:', error);
+        this.notificationService.error('Failed to add product to cart. Please try again.');
+        this.addingToCart[productId] = false;
+      }
+    });
   }
+  
 
  
   

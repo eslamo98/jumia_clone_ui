@@ -1,6 +1,17 @@
 <div class="cart-container">
   <h1>Shopping Cart ({{ getCartItemCount() }} items)</h1>
 
+  <!-- Loading overlay -->
+  <div class="loading-overlay" *ngIf="isLoading">
+    <div class="spinner">Loading...</div>
+  </div>
+
+  <!-- Error message -->
+  <div class="error-message" *ngIf="error">
+    {{ error }}
+    <button class="retry-btn" (click)="refreshCart()">Try Again</button>
+  </div>
+
   <div class="cart-content" *ngIf="cartItems.length > 0">
     <div class="cart-items">
       <app-cart-item
@@ -15,10 +26,19 @@
       [totalPrice]="getTotalPrice()"
       [hasExpressItems]="hasJumiaExpressItems()"
       [itemCount]="getCartItemCount()"
+      (refreshCart)="refreshCart()"
+      (proceedToCheckout)="checkout()"
     ></app-cart-summary>
   </div>
 
-  <div class="empty-cart" *ngIf="cartItems.length === 0">
-    Your cart is empty
+  <div class="empty-cart" *ngIf="!isLoading && cartItems.length === 0">
+    <div class="empty-cart-message">
+      Your cart is empty
+    </div>
+    <a href="#">
+    <button class="continue-shopping-btn">
+      Continue Shopping
+    </button>
+  </a>
   </div>
 </div>

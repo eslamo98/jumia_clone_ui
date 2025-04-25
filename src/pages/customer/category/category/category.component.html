@@ -56,7 +56,7 @@
         
         <!-- Wishlist icon -->
         <div class="wishlist-icon" (click)="toggleWishlist($event, product.productId)">
-          <i class="far fa-heart"></i>
+          <i class="fa-heart" [ngClass]="{'fas': isInWishlist(product.productId), 'far': !isInWishlist(product.productId)}"></i>
         </div>
         
         <!-- Product image -->
@@ -89,9 +89,15 @@
       </div>
       
       <!-- Add to cart button -->
-      <button class="add-to-cart-btn" (click)="addToCart($event, product.productId)">
-        Add to cart
-      </button>
+      <button 
+  class="add-to-cart-btn" 
+  [disabled]="addingToCart[product.productId]"
+  (click)="addToCart($event, product.productId)">
+  <span *ngIf="!addingToCart[product.productId]">Add to cart</span>
+  <span *ngIf="addingToCart[product.productId]">
+    <i class="fas fa-spinner fa-spin"></i> Adding...
+  </span>
+</button>
     </div>
   </div>
 
