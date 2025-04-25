@@ -14,8 +14,9 @@ import { AuthService } from '../../../services/auth/auth.service';
 export class AddressStepComponent implements OnInit {
   @Input() currentStep: number = 0;
   @Output() editAddressEvent = new EventEmitter<void>();
-  @Output() saveAddressEvent = new EventEmitter<void>();
-  
+  @Output() addressConfirmed = new EventEmitter<number>();  
+  @Output() saveAddressEvent = new EventEmitter<number>();
+  isStepCompleted = false;
   addresses: any[] = [];
   selectedAddress: any = null;
   isEditing = false;
@@ -24,7 +25,8 @@ export class AddressStepComponent implements OnInit {
   isLoadingCountries = false;
   isLoadingStates = false;
   isLoadingCities = false;
-  isStepCompleted = false;
+  selectedAddressId: number = 0;  
+
   
   countries: any[] = [];
   states: any[] = [];
@@ -142,10 +144,6 @@ export class AddressStepComponent implements OnInit {
       });
   }
 
-  selectAddress(address: any) {
-    this.selectedAddress = address;
-  }
-
   startNewAddress() {
     this.resetForm();
     this.isCreatingNew = true;
@@ -237,14 +235,24 @@ export class AddressStepComponent implements OnInit {
       userId: this.authService.currentUserValue?.userId || 0
     };
   }
-
+  onAddressConfirmed(addressId: number) {
+    this.isStepCompleted = true;  
+    this.selectedAddressId = addressId;
+    alert(this.selectedAddressId);
+    this.addressConfirmed.emit(addressId);  
+  }
   confirmStep() {
     if (this.selectedAddress) {
       this.isStepCompleted = true;
-      this.saveAddressEvent.emit();
+      this.saveAddressEvent.emit(this.selectedAddress.addressId); // Pass the addressId
     } else {
       this.notificationService.showError('Please select an address to continue');
     }
+  }
+
+  selectAddress(address: any) {
+    this.selectedAddress = address;
+    this.selectedAddressId = address.addressId;
   }
 
   cancelEdit() {

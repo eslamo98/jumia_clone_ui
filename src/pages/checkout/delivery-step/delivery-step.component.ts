@@ -4,25 +4,59 @@ import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-delivery-step',
-  imports: [CommonModule,FormsModule],
+  standalone: true,
+  imports: [CommonModule, FormsModule],
   templateUrl: './delivery-step.component.html',
   styleUrls: ['./delivery-step.component.css']
 })
 export class DeliveryStepComponent {
   @Input() currentStep: number = 0;
+  @Input() isAddressConfirmed: boolean = false;
   @Output() deliveryOptionSelected = new EventEmitter<string>();
-  deliveryOption = 'Standard Delivery';
-  deliveryStartDate = '2025-04-23';
-  deliveryEndDate = '2025-04-27';
+  @Output() nextStep = new EventEmitter<void>();
+
+  isStepCompleted = false;
   isEditingDelivery = false;
+  selectedDeliveryOption: string = '';
+  deliveryOptions = [
+    {
+      id: 'standard',
+      name: 'Standard Delivery',
+      price: 50,
+      time: '3-5 business days',
+      description: 'Regular delivery service with standard tracking'
+    },
+    {
+      id: 'express',
+      name: 'Express Delivery',
+      price: 100,
+      time: '1-2 business days',
+      description: 'Fast delivery service with priority handling'
+    }
+  ];
 
-  editDeliveryOption() {
-    this.isEditingDelivery = !this.isEditingDelivery;
+  selectDeliveryOption(option: any) {
+    if (!this.isAddressConfirmed || this.isStepCompleted) return;
+    
+    this.selectedDeliveryOption = option.id;
+    this.deliveryOptionSelected.emit(option.name);
   }
-  onDeliveryOptionChange() {
-    this.deliveryOptionSelected.emit(this.deliveryOption);
-  }
- 
-  selectedDeliveryOption: string = 'Standard Delivery';
 
+  getSelectedOption() {
+    return this.deliveryOptions.find(opt => opt.id === this.selectedDeliveryOption);
+  }
+
+  confirmDelivery() {
+    if (this.selectedDeliveryOption) {
+      this.isStepCompleted = true;
+      this.nextStep.emit();
+    }
+  }
+
+  editDelivery() {
+    if (this.isStepCompleted) {
+      this.isStepCompleted = false;
+      this.isEditingDelivery = true;
+    }
+  }
 }

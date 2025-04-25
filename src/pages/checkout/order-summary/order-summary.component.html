@@ -2,8 +2,17 @@
   <h3>Order Summary</h3>
   <div class="order-items">
     <p>Items Total: <span>EGP {{ itemsTotal.toFixed(2) }}</span></p>
-    <p>Delivery Fee: <span>EGP {{ deliveryFee.toFixed(2) }}</span></p>
-    <p>Total: <span>EGP {{ total.toFixed(2) }}</span></p>
+    <p *ngIf="selectedDeliveryOption">
+      Delivery Fee ({{ selectedDeliveryOption }}): 
+      <span>EGP {{ deliveryFee.toFixed(2) }}</span>
+    </p>
+    <div class="total-section">
+      <p class="total">Total: <span>EGP {{ total.toFixed(2) }}</span></p>
+    </div>
   </div>
-  <button class="confirm-btn" (click)="confirmOrder()">Confirm Order</button>
+  <button class="confirm-btn" 
+          [disabled]="!selectedDeliveryOption"
+          (click)="confirmOrder()">
+    Confirm Order
+  </button>
 </div>

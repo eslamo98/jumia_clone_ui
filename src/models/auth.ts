@@ -37,10 +37,11 @@ export interface RegisterRequest {
   
   export interface UserData {
     userId: number;
+    entityId: number;
     email: string;
     firstName: string;
     lastName: string;
-    userType: 'customer' | 'seller' | 'admin';
+    userType: 'Customer' | 'Seller' | 'Admin';
     token: string;
     refreshToken: string;
   }

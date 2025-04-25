@@ -33,6 +33,7 @@ export class AppComponent {
     });
   }
   getCurrentUrl(): string {
+    
     return this.router.url;
   }
 

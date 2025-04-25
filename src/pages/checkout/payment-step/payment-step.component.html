@@ -1,11 +1,77 @@
-<div class="step" [ngClass]="{'active': currentStep === 3}">
-  <h2> <span class="checkmark">✅</span> Payment <i class="fa fa-credit-card"></i></h2>
-  <div class="payment-options">
-    <p>Select Payment Method:</p>
-    <input type="radio" id="credit-card" name="payment" value="credit-card" [(ngModel)]="selectedPaymentMethod" (ngModelChange)="onPaymentMethodChange()" />
-    <label for="credit-card"><i class="fa fa-credit-card"></i> Credit Card</label><br />
-    <input type="radio" id="paypal" name="payment" value="paypal" [(ngModel)]="selectedPaymentMethod" (ngModelChange)="onPaymentMethodChange()" />
-    <label for="paypal"><i class="fa fa-paypal"></i> PayPal</label><br />
+<div class="step" [ngClass]="{
+  'active': currentStep === 3,
+  'disabled': !isDeliveryConfirmed,
+  'completed': isStepCompleted
+}">
+  <h2>
+    <span class="checkmark" [ngClass]="{'completed': isStepCompleted}">
+      <i class="fas" [ngClass]="isStepCompleted ? 'fa-check-circle' : 'fa-credit-card'"></i>
+    </span>
+    <span class="step-title">Payment Method</span>
+    <button class="btn btn-link change-btn" 
+            (click)="editPayment()" 
+            *ngIf="isStepCompleted && !isEditingPayment">
+      Change
+    </button>
+  </h2>
+
+  <div class="step-content" [ngClass]="{'d-none': isStepCompleted && !isEditingPayment}">
+    <!-- Disabled State -->
+    <div class="step-disabled" *ngIf="!isDeliveryConfirmed">
+      <div class="alert alert-warning">
+        <i class="fas fa-exclamation-triangle"></i>
+        Please complete the delivery step first
+      </div>
+    </div>
+
+    <!-- Payment Options -->
+    <div class="payment-options" *ngIf="isDeliveryConfirmed && !isStepCompleted">
+      <div class="payment-option-card" 
+           [class.selected]="selectedPaymentMethod === 'credit-card'"
+           (click)="selectedPaymentMethod = 'credit-card'">
+        <div class="option-header">
+          <div class="option-title">
+            <i class="fas fa-credit-card"></i>
+            <span>Credit Card</span>
+          </div>
+          <div class="option-check" *ngIf="selectedPaymentMethod === 'credit-card'">
+            <i class="fas fa-check-circle text-success"></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="payment-option-card" 
+           [class.selected]="selectedPaymentMethod === 'cash'"
+           (click)="selectedPaymentMethod = 'cash'">
+        <div class="option-header">
+          <div class="option-title">
+            <i class="fas fa-money-bill"></i>
+            <span>Cash on Delivery</span>
+          </div>
+          <div class="option-check" *ngIf="selectedPaymentMethod === 'cash'">
+            <i class="fas fa-check-circle text-success"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Confirm Button -->
+      <div class="action-buttons mt-4">
+        <button class="btn btn-primary" 
+                [disabled]="!selectedPaymentMethod"
+                (click)="confirmPaymentMethod()">
+          Confirm Payment Method
+        </button>
+      </div>
+    </div>
   </div>
-  <button class="confirm-btn" (click)="confirmPaymentMethod()">Confirm Payment Method </button>
+
+  <!-- Completed Summary -->
+  <div class="step-summary" *ngIf="isStepCompleted && !isEditingPayment">
+    <div class="selected-payment-summary">
+      <div class="summary-content">
+        <i class="fas" [ngClass]="selectedPaymentMethod === 'credit-card' ? 'fa-credit-card' : 'fa-money-bill'"></i>
+        <span>{{ selectedPaymentMethod === 'credit-card' ? 'Credit Card' : 'Cash on Delivery' }}</span>
+      </div>
+    </div>
+  </div>
 </div>
