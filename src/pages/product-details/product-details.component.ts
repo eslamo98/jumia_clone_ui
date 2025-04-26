@@ -10,11 +10,12 @@ import { ProductService } from '../../services/products/product.service';
 import { AuthService } from '../../services/auth/auth.service';
 import { Router } from '@angular/router';
 import { KeepShoppingComponent } from "../public/home-page/homeComponents/keepShoppingContainer/keep-shopping/keep-shopping.component";
+import { UpArrowComponent } from "../public/home-page/homeComponents/upArrow/up-arrow/up-arrow.component";
 
 @Component({
   selector: 'app-product-details',
   standalone: true,
-  imports: [CommonModule, FormsModule, KeepShoppingComponent],
+  imports: [CommonModule, FormsModule, KeepShoppingComponent, UpArrowComponent],
   templateUrl: './product-details.component.html',
   styleUrls: ['./product-details.component.css']
 })
