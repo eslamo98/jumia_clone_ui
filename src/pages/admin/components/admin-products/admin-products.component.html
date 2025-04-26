@@ -56,32 +56,28 @@
                     (change)="onFilterChange()"
                   >
                     <option value="">All Categories</option>
-                    <option [value]="1">Electronics</option>
-                    <option [value]="2">Accessories</option>
-                    <option [value]="3">Computer Hardware</option>
-                    <option [value]="4">Fashion</option>
-                    <option [value]="5">Home & Kitchen</option>
-                    <option [value]="6">Beauty & Health</option>
+                    <option *ngFor="let category of categories" [value]="category.categoryId">
+                      {{category.name}}
+                    </option>
                   </select>
                 </div>
                 
                 <div class="col-md-3">
                   <select 
-                    class="form-select" 
-                    [(ngModel)]="statusFilter" 
-                    (change)="onFilterChange()"
-                  >
-                    <option value="">All Statuses</option>
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                    <option value="draft">Draft</option>
-                  </select>
+                  class="form-select" 
+                  [(ngModel)]="statusFilter" 
+                  (change)="onFilterChange()"
+                >
+                  <option *ngFor="let status of approvalStatusOptions" [value]="status.value">
+                    {{status.label}}
+                  </option>
+                </select>
                 </div>
                 
                 <div class="col-md-2">
                   <button 
                     class="btn btn-outline-secondary w-100" 
-                    (click)="searchTerm = ''; categoryFilter = ''; statusFilter = ''; onFilterChange()"
+                    (click)="searchTerm = ''; categoryFilter = ''; statusFilter = null; onFilterChange()"
                   >
                     Clear Filters
                   </button>
@@ -105,57 +101,66 @@
                   <thead class="bg-light">
                     <tr>
                       <th class="border-0">
-                        <div class="d-flex align-items-center">
-                          <span>Product</span>
-                          <a href="javascript:void(0)" class="ms-2" (click)="onSort('name')">
-                            <i class="bi" [ngClass]="{
-                              'bi-arrow-up': sortField === 'name' && sortDirection === 'asc',
-                              'bi-arrow-down': sortField === 'name' && sortDirection === 'desc',
-                              'bi-arrow-down-up': sortField !== 'name'
-                            }"></i>
-                          </a>
-                        </div>
-                      </th>
-                      <th class="border-0">Category</th>
-                      <th class="border-0">
-                        <div class="d-flex align-items-center">
-                          <span>Price</span>
-                          <a href="javascript:void(0)" class="ms-2" (click)="onSort('price')">
-                            <i class="bi" [ngClass]="{
-                              'bi-arrow-up': sortField === 'price' && sortDirection === 'asc',
-                              'bi-arrow-down': sortField === 'price' && sortDirection === 'desc',
-                              'bi-arrow-down-up': sortField !== 'price'
-                            }"></i>
-                          </a>
-                        </div>
+                        <button class="btn btn-link text-dark p-0 text-decoration-none" (click)="onSort('name')">
+                          Product
+                          <i class="bi" [ngClass]="{
+                            'bi-sort-alpha-down': sortField === 'name' && sortDirection === 'asc',
+                            'bi-sort-alpha-up': sortField === 'name' && sortDirection === 'desc',
+                            'bi-sort': sortField !== 'name'
+                          }"></i>
+                        </button>
                       </th>
                       <th class="border-0">
-                        <div class="d-flex align-items-center">
-                          <span>Stock</span>
-                          <a href="javascript:void(0)" class="ms-2" (click)="onSort('stock')">
-                            <i class="bi" [ngClass]="{
-                              'bi-arrow-up': sortField === 'stock' && sortDirection === 'asc',
-                              'bi-arrow-down': sortField === 'stock' && sortDirection === 'desc',
-                              'bi-arrow-down-up': sortField !== 'stock'
-                            }"></i>
-                          </a>
-                        </div>
+                        <button class="btn btn-link text-dark p-0 text-decoration-none" (click)="onSort('subcategoryName')">
+                          Subcategory
+                          <i class="bi" [ngClass]="{
+                            'bi-sort-alpha-down': sortField === 'subcategoryName' && sortDirection === 'asc',
+                            'bi-sort-alpha-up': sortField === 'subcategoryName' && sortDirection === 'desc',
+                            'bi-sort': sortField !== 'subcategoryName'
+                          }"></i>
+                        </button>
                       </th>
-                      <th class="border-0">Status</th>
-                      <th class="border-0">Featured</th>
                       <th class="border-0">
-                        <div class="d-flex align-items-center">
-                          <span>Created</span>
-                          <a href="javascript:void(0)" class="ms-2" (click)="onSort('createdAt')">
-                            <i class="bi" [ngClass]="{
-                              'bi-arrow-up': sortField === 'createdAt' && sortDirection === 'asc',
-                              'bi-arrow-down': sortField === 'createdAt' && sortDirection === 'desc',
-                              'bi-arrow-down-up': sortField !== 'createdAt'
-                            }"></i>
-                          </a>
-                        </div>
+                        <button class="btn btn-link text-dark p-0 text-decoration-none" (click)="onSort('stockQuantity')">
+                          Stock
+                          <i class="bi" [ngClass]="{
+                            'bi-sort-numeric-down': sortField === 'stockQuantity' && sortDirection === 'asc',
+                            'bi-sort-numeric-up': sortField === 'stockQuantity' && sortDirection === 'desc',
+                            'bi-sort': sortField !== 'stockQuantity'
+                          }"></i>
+                        </button>
                       </th>
-                      <th class="border-0 text-end">Actions</th>
+                      <th class="border-0">
+                        <button class="btn btn-link text-dark p-0 text-decoration-none" (click)="onSort('finalPrice')">
+                          Price
+                          <i class="bi" [ngClass]="{
+                            'bi-sort-numeric-down': sortField === 'finalPrice' && sortDirection === 'asc',
+                            'bi-sort-numeric-up': sortField === 'finalPrice' && sortDirection === 'desc',
+                            'bi-sort': sortField !== 'finalPrice'
+                          }"></i>
+                        </button>
+                      </th>
+                      <th class="border-0">
+                        <button class="btn btn-link text-dark p-0 text-decoration-none" (click)="onSort('approvalStatus')">
+                          Status
+                          <i class="bi" [ngClass]="{
+                            'bi-sort-alpha-down': sortField === 'approvalStatus' && sortDirection === 'asc',
+                            'bi-sort-alpha-up': sortField === 'approvalStatus' && sortDirection === 'desc',
+                            'bi-sort': sortField !== 'approvalStatus'
+                          }"></i>
+                        </button>
+                      </th>
+                      <th class="border-0">
+                        <button class="btn btn-link text-dark p-0 text-decoration-none" (click)="onSort('isAvailable')">
+                          Available
+                          <i class="bi" [ngClass]="{
+                            'bi-sort-down': sortField === 'isAvailable' && sortDirection === 'asc',
+                            'bi-sort-up': sortField === 'isAvailable' && sortDirection === 'desc',
+                            'bi-sort': sortField !== 'isAvailable'
+                          }"></i>
+                        </button>
+                      </th>
+                      <th class="border-0">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -163,7 +168,7 @@
                       <td>
                         <div class="d-flex align-items-center">
                           <img 
-                            [src]="product.mainImageUrl" 
+                            [src]="getFullImageUrl(product.mainImageUrl)" 
                             class="img-thumbnail me-3" 
                             width="50" 
                             [alt]="product.name"
@@ -176,10 +181,10 @@
                       </td>
                       <td>
                         <span class="badge bg-secondary">
-                          {{getCategoryName(product.categoryId)}}
+                          {{product.subcategoryName}}
                         </span>
                       </td>
-                      <td>₦{{product.finalPrice.toLocaleString()}}</td>
+                      
                       <td>
                         <span [ngClass]="{
                           'text-success': product.stockQuantity > 50,
@@ -189,27 +194,27 @@
                           {{product.stockQuantity}}
                         </span>
                       </td>
+                      <td>EGP{{product.finalPrice.toLocaleString()}}</td>
                       <td>
-                        <div class="dropdown">
-                          <button 
-                            class="btn btn-sm dropdown-toggle" 
-                            type="button" 
-                            [ngClass]="{
-                              'btn-success': product.approvalStatus === 'approved',
-                              'btn-secondary': product.approvalStatus === 'pending',
-                              'btn-warning': product.approvalStatus === 'pending_review'
-                            }"
-                            data-bs-toggle="dropdown" 
-                            aria-expanded="false"
-                          >
-                            {{product.approvalStatus | titlecase}}
-                          </button>
-                          <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="javascript:void(0)" (click)="updateProductStatus(product.productId, 'approved')">Approved</a></li>
-                            <li><a class="dropdown-item" href="javascript:void(0)" (click)="updateProductStatus(product.productId, 'pending')">Pending</a></li>
-                            <li><a class="dropdown-item" href="javascript:void(0)" (click)="updateProductStatus(product.productId, 'pending_review')">Review</a></li>
-                          </ul>
-                        </div>
+                        <select 
+                          class="form-select form-select-sm text-white" 
+                          style="color: #fff !important;"
+                          [(ngModel)]="product.approvalStatus"
+                          (change)="updateProductStatus(product.productId, product.approvalStatus)"
+                          [ngClass]="{
+                            'bg-success text-white': product.approvalStatus === 'approved',
+                            'bg-secondary text-white': product.approvalStatus === 'pending',
+                            'bg-warning text-white': product.approvalStatus === 'pending_review',
+                            'bg-danger text-white': product.approvalStatus === 'rejected',
+                            'bg-dark text-white': product.approvalStatus === 'deleted'
+                          }"
+                        >
+                          <option value="approved">Approved</option>
+                          <option value="pending">Pending</option>
+                          <option value="pending_review">Pending Review</option>
+                          <option value="rejected">Rejected</option>
+                          <option value="deleted">Deleted</option>
+                        </select>
                       </td>
                       <td>
                         <div class="form-check form-switch">
@@ -252,8 +257,26 @@
             
             <!-- Pagination -->
             <div class="card-footer bg-white d-flex justify-content-between align-items-center" *ngIf="totalItems > 0">
-              <div>
-                Showing {{(currentPage - 1) * pageSize + 1}} to {{Math.min(currentPage * pageSize, totalItems)}} of {{totalItems}} entries
+              
+              <div class="card-footer bg-white d-flex justify-content-between align-items-center" *ngIf="totalItems > 0">
+                <div class="d-flex align-items-center">
+                  <span class="me-2">Show</span>
+                  <select 
+                    class="form-select form-select-sm" 
+                    style="width: auto;" 
+                    [(ngModel)]="pageSize" 
+                    (change)="onPageSizeChange()"
+                  >
+                    <option [value]="5">5</option>
+                    <option [value]="10">10</option>
+                    <option [value]="15">15</option>
+                    <option [value]="20">20</option>
+                  </select>
+                  <span class="ms-2">Products</span>
+                </div>
+                <div>
+                  Showing {{(currentPage - 1) * pageSize + 1}} to {{Math.min(currentPage * pageSize, totalItems)}} of {{totalItems}} entries
+                </div>
               </div>
               <nav aria-label="Page navigation">
                 <ul class="pagination mb-0">

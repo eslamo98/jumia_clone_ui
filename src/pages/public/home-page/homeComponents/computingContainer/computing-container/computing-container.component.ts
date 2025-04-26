@@ -39,7 +39,7 @@ export class ComputingContainerComponent extends Helpers implements OnInit, Afte
   @ViewChild('productContainer') productContainer!: ElementRef;
   @Input() categoryName: string = 'Computing';
   @Input() categorySubtitle: string = 'Laptops';
-  @Input() categoryId: string = ''; //7
+  @Input() categoryId: string = ''; 
   @Input() subcategoryId: string = '';
   @Input() subcategoryName: string = '';
   
@@ -170,58 +170,28 @@ export class ComputingContainerComponent extends Helpers implements OnInit, Afte
     return quantity < 10 ? '#e41e23' : '#ff9900';
   }
   
-  navigateToCategory(): void {
-    // Log the values we're sending to the navigation service
-    console.log('Navigating to category with ID:', this.categoryId);
-    console.log('Navigating with subcategory ID:', this.subcategoryId);
-    
-    // If categoryId is empty, we might need to find a fallback
-    if (!this.categoryId && this.products.length > 0) {
-      console.log('No categoryId set, attempting to use categoryId from products');
-      this.categoryId = this.products[0].categoryId?.toString() || '';
-    }
-    
-    // Store both category name and ID in the navigation service
-    this.navigationService.setCategoryName(this.categoryName);
-    this.navigationService.setCategoryId(this.categoryId);
-    
-    // Store subcategory information if available
-    if (this.subcategoryId) {
-      this.navigationService.setSubcategoryId(this.subcategoryId);
-    }
-    
-    // Store it as a full category object for convenience
-    this.navigationService.setSelectedCategory({
-      id: this.categoryId,
-      name: this.categoryName,
-      subtitle: this.categorySubtitle
-    });
-    
-    // If we have a subcategory, store that too
-    if (this.subcategoryId) {
-      this.navigationService.setSelectedSubcategory({
-        id: this.subcategoryId,
-        name: this.subcategoryName || this.categorySubtitle
-      });
-    }
-    
-    // Navigate to the category page with the category ID
-    if (this.categoryId) {
-      if (this.subcategoryId) {
-        // You could navigate with both IDs if your routing supports it
-        this.router.navigate(['/category', this.categoryId, 'subcategory', this.subcategoryId]);
-      } else {
-        this.router.navigate(['/category', this.categoryId]);
-      }
-    } else {
-      console.error('No category ID available for navigation');
-      this.router.navigate(['/category']);
-    }
+  // Function to navigate to the category page
+navigateToCategory(): void {
+  console.log('Navigating to category:', this.categoryName, 'with ID:', this.categoryId);
   
-  // getFullImageUrl(relativePath: string): string {
-  //   if (!relativePath) return 'assets/images/placeholder-product.png';
-  //   if (relativePath.startsWith('http')) return relativePath;
-  //   return `${environment.apiUrl}/${relativePath}`;
-  // }
+  // Store category information in the navigation service
+  this.navigationService.setCategoryName(this.categoryName);
+  this.navigationService.setCategoryId(this.categoryId);
+  
+  // If categoryId is not set, try to get it from the first product
+  if (!this.categoryId && this.products.length > 0 && this.products[0].categoryId) {
+    const categoryId = this.products[0].categoryId.toString();
+    this.navigationService.setCategoryId(categoryId);
+    console.log('Using categoryId from products:', categoryId);
+    this.router.navigate(['/category', categoryId]);
+  } else if (this.categoryId) {
+    // Navigate with the available categoryId
+    this.router.navigate(['/category', this.categoryId]);
+  } else {
+    console.error('Cannot navigate: No categoryId available');
+    // Fallback navigation to general category page
+    this.router.navigate(['/category']);
+  }
 }
+
 }

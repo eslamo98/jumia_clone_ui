@@ -135,6 +135,10 @@ export class AdminSubcategoryFormComponent implements OnInit {
     this.loadingService.show();
     
     const formData = new FormData();
+    if (this.isEditMode && this.subcategoryId) {
+      formData.append('SubcategoryId', this.subcategoryId.toString());
+    }
+    formData.append('SubcategoryId', this.subcategoryForm.get('name')?.value);
     formData.append('Name', this.subcategoryForm.get('name')?.value);
     formData.append('Description', this.subcategoryForm.get('description')?.value || '');
     formData.append('IsActive', this.subcategoryForm.get('isActive')?.value.toString());

@@ -4,12 +4,13 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AdminSidebarComponent } from '../admin-sidebar/admin-sidebar.component';
-import { Product, ProductQueryParams } from '../../../../models/admin';
+import { BasicCategoiesInfo, Product, ProductQueryParams } from '../../../../models/admin';
 import { AdminService } from '../../../../services/admin/admin.service';
 import { ProductsService } from '../../../../services/admin/products.service';
 import { LoadingService } from '../../../../services/shared/loading.service';
 import { NotificationService } from '../../../../services/shared/notification.service';
 import { AdminHeaderComponent } from '../admin-header/admin-header.component';
+import { Helpers } from '../../../../Utility/helpers';
 
 @Component({
   selector: 'app-admin-products',
@@ -23,22 +24,29 @@ import { AdminHeaderComponent } from '../admin-header/admin-header.component';
   ],
   templateUrl: './admin-products.component.html'
 })
-export class AdminProductsComponent implements OnInit {
+export class AdminProductsComponent extends Helpers implements OnInit {
   products: Product[] = [];
   isLoading = false;
   
   // Filtering and pagination
   searchTerm = '';
   categoryFilter = '';
-  statusFilter = '';
+  statusFilter: 'pending' | 'approved' | 'rejected' | 'deleted' | 'pending_review' | null = null;
   currentPage = 1;
   pageSize = 10;
   totalItems = 0;
-  
+  categories: BasicCategoiesInfo[] = [];
   // Sorting
   sortField = 'createdAt';
   sortDirection: 'asc' | 'desc' = 'desc';
-  
+  approvalStatusOptions = [
+    { value: '', label: 'All Statuses' },
+    { value: 'pending', label: 'Pending' },
+    { value: 'approved', label: 'Approved' },
+    { value: 'rejected', label: 'Rejected' },
+    { value: 'deleted', label: 'Deleted' },
+    { value: 'pending_review', label: 'Pending Review' }
+  ];
   // Make Math available to template
   Math = Math;
 
@@ -47,30 +55,42 @@ export class AdminProductsComponent implements OnInit {
     private productsService: ProductsService,
     private loadingService: LoadingService,
     private notificationService: NotificationService
-  ) {}
+  ) {super()}
 
   ngOnInit(): void {
     this.loadProducts();
+    this.loadCategories();
   }
-
+  loadCategories(): void {
+    this.adminService.getBasicCategories().subscribe({
+      next: (categories) => {
+        this.categories = categories;
+      },
+      error: (error) => {
+        console.error('Error loading categories', error);
+        this.notificationService.showError('Failed to load categories');
+      }
+    });
+  }
   loadProducts(): void {
     this.isLoading = true;
     this.loadingService.show();
     
-    const queryParams: ProductQueryParams = {
-      pageSize: this.pageSize,
-      pageNumber: this.currentPage,
-      searchTerm: this.searchTerm,
+    // Create filter object for the service method
+    const filter = {
+      searchTerm: this.searchTerm || undefined,
       categoryId: this.categoryFilter ? parseInt(this.categoryFilter) : undefined,
       sortBy: this.sortField,
       sortDirection: this.sortDirection,
-      approvalStatus: this.statusFilter as 'pending' | 'approved' | 'rejected' | 'deleted' | 'pending_review'
+      approvalStatus: this.statusFilter || undefined,
+      _: new Date().getTime() 
     };
-
-    this.productsService.getProducts(queryParams).subscribe({
+  
+    this.adminService.getProducts(this.currentPage - 1, this.pageSize, filter).subscribe({
+      
       next: (response) => {
-        this.products = response.products;
-        this.totalItems = response.totalItems;
+        this.products = response.data.products;
+        this.totalItems = response.data.totalItems;
         this.isLoading = false;
         this.loadingService.hide();
       },
@@ -82,12 +102,14 @@ export class AdminProductsComponent implements OnInit {
       }
     });
   }
-
   onSearch(): void {
     this.currentPage = 1;
     this.loadProducts();
   }
-
+  onPageSizeChange(): void {
+    this.currentPage = 1; 
+    this.loadProducts();
+  }
   onSort(field: string): void {
     if (this.sortField === field) {
       this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
@@ -95,7 +117,7 @@ export class AdminProductsComponent implements OnInit {
       this.sortField = field;
       this.sortDirection = 'asc';
     }
-    
+  
     this.loadProducts();
   }
 

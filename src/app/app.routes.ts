@@ -28,6 +28,10 @@ import { CategoryComponent } from '../pages/customer/category/category/category.
 import { OrdersComponent } from '../pages/seller/seller-orders/orders/orders.component';
 import { AdminSubcategoryFormComponent } from '../pages/admin/components/admin-subcategory-form/admin-subcategory-form.component';
 import { AdminSubcategoriesComponent } from '../pages/admin/components/admin-subcategories/admin-subcategories.component';
+import { AdminSellersFormComponent } from '../pages/admin/components/admin-sellers-form/admin-sellers-form.component';
+import { AdminCustomersFormComponent } from '../pages/admin/components/admin-customers-form/admin-customers-form.component';
+import { AdminProductAttributesComponent } from '../pages/admin/components/admin-product-attributes/admin-product-attributes.component';
+import { AdminProductAttributeFormComponent } from '../pages/admin/components/admin-product-attribute-form/admin-product-attribute-form.component';
 import { SellerProductFormComponent } from '../pages/seller/seller-productEdit/seller-product-form/seller-product-form.component';
 import { ManageproductsComponent } from '../pages/seller/seller-manageproducts/manageproducts/manageproducts.component';
 
@@ -86,6 +90,9 @@ export const routes: Routes = [
       { path: 'products', component: AdminProductsComponent },
       { path: 'products/add', component: AdminProductFormComponent },
       { path: 'products/edit/:id', component: AdminProductFormComponent },
+      { path: 'product-attributes', component: AdminProductAttributesComponent },
+      { path: 'product-attributes/add', component: AdminProductAttributeFormComponent },
+      { path: 'product-attributes/edit/:id', component: AdminProductAttributeFormComponent },
       { path: 'categories', component: AdminCategoriesComponent },
       { path: 'categories/add', component: AdminCategoryFormComponent },
       { path: 'categories/edit/:id', component: AdminCategoryFormComponent },
@@ -95,8 +102,12 @@ export const routes: Routes = [
       { path: 'orders', component: AdminOrdersComponent },
       { path: 'orders/:id', component: AdminOrderDetailsComponent },
       { path: 'customers', component: AdminCustomersComponent },
+      { path: 'customers/add', component: AdminCustomersFormComponent },
+      { path: 'customers/edit/:id', component: AdminCustomersFormComponent },
       { path: 'customers/:id', component: AdminCustomerDetailsComponent },
       { path: 'sellers', component: AdminSellersComponent },
+      { path: 'sellers/add', component: AdminSellersFormComponent },
+      { path: 'sellers/edit/:id', component: AdminSellersFormComponent },
       { path: 'sellers/:id', component: AdminSellerDetailsComponent },
       { path: 'reviews', component: AdminReviewsComponent },
       { path: 'settings', component: AdminSettingsComponent },
@@ -112,6 +123,8 @@ export const routes: Routes = [
     {
       path: 'checkout',
       component: CheckoutComponent,
+      canActivate: [roleGuard],
+      data: { role: 'customer' },
     },
 
   // Utility routes

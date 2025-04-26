@@ -62,6 +62,11 @@
     align-items: center;
     font-size: 12px;
     color: #555;
+    cursor: pointer;
+  }
+  .sell-on-jumia:hover {
+    text-decoration: underline;
+    color: #f68b1e;
   }
   
   .jumia-pay {
@@ -356,4 +361,110 @@
     position: absolute;
     top: -5px;
     right: -5px;
+  }
+
+
+  @media (max-width: 1024px) {
+    .header-container {
+      padding: 0 10px;
+    }
+    
+    .search-box {
+      margin: 0 10px;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .flash-sale {
+      padding: 0 10px;
+      height: auto;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 8px 10px;
+    }
+    
+    .flash-sale-text {
+      font-size: 20px;
+      order: -1;
+      width: 100%;
+      text-align: center;
+      margin-bottom: 5px;
+    }
+    
+    .call-to-order, .limited-time {
+      font-size: 14px;
+    }
+    
+    .secondary-top-bar {
+      padding: 0 10px;
+    }
+    
+    .header-container {
+      flex-wrap: wrap;
+    }
+    
+    .logo {
+      order: 1;
+      margin-right: auto;
+    }
+    
+    .right-nav {
+      order: 2;
+    }
+    
+    .search-box {
+      order: 3;
+      width: 100%;
+      margin: 10px 0 0;
+      max-width: none;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .top-banner {
+      max-height: 110px;
+    }
+    
+    .flash-sale {
+      flex-direction: column;
+      align-items: center;
+      height: auto;
+      padding: 10px;
+    }
+    
+    .flash-sale-text, .call-to-order, .limited-time {
+      margin: 3px 0;
+    }
+    
+    .call-to-order, .limited-time {
+      font-size: 12px;
+    }
+    
+    .header-container {
+      padding: 5px;
+    }
+    
+    .logo img {
+      height: 25px;
+    }
+    
+    .account-button span, .help-button span, .cart-button span {
+      display: none;
+    }
+    
+    .nav-icon {
+      margin-right: 0;
+    }
+    
+    .arrow-down {
+      display: none;
+    }
+    
+    .account-section, .help-button, .cart-button {
+      margin-left: 12px;
+    }
+    
+    .account-dropdown {
+      right: -30px;
+    }
   }
