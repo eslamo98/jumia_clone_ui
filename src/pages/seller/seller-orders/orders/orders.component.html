@@ -1,53 +1,9 @@
+
 <!-- order-management.component.html -->
 <div class="d-flex">
   <!-- Sidebar Navigation -->
-  <div class="sidebar">
-    <div class="d-flex justify-content-center py-3">
-      <span class="logo">VC</span>
-    </div>
-    <ul class="nav flex-column">
-      <li class="nav-item">
-        <a class="nav-link active" href="#">
-          <i class="bi bi-clipboard-data fs-4"></i>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#">
-          <i class="bi bi-list-ul fs-4"></i>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#">
-          <i class="bi bi-tag fs-4"></i>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#">
-          <i class="bi bi-megaphone fs-4"></i>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#">
-          <i class="bi bi-bar-chart fs-4"></i>
-        </a>
-      </li>
-      <li class="nav-item mt-auto">
-        <a class="nav-link" href="#">
-          <i class="bi bi-shop fs-4"></i>
-        </a>
-      </li>
-      <li class="nav-item mb-3">
-        <a class="nav-link" href="#">
-          <div
-            class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center"
-            style="width: 30px; height: 30px"
-          >
-            M
-          </div>
-        </a>
-      </li>
-    </ul>
-  </div>
+  <app-sidebar [collapsed]="isCollapsed" (toggle)="toggleSidebar()" [class.show]="showSidebar"></app-sidebar>
+
 
   <!-- Main Content -->
   <div class="main-content">

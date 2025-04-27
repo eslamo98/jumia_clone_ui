@@ -23,6 +23,7 @@ import {
   Column,
 } from '../../../../models/order.model';
 import { OrderService } from '../../../../services/orders/order.service';
+import { SidebarComponent } from '../../seller-sidebar/sidebar/sidebar.component';
 
 @Component({
   selector: 'app-orders',
@@ -34,6 +35,7 @@ import { OrderService } from '../../../../services/orders/order.service';
     MatPaginatorModule,
     MatSortModule,
     NgbModule,
+    SidebarComponent
   ],
   providers: [DatePipe, DecimalPipe],
   templateUrl: './orders.component.html',
@@ -667,4 +669,9 @@ export class OrdersComponent implements OnInit {
     this.currentPage = page;
     this.loadOrders();
   }
+  isCollapsed = false;
+  showSidebar = false;
+toggleSidebarVisibility() {
+  this.showSidebar = !this.showSidebar;
+}
 }
