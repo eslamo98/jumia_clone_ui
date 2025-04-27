@@ -234,35 +234,37 @@ cancelSubOrder(subOrderId: number): void {
     doc.setFontSize(12);
     doc.text(`Date: ${new Date(this.order.createdAt).toLocaleString()}`, 14, 32);
     doc.text(`Customer ID: ${this.order.customerId}`, 14, 38);
-    doc.text(`Status: ${this.order.orderStatus}`, 14, 44);
-    doc.text(`Payment Status: ${this.order.paymentStatus}`, 14, 50);
+    doc.text(`Customer: ${this.order.customerName}`, 14, 44);
+    doc.text(`Address: ${this.order.address}`, 14, 50);
+    doc.text(`Status: ${this.order.orderStatus}`, 14, 56);
+    doc.text(`Payment Status: ${this.order.paymentStatus}`, 14, 62);
     
     // Add financial details
-    doc.text(`Subtotal: $${this.order.totalAmount.toFixed(2)}`, 14, 60);
-    doc.text(`Discount: $${this.order.discountAmount.toFixed(2)}`, 14, 66);
-    doc.text(`Shipping: $${this.order.shippingFee.toFixed(2)}`, 14, 72);
-    doc.text(`Tax: $${this.order.taxAmount.toFixed(2)}`, 14, 78);
-    doc.text(`Total: $${this.order.finalAmount.toFixed(2)}`, 14, 84);
+    doc.text(`Subtotal: $${this.order.totalAmount.toFixed(2)}`, 14, 68);
+    doc.text(`Discount: $${this.order.discountAmount.toFixed(2)}`, 14, 74);
+    doc.text(`Shipping: $${this.order.shippingFee.toFixed(2)}`, 14, 78);
+    doc.text(`Tax: $${this.order.taxAmount.toFixed(2)}`, 14, 84);
+    doc.text(`Total: $${this.order.finalAmount.toFixed(2)}`, 14, 90);
     
     // Add suborders
     doc.setFontSize(14);
-    doc.text('Suborders', 14, 94);
+    doc.text('Suborders', 14, 96);
     
-    let yPos = 100;
+    let yPos = 104;
     
     this.order.subOrders.forEach((subOrder: any, index: number) => {
       doc.setFontSize(12);
-      doc.text(`Suborder #${subOrder.suborderId} - Seller ID: ${subOrder.sellerId}`, 14, yPos);
+      doc.text(`Suborder #${subOrder.suborderId} - Seller: (${subOrder.sellerId}) ${subOrder.sellerName}`, 14, yPos);
       doc.text(`Status: ${subOrder.status}`, 14, yPos + 6);
       
       // Create table for order items
-      const tableColumn = ["Product ID", "Variant", "Quantity", "Price", "Total"];
+      const tableColumn = ["Product", "Variant", "Quantity", "Price", "Total"];
       const tableRows: any[] = [];
       
       subOrder.orderItems.forEach((item: any) => {
         const itemData = [
-          item.productId,
-          item.variantId || 'N/A',
+          `${item.productId}-${item.productName}` ,
+          item.variantId ?`${item.variantId}-${item.variantName}` : 'N/A',
           item.quantity,
           `$${item.priceAtPurchase.toFixed(2)}`,
           `$${item.totalPrice.toFixed(2)}`
@@ -302,9 +304,10 @@ cancelSubOrder(subOrderId: number): void {
     // Add suborder details
     doc.setFontSize(12);
     doc.text(`Order ID: ${subOrder.orderId}`, 14, 32);
-    doc.text(`Seller ID: ${subOrder.sellerId}`, 14, 38);
+    doc.text(`Seller: (${subOrder.sellerId}) ${subOrder.sellerName}`, 14, 38);
     doc.text(`Status: ${subOrder.status}`, 14, 44);
     doc.text(`Date: ${new Date(subOrder.statusUpdatedAt).toLocaleString()}`, 14, 50);
+    doc.text(`Customer: (${this.order.customerId}) ${this.order.customerName}`, 14, 56);
     
     if (subOrder.trackingNumber) {
       doc.text(`Tracking: ${subOrder.trackingNumber} (${subOrder.shippingProvider})`, 14, 56);
@@ -313,13 +316,13 @@ cancelSubOrder(subOrderId: number): void {
     doc.text(`Subtotal: $${subOrder.subtotal.toFixed(2)}`, 14, 66);
     
     // Create table for order items
-    const tableColumn = ["Product ID", "Variant", "Quantity", "Price", "Total"];
+    const tableColumn = ["Product", "Variant", "Quantity", "Price", "Total"];
     const tableRows: any[] = [];
     
     subOrder.orderItems.forEach((item: any) => {
       const itemData = [
-        item.productId,
-        item.variantId || 'N/A',
+        `${item.productId}-${item.productName}` ,
+        item.variantId ?`${item.variantId}-${item.variantName}` : 'N/A',
         item.quantity,
         `$${item.priceAtPurchase.toFixed(2)}`,
         `$${item.totalPrice.toFixed(2)}`

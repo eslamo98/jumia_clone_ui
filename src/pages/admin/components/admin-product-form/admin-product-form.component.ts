@@ -31,6 +31,7 @@ import { environment } from '../../../../environments/environment';
 })
 export class AdminProductFormComponent implements OnInit, OnDestroy {
   productForm: FormGroup;
+  approvalForm: FormGroup;
   categories: BasicCategoiesInfo[] = [];
   filteredCategories: BasicCategoiesInfo[] = [];
   subcategories: BasicSubCategoriesInfo[] = [];
@@ -60,7 +61,9 @@ export class AdminProductFormComponent implements OnInit, OnDestroy {
     private router: Router
   ) {
     this.productForm = this.createProductForm();
-
+    this.approvalForm = this.fb.group({
+      adminNotes: ['', Validators.required]
+    });
     // Setup search debounce for categories
     this.categorySearchSubject.pipe(
       debounceTime(300),
@@ -77,7 +80,50 @@ export class AdminProductFormComponent implements OnInit, OnDestroy {
       this.filterSellers(searchTerm);
     });
   }
+  onApprove(): void {
+    if (this.productId) {
+      const approvalData = {
+        approvalStatus: 'approved',
+        adminNotes: this.approvalForm.get('adminNotes')?.value || ''
+      };
+      
+      this.productsService.updateProductStatus(this.productId, approvalData).subscribe({
+        next: () => {
+          this.notificationService.showSuccess('Product approved successfully');
+          this.router.navigate(['/admin/products']);
+        },
+        error: (error) => {
+          console.error('Error approving product:', error);
+          this.notificationService.showError('Failed to approve product');
+        }
+      });
+    }
+  }
 
+  onReject(): void {
+    if (!this.approvalForm.valid) {
+      this.notificationService.showError('Please provide rejection reason');
+      return;
+    }
+
+    if (this.productId) {
+      const approvalData = {
+        approvalStatus: 'rejected',
+        adminNotes: this.approvalForm.get('adminNotes')?.value
+      };
+      
+      this.productsService.updateProductStatus(this.productId, approvalData).subscribe({
+        next: () => {
+          this.notificationService.showSuccess('Product rejected successfully');
+          this.router.navigate(['/admin/products']);
+        },
+        error: (error) => {
+          console.error('Error rejecting product:', error);
+          this.notificationService.showError('Failed to reject product');
+        }
+      });
+    }
+  }
   getFullImageUrl(imagePath: string | null | undefined): string {
     if (!imagePath) return 'assets/images/placeholder.jpg';
     return `${environment.apiUrl}/${imagePath}`;
