@@ -298,7 +298,7 @@ deleteCustomer(id: number): Observable<any> {
     );
   }
 
-// ... existing code ...
+
 //product attributes 
 getAllProductAttributes(pageNumber: number = 1, pageSize: number = 10, searchTerm: string = ''): Observable<any> {
   let params = new HttpParams()
@@ -326,7 +326,45 @@ createProductAttribute(attributeData: any): Observable<any> {
 updateProductAttribute(id: number, attributeData: any): Observable<any> {
   return this.http.put<any>(`${this.apiUrl}/api/ProductAttributes/attribute/${id}`, attributeData);
 }
-// Add these methods to your AdminService class
+getUserById(id: number): Observable<any> {
+  return this.http.get<ApiResponse<any>>(`${this.apiUrl}/api/users/${id}`)
+    .pipe(
+      map(response => response.data)
+    );
+}
+
+changePassword(id: number, changePasswordDto: { currentPassword: string; newPassword: string }): Observable<any> {
+  return this.http.put<ApiResponse<any>>(`${this.apiUrl}/api/users/${id}/change-password`, changePasswordDto)
+    .pipe(
+      map(response => response),
+      catchError(error => {
+        console.error('Error changing password:', error);
+        return throwError(() => new Error('Failed to change password. Please try again.'));
+      })
+    );
+}
+
+updateUserStatus(id: number, isActive: boolean): Observable<any> {
+  return this.http.patch<ApiResponse<any>>(`${this.apiUrl}/api/users/${id}/status`, { isActive })
+    .pipe(
+      map(response => response),
+      catchError(error => {
+        console.error('Error updating user status:', error);
+        return throwError(() => new Error('Failed to update user status. Please try again.'));
+      })
+    );
+}
+
+deleteUser(id: number): Observable<any> {
+  return this.http.delete<ApiResponse<any>>(`${this.apiUrl}/api/users/${id}`)
+    .pipe(
+      map(response => response),
+      catchError(error => {
+        console.error('Error deleting user:', error);
+        return throwError(() => new Error('Failed to delete user. Please try again.'));
+      })
+    );
+}
 
 // Get all orders with pagination and filters
 getOrders(params: any): Observable<ApiResponse<any>> {

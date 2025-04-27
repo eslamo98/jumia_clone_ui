@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { CheckoutService } from '../../../services/CheckoutService/CheckoutService';
 import { NotificationService } from '../../../services/shared/notification.service';
-
+import { PaymentModalComponent } from '../payment-modal/payment-modal.component';
+import { PaymentResponse } from '../../../models/checkout';
 @Component({
   selector: 'app-order-summary',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, PaymentModalComponent],
   templateUrl: './order-summary.component.html',
   styleUrls: ['../checkout/checkout.component.css']
 })
@@ -18,6 +19,10 @@ export class OrderSummaryComponent {
   @Input() addressId: number = 0;
   @Input() paymentMethod: string = '';
   @Output() orderConfirmed = new EventEmitter<void>();
+
+  showPaymentModal = false;
+  paymentResponse!: PaymentResponse;
+  isProcessing = false;
 
   constructor(
     private ordersService: CheckoutService,
@@ -45,21 +50,46 @@ export class OrderSummaryComponent {
       return;
     }
 
-    this.ordersService.completeOrder(this.addressId, undefined, this.paymentMethod)
+    this.isProcessing = true;
+
+    this.ordersService.completeOrderWithPayment(this.addressId, undefined, this.paymentMethod)
       .subscribe({
         next: (response) => {
-          if (response.success) {
-            this.notificationService.showSuccess('Order placed successfully!');
-            this.orderConfirmed.emit();
-            this.router.navigate(['/order-confirmation']);
+          this.isProcessing = false;
+          
+          if (response.orderResponse.success) {
+            if (response.paymentResponse && response.paymentResponse.success) {
+              this.paymentResponse = response.paymentResponse;
+              this.showPaymentModal = true;
+            } else {
+              this.notificationService.showError('Payment initiation failed');
+            }
           } else {
-            this.notificationService.showError(response.message || 'Failed to place order');
+            this.notificationService.showError(response.orderResponse.message || 'Failed to place order');
           }
         },
         error: (error) => {
+          this.isProcessing = false;
           console.error('Error placing order:', error);
           this.notificationService.showError(error.message || 'Failed to place order');
         }
       });
+  }
+
+  onPaymentComplete(success: boolean) {
+    this.showPaymentModal = false;
+    
+    if (success) {
+      this.notificationService.showSuccess('Payment completed successfully!');
+      this.orderConfirmed.emit();
+      this.router.navigate(['/order-confirmation']);
+    } else {
+      this.notificationService.showError('Payment failed. Please try again.');
+    }
+  }
+
+  closePaymentModal() {
+    this.showPaymentModal = false;
+    this.notificationService.showWarning('Payment was cancelled');
   }
 }

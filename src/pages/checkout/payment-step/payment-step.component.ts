@@ -15,10 +15,16 @@ export class PaymentStepComponent {
   @Input() isDeliveryConfirmed: boolean = false;
   @Output() nextStep = new EventEmitter<string>();
 
-  selectedPaymentMethod: string = 'CreditCard';
+  selectedPaymentMethod: string = '';
   isStepCompleted: boolean = false;
+
+  paymentMethods = [
+    { id: 'card', name: 'Credit Card', icon: 'fa-credit-card' },
+    { id: 'vodafone', name: 'Vodafone Wallet', icon: 'fa-mobile-alt' },
+    { id: 'paypal', name: 'PayPal', icon: 'fa-paypal' }
+  ];
+
   onPaymentMethodChange() {
-    // Reset completion if editing
     if (this.isStepCompleted) {
       this.isStepCompleted = false;
     }
@@ -34,5 +40,9 @@ export class PaymentStepComponent {
   editPayment() {
     this.isEditingPayment = true;
     this.isStepCompleted = false;
+  }
+
+  getSelectedPaymentMethod() {
+    return this.paymentMethods.find(m => m.id === this.selectedPaymentMethod);
   }
 }
