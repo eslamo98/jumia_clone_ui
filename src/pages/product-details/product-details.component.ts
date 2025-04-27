@@ -8,14 +8,14 @@ import { NotificationService } from '../../services/shared/notification.service'
 import { environment } from '../../environments/environment';
 import { ProductService } from '../../services/products/product.service';
 import { AuthService } from '../../services/auth/auth.service';
-import { Router } from '@angular/router';
+import { Router , RouterModule } from '@angular/router';
 import { KeepShoppingComponent } from "../public/home-page/homeComponents/keepShoppingContainer/keep-shopping/keep-shopping.component";
 import { UpArrowComponent } from "../public/home-page/homeComponents/upArrow/up-arrow/up-arrow.component";
 
 @Component({
   selector: 'app-product-details',
   standalone: true,
-  imports: [CommonModule, FormsModule, KeepShoppingComponent, UpArrowComponent],
+  imports: [CommonModule, FormsModule, KeepShoppingComponent, UpArrowComponent ,RouterModule],
   templateUrl: './product-details.component.html',
   styleUrls: ['./product-details.component.css']
 })
@@ -26,21 +26,47 @@ export class ProductDetailsComponent implements OnInit {
   selectedVariant: ProductVariant | null = null;
   selectedImage: string = '';
   quantity: number = 1;
-  activeTab: string = 'details';
+  activeTab: string = 'reviews';
   isFollowing: boolean = false;
   selectedLocation: number = 1;
   freeDeliveryThreshold: number = 500;
   showToast: boolean = false;
   private addingToCart = false;
-  
-  deliveryLocations = [
-    { id: 1, name: 'Al Beheira' },
-    { id: 2, name: 'Damanhour' }
-  ];
 
+  
+
+     deliveryLocations = [
+      { id: 1, name: 'Select a Governorate' }, // General option appears first
+      { id: 0, name: 'Al Beheira' },
+      { id: 2, name: 'Alexandria' },
+      { id: 3, name: 'Aswan' },
+      { id: 4, name: 'Asyut' },
+      { id: 5, name: 'Beni Suef' },
+      { id: 6, name: 'Cairo' },
+      { id: 7, name: 'Dakahlia' },
+      { id: 8, name: 'Damietta' },
+      { id: 9, name: 'Faiyum' },
+      { id: 10, name: 'Gharbia' },
+      { id: 11, name: 'Giza' },
+      { id: 12, name: 'Ismailia' },
+      { id: 13, name: 'Kafr El Sheikh' },
+      { id: 14, name: 'Luxor' },
+      { id: 15, name: 'Matrouh' },
+      { id: 16, name: 'Minya' },
+      { id: 17, name: 'Monufia' },
+      { id: 18, name: 'New Valley' },
+      { id: 19, name: 'North Sinai' },
+      { id: 20, name: 'Port Said' },
+      { id: 21, name: 'Qalyubia' },
+      { id: 22, name: 'Qena' },
+      { id: 23, name: 'Red Sea' },
+      { id: 24, name: 'Sharqia' },
+      { id: 25, name: 'Sohag' },
+      { id: 26, name: 'South Sinai' }
+    ];
   deliveryOptions = [
-    { type: 'Pickup Station', fee: 10, leadDays: 2 },
-    { type: 'Door Delivery', fee: 30, leadDays: 2 }
+    { type: 'Pickup Station', fee: 45, leadDays: 2 },
+    { type: 'Door Delivery', fee: 70, leadDays: 3 }
   ];
 
   returnPolicy: string = '30 days return policy';
@@ -54,6 +80,8 @@ export class ProductDetailsComponent implements OnInit {
     { reviewer: 'Eve', rating: 1, comment: 'Very disappointed.' }
   ];
 
+
+  
   constructor(
     private route: ActivatedRoute,
     private productService: ProductService,
@@ -73,6 +101,7 @@ export class ProductDetailsComponent implements OnInit {
       this.errorMessage = 'Invalid product ID';
       this.isLoading = false;
       return;
+
     }
   
     this.productService.getProductById(id, true).subscribe({
@@ -180,8 +209,17 @@ export class ProductDetailsComponent implements OnInit {
    isAddedToCart: boolean = false;
 
   // public addToCart(): void {
-  //   // Check if the product is available and the quantity is greater than 0
-  //   if (!this.product || this.quantity < 1) return;
+  //   // Prevent multiple clicks
+  //   if (this.addingToCart) {
+  //     return;
+  //   }
+  
+  //   // Check if product is available
+  //   const currentStock = this.selectedVariant?.stockQuantity || this.product.stockQuantity;
+  //   if (!this.product || currentStock < 1 || this.quantity < 1) {
+  //     this.notificationService.showWarning('This product is currently unavailable or out of stock');
+  //     return;
+  //   }
   
   //   // Check authentication first
   //   if (!this.authService.isAuthenticated()) {
@@ -194,81 +232,112 @@ export class ProductDetailsComponent implements OnInit {
   //     return;
   //   }
   
-  //   // Mark the product as added
-  //   this.isAddedToCart = true;
+  //   // Set loading state
+  //   this.addingToCart = true;
   
   //   // Get the productId and variantId
   //   const productId = this.product.productId;
   //   const variantId = this.selectedVariant?.variantId;
   
-  //   // Call the service to add the item to the cart
-  //   this.cartService.addItemToCart(productId, this.quantity, variantId).subscribe({
-  //     next: (response) => {
-  //       if (response.success) {
-  //         this.notificationService.showSuccess('Item added to cart successfully');
-  //         console.log('Item added to cart:', response.data);
-  //       } else {
-  //         this.notificationService.showError(response.message || 'Failed to add item to cart');
-  //         console.error('Failed to add item to cart:', response.message);
+  //   // First check if item already exists in cart
+  //   this.cartService.checkItemInCart(productId, variantId).subscribe({
+  //     next: (exists) => {
+  //       if (exists) {
+  //         this.notificationService.showInfo('This item is already in your cart', 'Already in Cart');
+  //         this.addingToCart = false;
+  //         return;
   //       }
+  
+  //       // If not in cart, proceed to add it
+  //       this.cartService.addItemToCart(productId, this.quantity, variantId).subscribe({
+  //         next: (response) => {
+  //           if (response.success) {
+  //             this.isAddedToCart = true;
+  //             this.notificationService.showSuccess('Item added to cart successfully');
+  //             this.showToast = true;
+  //             setTimeout(() => {
+  //               this.showToast = false;
+  //             }, 3000);
+  //           } else {
+  //             this.notificationService.showError(response.message || 'Failed to add item to cart');
+  //           }
+  //           this.addingToCart = false;
+  //         },
+  //         error: (err) => {
+  //           let errorMessage = 'Failed to add item to cart. Please try again later.';
+  //           const currentUrl = this.router.url;
+  
+  //           if (err.status === 401) {
+  //             errorMessage = 'Please log in first to add items to your cart';
+  //             this.router.navigate(['auth/login'], {
+  //               queryParams: { returnUrl: currentUrl },
+  //               state: { errorMessage: errorMessage }
+  //             });
+  //           } else if (err.status === 404) {
+  //             errorMessage = 'Product not found or has been removed';
+  //           } else if (err.status === 409) {
+  //             errorMessage = 'This item is already in your shopping cart';
+  //           } else if (err.status === 429) {
+  //             errorMessage = 'Too many requests. Please wait before trying again';
+  //           } else if (err.message?.includes('network error')) {
+  //             errorMessage = 'Network connection issue. Please check your internet connection';
+  //           }
+  
+  //           if (err.error?.outOfStock) {
+  //             errorMessage = 'This product is currently out of stock';
+  //           }
+  
+  //           if (err.error?.invalidQuantity) {
+  //             errorMessage = 'The requested quantity is not available';
+  //           }
+  
+  //           this.notificationService.showError(errorMessage);
+  //           console.error('Error adding item to cart:', {
+  //             errorMessage: err.message,
+  //             statusCode: err.status,
+  //             timestamp: new Date().toISOString(),
+  //             errorDetails: err.error
+  //           });
+  //           this.addingToCart = false;
+  //         }
+  //       });
   //     },
   //     error: (err) => {
-  //       let errorMessage = 'Failed to add item to cart. Please try again later.';
-  //       const currentUrl = this.router.url;
+  //       this.notificationService.showError('Could not verify cart status. Please try again.');
+  //       this.addingToCart = false;
+  //     }
+  //   });
 
-  //       // Handle specific error cases
-  //       if (err.status === 401) {
-  //         errorMessage = 'Please log in first to add items to your cart';
-  //         this.router.navigate(['auth/login'], {
-  //           queryParams: { returnUrl: currentUrl },
-  //           state: { errorMessage: errorMessage }
-  //         });
-  //         } else if (err.status === 404) {
-  //         errorMessage = 'Product not found or has been removed';
-  //       } else if (err.status === 409) {
-  //         errorMessage = 'This item is already in your shopping cart';
-  //       } else if (err.status === 429) {
-  //         errorMessage = 'Too many requests. Please wait before trying again';
-  //       } else if (err.message.includes('network error')) {
-  //         errorMessage = 'Network connection issue. Please check your internet connection';
-  //       }
-      
-  //       // Handle additional business logic errors
-  //       if (err.error?.outOfStock) {
-  //         errorMessage = 'This product is currently out of stock';
-  //       }
-      
-  //       if (err.error?.invalidQuantity) {
-  //         errorMessage = 'The requested quantity is not available';
-  //       }
-      
-  //       // Show error notification
-  //       this.notificationService.showError(errorMessage);
-        
-  //       // Detailed error logging
-  //       console.error('Error adding item to cart:', {
-  //         errorMessage: err.message,
-  //         statusCode: err.status,
-  //         requestURL: err.config?.url,
-  //         timestamp: new Date().toISOString(),
-  //         errorDetails: err.error
-  //       });}
-  //     });
-   
+
+    //  *****************************************************
+
+
   public addToCart(): void {
     // Prevent multiple clicks
     if (this.addingToCart) {
       return;
     }
-  
-    // Check if product is available
-    const currentStock = this.selectedVariant?.stockQuantity || this.product.stockQuantity;
-    if (!this.product || currentStock < 1 || this.quantity < 1) {
-      this.notificationService.showWarning('This product is currently unavailable or out of stock');
+    
+    // Check if product exists
+    if (!this.product) {
+      this.notificationService.showWarning('Product not available');
       return;
     }
-  
-    // Check authentication first
+    
+    // Check quantity validity first (faster check)
+    if (this.quantity < 1) {
+      this.notificationService.showWarning('Please select a valid quantity');
+      return;
+    }
+    
+    // Check available stock
+    const currentStock = this.selectedVariant?.stockQuantity || this.product.stockQuantity;
+    if (currentStock < 1) {
+      this.notificationService.showWarning('This product is currently out of stock');
+      return;
+    }
+    
+    // Check authentication
     if (!this.authService.isAuthenticated()) {
       this.notificationService.showError('You must be logged in to add items to your cart');
       const currentUrl = this.router.url;
@@ -279,10 +348,10 @@ export class ProductDetailsComponent implements OnInit {
       return;
     }
   
-    // Set loading state
+    // Set loading state before starting async operations
     this.addingToCart = true;
   
-    // Get the productId and variantId
+    // Prepare data
     const productId = this.product.productId;
     const variantId = this.selectedVariant?.variantId;
   
@@ -354,9 +423,8 @@ export class ProductDetailsComponent implements OnInit {
         this.addingToCart = false;
       }
     });
-  
 
-  
+
     // Show the toast notification
     this.showToast = true;
 
