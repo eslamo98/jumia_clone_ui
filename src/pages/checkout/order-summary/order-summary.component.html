@@ -1,18 +1,39 @@
 <div class="order-summary">
   <h3>Order Summary</h3>
-  <div class="order-items">
-    <p>Items Total: <span>EGP {{ itemsTotal.toFixed(2) }}</span></p>
-    <p *ngIf="selectedDeliveryOption">
-      Delivery Fee ({{ selectedDeliveryOption }}): 
-      <span>EGP {{ deliveryFee.toFixed(2) }}</span>
-    </p>
-    <div class="total-section">
-      <p class="total">Total: <span>EGP {{ total.toFixed(2) }}</span></p>
-    </div>
+  
+  <div class="summary-item">
+    <span>Items Total</span>
+    <span>{{ itemsTotal | currency:'EGP':'symbol':'1.2-2' }}</span>
   </div>
-  <button class="confirm-btn" 
-          [disabled]="!selectedDeliveryOption"
-          (click)="confirmOrder()">
-    Confirm Order
+  
+  <div class="summary-item">
+    <span>Delivery Fee</span>
+    <span>{{ deliveryFee | currency:'EGP':'symbol':'1.2-2' }}</span>
+  </div>
+  
+  <div class="summary-item total">
+    <span>Total</span>
+    <span>{{ total | currency:'EGP':'symbol':'1.2-2' }}</span>
+  </div>
+  
+  <button 
+    class="btn btn-primary btn-block" 
+    [disabled]="isProcessing || !addressId || !selectedDeliveryOption || !paymentMethod"
+    (click)="confirmOrder()">
+    <span *ngIf="isProcessing">
+      <i class="fas fa-spinner fa-spin"></i> Processing...
+    </span>
+    <span *ngIf="!isProcessing">
+      Confirm Order & Pay
+    </span>
   </button>
 </div>
+
+<!-- Payment Modal -->
+<app-payment-modal 
+  *ngIf="showPaymentModal && paymentResponse" 
+  [paymentResponse]="paymentResponse"
+  [paymentMethod]="paymentMethod"
+  (paymentComplete)="onPaymentComplete($event)"
+  (closeModal)="closePaymentModal()">
+</app-payment-modal>

@@ -1,6 +1,6 @@
 // shared/footer/footer.component.ts
 import { Component , OnInit } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { RouterModule , Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -16,14 +16,14 @@ export class FooterComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  // يمكنك إضافة أي منطق إضافي هنا إذا لزم الأمر
+ 
   subscribeToNewsletter(email: string): void {
-    // هنا يمكنك إضافة منطق الاشتراك في النشرة الإخبارية
+  
     console.log('Email subscribed:', email);
   }
 
   acceptTerms(event: any): void {
-    // منطق قبول الشروط
+  
     console.log('Terms accepted:', event.target.checked);
   }
 }

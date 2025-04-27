@@ -14,6 +14,7 @@ import { NotificationService } from '../../../../services/shared/notification.se
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { DynamicAttributeInputComponent } from '../../../../shared/dynamic-attribute-input/dynamic-attribute-input.component';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-admin-product-form',
@@ -30,6 +31,7 @@ import { DynamicAttributeInputComponent } from '../../../../shared/dynamic-attri
 })
 export class AdminProductFormComponent implements OnInit, OnDestroy {
   productForm: FormGroup;
+  approvalForm: FormGroup;
   categories: BasicCategoiesInfo[] = [];
   filteredCategories: BasicCategoiesInfo[] = [];
   subcategories: BasicSubCategoriesInfo[] = [];
@@ -59,7 +61,9 @@ export class AdminProductFormComponent implements OnInit, OnDestroy {
     private router: Router
   ) {
     this.productForm = this.createProductForm();
-
+    this.approvalForm = this.fb.group({
+      adminNotes: ['', Validators.required]
+    });
     // Setup search debounce for categories
     this.categorySearchSubject.pipe(
       debounceTime(300),
@@ -76,16 +80,81 @@ export class AdminProductFormComponent implements OnInit, OnDestroy {
       this.filterSellers(searchTerm);
     });
   }
+  onApprove(): void {
+    if (this.productId) {
+      const approvalData = {
+        approvalStatus: 'approved',
+        adminNotes: this.approvalForm.get('adminNotes')?.value || ''
+      };
+      
+      this.productsService.updateProductStatus(this.productId, approvalData).subscribe({
+        next: () => {
+          this.notificationService.showSuccess('Product approved successfully');
+          this.router.navigate(['/admin/products']);
+        },
+        error: (error) => {
+          console.error('Error approving product:', error);
+          this.notificationService.showError('Failed to approve product');
+        }
+      });
+    }
+  }
 
+  onReject(): void {
+    if (!this.approvalForm.valid) {
+      this.notificationService.showError('Please provide rejection reason');
+      return;
+    }
+
+    if (this.productId) {
+      const approvalData = {
+        approvalStatus: 'rejected',
+        adminNotes: this.approvalForm.get('adminNotes')?.value
+      };
+      
+      this.productsService.updateProductStatus(this.productId, approvalData).subscribe({
+        next: () => {
+          this.notificationService.showSuccess('Product rejected successfully');
+          this.router.navigate(['/admin/products']);
+        },
+        error: (error) => {
+          console.error('Error rejecting product:', error);
+          this.notificationService.showError('Failed to reject product');
+        }
+      });
+    }
+  }
+  getFullImageUrl(imagePath: string | null | undefined): string {
+    if (!imagePath) return 'assets/images/placeholder.jpg';
+    return `${environment.apiUrl}/${imagePath}`;
+  }
+  
+  
   ngOnInit(): void {
     this.loadCategories();
     this.loadSellers();
 
+    // Check if we're in edit mode first
+    this.route.params.subscribe(params => {
+      if (params['id']) {
+        this.productId = parseInt(params['id'], 10);
+        this.isEditMode = true;
+        this.loadProduct(this.productId);
+      }
+    });
+
+    // Setup subscriptions after checking edit mode
+    this.setupFormSubscriptions();
+  }
+
+  private setupFormSubscriptions(): void {
     // Watch for category changes to load subcategories
     this.productForm.get('categoryId')?.valueChanges.subscribe((categoryId: number) => {
       const subcategoryControl = this.productForm.get('subcategoryId');
       if (categoryId) {
-        this.loadSubcategories(categoryId);
+        if (!this.isEditMode) {  // Only load subcategories if not in edit mode
+          this.loadSubcategories(categoryId);
+        }
         subcategoryControl?.enable();
       } else {
         this.subcategories = [];
@@ -95,34 +164,24 @@ export class AdminProductFormComponent implements OnInit, OnDestroy {
 
     // Watch for subcategory changes to load attributes
     this.productForm.get('subcategoryId')?.valueChanges.subscribe((subcategoryId: number) => {
-      if (subcategoryId) {
+      if (subcategoryId && !this.isEditMode) {  // Only load attributes if not in edit mode
         this.loadSubcategoryAttributes(subcategoryId);
-      } else {
+      } else if (!subcategoryId) {
         this.subcategoryAttributes = [];
         this.clearAttributeValues();
       }
     });
 
-    // Watch for hasVariants changes to handle variant validation
+    // Watch for hasVariants changes
     this.productForm.get('hasVariants')?.valueChanges.subscribe((hasVariants: boolean) => {
       if (hasVariants) {
-        this.addVariant(); // Add at least one variant when enabled
+        this.addVariant();
       } else {
         (this.productForm.get('variants') as FormArray).clear();
       }
       this.updateVariantValidation(hasVariants);
     });
-    
-    // Check if we're in edit mode
-    this.route.params.subscribe(params => {
-      if (params['id']) {
-        this.productId = parseInt(params['id'], 10);
-        this.isEditMode = true;
-        this.loadProduct(this.productId);
-      }
-    });
   }
-
   createProductForm(): FormGroup {
     return this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3)]],
@@ -130,7 +189,7 @@ export class AdminProductFormComponent implements OnInit, OnDestroy {
       basePrice: [0, [Validators.required, Validators.min(0)]],
       discountPercentage: [0, [Validators.min(0), Validators.max(100)]],
       stockQuantity: [0, [Validators.required, Validators.min(0)]],
-      mainImageFile: [null, Validators.required],
+      mainImageFile: [null],
       categoryId: ['', Validators.required],
       subcategoryId: [{value: '', disabled: true}, Validators.required],
       sellerId: ['', Validators.required],
@@ -144,6 +203,7 @@ export class AdminProductFormComponent implements OnInit, OnDestroy {
 
   createVariantFormGroup(): FormGroup {
     return this.fb.group({
+      variantId: [null],
       variantName: ['', Validators.required],
       price: [0, [Validators.required, Validators.min(0)]],
       discountPercentage: [0, [Validators.min(0), Validators.max(100)]],
@@ -151,11 +211,12 @@ export class AdminProductFormComponent implements OnInit, OnDestroy {
       sku: ['', Validators.required],
       variantImageFile: [null],
       variantImageBase64: [''],
+      variantImageUrl: [''], 
       isDefault: [false],
       isAvailable: [true],
       attributeValues: this.fb.array([])
     });
-  }
+}
   onAdditionalImageSelected(event: Event, index: number): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
@@ -292,64 +353,214 @@ export class AdminProductFormComponent implements OnInit, OnDestroy {
       }
     });
   }
+  getVariantAttributeValue(variantIndex: number, attributeIndex: number, field: string): any {
+    const variant = this.getVariantFormGroup(variantIndex);
+    const attributeValues = variant.get('attributeValues') as FormArray;
+    const attribute = attributeValues.at(attributeIndex) as FormGroup;
+    return attribute.get(field)?.value;
+  }
+  
 
-  loadProduct(id: number): void {
+  loadProduct(productId: number): void {
     this.isLoading = true;
-    this.loadingService.show();
-    
-    this.productsService.getProductById(id, true).subscribe({
-      next: (product) => {
-        if (product) {
-          const hasVariants = product.variants && product.variants.length > 0;
+    this.productsService.getProductById(productId, true).subscribe({
+      next: (response) => {
+        if (response && response.data) {
+          const product = response.data;
           
-          // Patch main product data
+          // Enable the subcategory control before setting its value
+          this.productForm.get('subcategoryId')?.enable();
+          this.productForm.get('subcategoryId')?.setValue(product.subcategoryId);
+          // Set main form values
           this.productForm.patchValue({
             name: product.name,
             description: product.description,
             basePrice: product.basePrice,
             discountPercentage: product.discountPercentage,
             stockQuantity: product.stockQuantity,
-            mainImageFile: product.mainImageUrl,
             categoryId: product.categoryId,
+            subcategoryId: product.subcategoryId,
             sellerId: product.sellerId,
-            hasVariants: hasVariants,
-            isAvailable: product.isAvailable
+            isAvailable: product.isAvailable,
+            approvalStatus: product.approvalStatus,
+            hasVariants: product.variants && product.variants.length > 0
           });
-
-          // Load variants if they exist
-          if (hasVariants) {
-            this.variants.clear();
-            product.variants.forEach(variant => {
+          
+          // Set main image preview
+          if (product.mainImageUrl) {
+            this.imagePreview = this.getFullImageUrl(product.mainImageUrl);
+          }
+          
+          // Load subcategories for the selected category
+          this.loadSubcategories(product.categoryId);
+          
+          // Load additional images
+          if (product.images && product.images.length > 0) {
+            this.additionalImageInputs = [];
+            this.additionalImagePreviews = [];
+            
+            product.images.forEach((image: any) => {
+              this.additionalImageInputs.push({});
+              this.additionalImagePreviews.push(this.getFullImageUrl(image.imageUrl));
+              this.additionalImageFiles.push(null);
+            });
+          }
+          
+          // Load variants if any
+          if (product.variants && product.variants.length > 0) {
+            const variantsArray = this.productForm.get('variants') as FormArray;
+            variantsArray.clear();
+            
+            product.variants.forEach((variant: any) => {
               const variantGroup = this.createVariantFormGroup();
               variantGroup.patchValue({
+                variantId: variant.variantId,
                 variantName: variant.variantName,
                 price: variant.price,
                 discountPercentage: variant.discountPercentage,
                 stockQuantity: variant.stockQuantity,
                 sku: variant.sku,
-                variantImageUrl: variant.variantImageUrl,
                 isDefault: variant.isDefault,
                 isAvailable: variant.isAvailable
               });
-              this.variants.push(variantGroup);
+              
+              // Set variant image preview if available
+              if (variant.variantImageUrl) {
+                variantGroup.patchValue({
+                  variantImageBase64: this.getFullImageUrl(variant.variantImageUrl)
+                });
+              }
+              
+              // Load variant attributes
+              if (variant.attributes && variant.attributes.length > 0) {
+                const attributesArray = variantGroup.get('attributeValues') as FormArray;
+                attributesArray.clear();
+                
+                variant.attributes.forEach((attr: any) => {
+                  attributesArray.push(this.fb.group({
+                    attributeId: [attr.variantAttributeId],
+                    attributeName: [attr.attributeName],
+                    attributeType: ['text'], // Default to text if not specified
+                    value: [attr.attributeValue],
+                    options: [[]] // Default empty options
+                  }));
+                });
+              }
+              
+              variantsArray.push(variantGroup);
             });
+            
             this.updateVariantValidation(true);
           }
+          
+          // Load product attributes
+          if (product.attributeValues && product.attributeValues.length > 0) {
+            const attributesArray = this.productForm.get('attributeValues') as FormArray;
+            attributesArray.clear();
+            
+            product.attributeValues.forEach((attr: any) => {
+              attributesArray.push(this.fb.group({
+                attributeId: [attr.attributeId],
+                attributeName: [attr.attributeName],
+                attributeType: [attr.attributeType],
+                value: [attr.value],
+                options: [[]] // Default empty options
+              }));
+            });
+          }
         }
-        
         this.isLoading = false;
-        this.loadingService.hide();
       },
       error: (error) => {
-        console.error('Error loading product', error);
-        this.notificationService.showError('Failed to load product');
+        console.error('Error loading product:', error);
+        this.notificationService.showError('Failed to load product details');
         this.isLoading = false;
-        this.loadingService.hide();
-        this.router.navigate(['/admin/products']);
       }
     });
   }
+// Helper method to set up variants from product data
+private setupVariantsFromProduct(productVariants: any[]): void {
+  const variantsArray = this.productForm.get('variants') as FormArray;
+  variantsArray.clear();
+  
+  // Add each variant to the form
+  productVariants.forEach(variant => {
+    const variantGroup = this.createVariantFormGroup();
+    
+    // Set basic variant information
+    variantGroup.patchValue({
+      variantName: variant.variantName,
+      price: variant.price,
+      discountPercentage: variant.discountPercentage,
+      stockQuantity: variant.stockQuantity,
+      sku: variant.sku,
+      isDefault: variant.isDefault,
+      isAvailable: variant.isAvailable
+    });
+    
+    // Handle variant attributes
+    if (variant.attributes && variant.attributes.length > 0) { 
+      const attributeValues = variantGroup.get('attributeValues') as FormArray; 
+      attributeValues.clear(); 
+      
+      // Create form controls for each attribute 
+      variant.attributes.forEach((attr: any) => { 
+        const subcategoryAttr = this.subcategoryAttributes.find( 
+          a => a.attributeId === attr.variantAttributeId || a.name === attr.attributeName 
+        ) || { type: 'text', options: [] }; 
+        
+        const attributeGroup = this.fb.group({ 
+          attributeId: [attr.variantAttributeId], 
+          attributeName: [attr.attributeName], 
+          attributeType: [subcategoryAttr.type || 'text'], 
+          value: [attr.attributeValue], 
+          options: [subcategoryAttr.options || []] 
+        }); 
+        attributeValues.push(attributeGroup); 
+      }); 
+    }  else {
+      // If no attributes in variant, set up with subcategory attributes
+      this.setupVariantAttributes(variantGroup, this.subcategoryAttributes);
+    }
+    
+    variantsArray.push(variantGroup);
+  });
+}
 
+// Modify loadSubcategoryAttributes to accept a callback
+private loadSubcategoryAttributes(subcategoryId: number): void {
+  this.isLoading = true;
+  this.adminService.getSubcategoryAttributes(subcategoryId).subscribe({
+    next: (attributes) => {
+      this.subcategoryAttributes = attributes;
+      // Replace setupAttributeFormControls with setupProductAttributes
+      this.setupProductAttributes(attributes);
+      this.isLoading = false;
+    },
+    error: (error) => {
+      console.error('Error loading subcategory attributes:', error);
+      this.notificationService.showError('Failed to load subcategory attributes');
+      this.isLoading = false;
+    }
+  });
+}
+
+
+private setupProductAttributes(attributes: any[]): void {
+  const attributeValues = this.productForm.get('attributeValues') as FormArray;
+  attributeValues.clear();
+  
+  attributes.forEach(attr => {
+    const attributeGroup = this.fb.group({
+      attributeId: [attr.attributeId],
+      attributeName: [attr.name],
+      attributeType: [attr.type],
+      value: [''],
+      options: [attr.options || []]
+    });
+    attributeValues.push(attributeGroup);
+  });
+}
   onImageSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
@@ -382,32 +593,41 @@ export class AdminProductFormComponent implements OnInit, OnDestroy {
 }
 
 private formatVariants(): any[] {
-    const variants = this.variants.value;
-    if (!variants || variants.length === 0) {
-      return [];
-    }
-  
-    return variants.map((variant: any) => {
-      // Format variant attributes
-      const variantAttributes = variant.attributeValues
-        .filter((attr: any) => attr.value && attr.value.trim() !== '')
-        .map((attr: any) => ({
-          AttributeName: attr.attributeName,
-          AttributeValue: attr.value
-        }));
-  
-      return {
-        VariantName: variant.variantName,
-        Price: variant.price,
-        DiscountPercentage: variant.discountPercentage,
-        StockQuantity: variant.stockQuantity,
-        Sku: variant.sku,
-        IsDefault: variant.isDefault,
-        VariantImageBase64: variant.variantImageBase64,
-        VariantAttributes: variantAttributes
-      };
-    });
+  const variants = this.variants.value;
+  if (!variants || variants.length === 0) {
+    return [];
   }
+
+  return variants.map((variant: any) => {
+    // Format variant attributes
+    const variantAttributes = variant.attributeValues
+      .filter((attr: any) => attr.value && attr.value.trim() !== '')
+      .map((attr: any) => ({
+        AttributeId: attr.attributeId,
+        AttributeName: attr.attributeName,
+        AttributeValue: attr.value
+      }));
+
+    const formattedVariant: any = {
+      VariantId: variant.variantId,
+      VariantName: variant.variantName,
+      Price: variant.price,
+      DiscountPercentage: variant.discountPercentage,
+      StockQuantity: variant.stockQuantity,
+      Sku: variant.sku,
+      IsDefault: variant.isDefault,
+      IsAvailable: variant.isAvailable,
+      Attributes: variantAttributes
+    };
+
+    // Only include variant image if it's a new file (base64)
+    if (variant.variantImageFile) {
+      formattedVariant.VariantImageBase64 = variant.variantImageBase64;
+    }
+
+    return formattedVariant;
+  });
+}
   
   onMainImageSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -429,91 +649,93 @@ private formatVariants(): any[] {
   }
 
 
-onSubmit(): void {
-  if (this.productForm.invalid) {
-      // Check if the form is invalid only because of attributeValues
-      const formWithoutAttributes = { ...this.productForm.controls };
-      delete formWithoutAttributes['attributeValues'];
-      
-      const isOtherFieldsValid = Object.values(formWithoutAttributes).every(
-          control => !control.invalid
-      );
-      
-      if (!isOtherFieldsValid) {
-          this.markFormGroupTouched(this.productForm);
-          this.notificationService.showWarning('Please fix the form errors');
-          return;
-      }
-  }
-
-  if (this.productForm.get('hasVariants')?.value && !this.hasDefaultVariant()) {
-      this.notificationService.showWarning('Please select a default variant');
-      return;
-  }
+  onSubmit(): void {
+    if (this.productForm.invalid) {
+        // Check if the form is invalid only because of attributeValues
+        const formWithoutAttributes = { ...this.productForm.controls };
+        delete formWithoutAttributes['attributeValues'];
+        
+        const isOtherFieldsValid = Object.values(formWithoutAttributes).every(
+            control => !control.invalid
+        );
+        
+        if (!isOtherFieldsValid) {
+            this.markFormGroupTouched(this.productForm);
+            this.notificationService.showWarning('Please fix the form errors');
+            return;
+        }
+    }
   
-  this.isLoading = true;
-  this.loadingService.show();
+    if (this.productForm.get('hasVariants')?.value && !this.hasDefaultVariant()) {
+        this.notificationService.showWarning('Please select a default variant');
+        return;
+    }
+    
+    this.isLoading = true;
+    this.loadingService.show();
+    
+    const formData = new FormData();
+    const productData = this.prepareProductData();
+    
+    const attributeValuesForBackend = this.formatAttributeValues();
+    if (attributeValuesForBackend.length > 0) {
+        formData.append('ProductAttributeValuesJson', JSON.stringify(attributeValuesForBackend));
+    }
+    
+    if (productData.hasVariants && productData.variants && productData.variants.length > 0) {
+        const variantsForBackend = this.formatVariants();   
+        formData.append('ProductVariantsJson', JSON.stringify(variantsForBackend));
+    }
+    formData.append('Name', productData.name);
+    formData.append('Description', productData.description);
+    formData.append('BasePrice', productData.basePrice.toString());
+    if (productData.discountPercentage !== null && productData.discountPercentage !== undefined) {
+        formData.append('DiscountPercentage', productData.discountPercentage.toString());
+    }
+    formData.append('StockQuantity', productData.stockQuantity.toString());
+    formData.append('SubcategoryId', this.productForm.get('subcategoryId')?.value.toString());
+    formData.append('SellerId', productData.sellerId.toString());
+    formData.append('HasVariants', productData.hasVariants.toString());
+    formData.append('IsAvailable', productData.isAvailable.toString());
   
-  const formData = new FormData();
-  const productData = this.prepareProductData();
+    if (this.mainImageFile) {
+        formData.append('MainImageFile', this.mainImageFile);
+    }
+    
+    if (this.additionalImageFiles.length > 0) {
+        this.additionalImageFiles.forEach(file => {
+            if (file) {
+                formData.append('AdditionalImageFiles', file);
+            }
+        });
+    }
   
-  const attributeValuesForBackend = this.formatAttributeValues();
-  console.log(attributeValuesForBackend);
-  if (attributeValuesForBackend.length > 0) {
-      formData.append('ProductAttributeValuesJson', JSON.stringify(attributeValuesForBackend));
+    if(this.isEditMode) {
+      formData.append("productId", this.productId.toString());
+    }
+    // Make sure we're using the correct productId for updates
+    const request = this.isEditMode ? 
+        this.productsService.updateProduct(this.productId || 0, formData) :
+        this.productsService.createProduct(formData);
+    request.subscribe({
+        next: (response) => {
+            this.notificationService.showSuccess(
+                `Product ${this.isEditMode ? 'updated' : 'created'} successfully`
+            );
+            this.router.navigate(['/admin/products']);
+        },
+        error: (error) => {
+            console.error('Error saving product', error);
+            this.notificationService.showError(`Failed to ${this.isEditMode ? 'update' : 'create'} product`);
+            this.isLoading = false;
+            this.loadingService.hide();
+        },
+        complete: () => {
+            this.isLoading = false;
+            this.loadingService.hide();
+        }
+    });
   }
-  
-  if (productData.hasVariants && productData.variants && productData.variants.length > 0) {
-      const variantsForBackend = this.formatVariants();   
-      formData.append('ProductVariantsJson', JSON.stringify(variantsForBackend));
-  }
-  formData.append('Name', productData.name);
-  formData.append('Description', productData.description);
-  formData.append('BasePrice', productData.basePrice.toString());
-  if (productData.discountPercentage !== null && productData.discountPercentage !== undefined) {
-      formData.append('DiscountPercentage', productData.discountPercentage.toString());
-  }
-  formData.append('StockQuantity', productData.stockQuantity.toString());
-  formData.append('SubcategoryId', this.productForm.get('subcategoryId')?.value.toString());
-  formData.append('SellerId', productData.sellerId.toString());
-  formData.append('HasVariants', productData.hasVariants.toString());
-  formData.append('IsAvailable', productData.isAvailable.toString());
-
-  if (this.mainImageFile) {
-      formData.append('MainImageFile', this.mainImageFile);
-  }
-  
-  if (this.additionalImageFiles.length > 0) {
-      this.additionalImageFiles.forEach(file => {
-          if (file) {
-              formData.append('AdditionalImageFiles', file);
-          }
-      });
-  }
-
-  const request = this.isEditMode ? 
-      this.productsService.updateProduct(this.productId, formData) :
-      this.productsService.createProduct(formData);
-
-  request.subscribe({
-      next: () => {
-          this.notificationService.showSuccess(
-              `Product ${this.isEditMode ? 'updated' : 'created'} successfully`
-          );
-          this.router.navigate(['/admin/products']);
-      },
-      error: (error) => {
-          console.error('Error saving product', error);
-          this.notificationService.showError(`Failed to ${this.isEditMode ? 'update' : 'create'} product`);
-          this.isLoading = false;
-          this.loadingService.hide();
-      },
-      complete: () => {
-          this.isLoading = false;
-          this.loadingService.hide();
-      }
-  });
-}
   private prepareProductData(): ProductFormData {
     const formValue = this.productForm.value;
     return {
@@ -596,47 +818,40 @@ onSubmit(): void {
       }
     });
   }
+  getCategoryName(categoryId: number): string {
+    const category = this.categories.find(c => c.categoryId === categoryId);
+    return category ? category.name : '';
+  }
 
-  loadSubcategories(categoryId: number): void {
+  getSubcategoryName(subcategoryId: number): string {
+    const subcategory = this.subcategories.find(s => s.subcategoryId === subcategoryId);
+    return subcategory ? subcategory.name : '';
+  }
+  private loadSubcategories(categoryId: number): void {
     this.isLoading = true;
-    this.loadingService.show();
-    this.productForm.get('subcategoryId')?.setValue(''); // Reset subcategory when category changes
-    
     this.adminService.getBasicSubcategoriesByCategory(categoryId).subscribe({
       next: (subcategories) => {
         this.subcategories = subcategories;
         this.isLoading = false;
-        this.loadingService.hide();
       },
       error: (error) => {
         console.error('Error loading subcategories:', error);
         this.notificationService.showError('Failed to load subcategories');
         this.isLoading = false;
-        this.loadingService.hide();
       }
     });
   }
 
-  loadSubcategoryAttributes(subcategoryId: number): void {
-    this.isLoading = true;
-    this.loadingService.show();
+
+  private getAttributeOptions(attributeId: number): string[] {
+    if (!this.subcategoryAttributes || this.subcategoryAttributes.length === 0) {
+      return [];
+    }
     
-    this.adminService.getSubcategoryAttributes(subcategoryId).subscribe({
-      next: (attributes) => {
-        this.subcategoryAttributes = attributes;
-        this.setupAttributeValues(attributes);
-        this.updateVariantsAttributes();
-        this.isLoading = false;
-        this.loadingService.hide();
-      },
-      error: (error) => {
-        console.error('Error loading subcategory attributes:', error);
-        this.notificationService.showError('Failed to load attributes');
-        this.isLoading = false;
-        this.loadingService.hide();
-      }
-    });
+    const attribute = this.subcategoryAttributes.find(attr => attr.attributeId === attributeId);
+    return attribute && attribute.options ? attribute.options : [];
   }
+    
 
   private setupAttributeValues(attributes: any[]): void {
     const attributeValues = this.productForm.get('attributeValues') as FormArray;
@@ -713,24 +928,26 @@ onSubmit(): void {
     return control.get(field)?.value;
   }
 
+
+
   getVariantFormGroup(index: number): FormGroup {
     return this.variants.at(index) as FormGroup;
   }
-
+  
+  // Helper method to get variant attribute values as FormArray
   getVariantAttributeValues(variantIndex: number): FormArray {
     const variant = this.getVariantFormGroup(variantIndex);
     return variant.get('attributeValues') as FormArray;
   }
+  
 
+  
   getAttributeControl(variantIndex: number, attributeIndex: number): FormGroup {
     const attributeValues = this.getVariantAttributeValues(variantIndex);
     return attributeValues.at(attributeIndex) as FormGroup;
   }
 
-  getVariantAttributeValue(variantIndex: number, attributeIndex: number, field: string): any {
-    const control = this.getAttributeControl(variantIndex, attributeIndex);
-    return control.get(field)?.value;
-  }
+
 
   // Validation methods
   isFieldInvalid(fieldName: string): boolean {

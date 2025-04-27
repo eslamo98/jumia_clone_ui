@@ -26,29 +26,16 @@
 
     <!-- Payment Options -->
     <div class="payment-options" *ngIf="isDeliveryConfirmed && !isStepCompleted">
-      <div class="payment-option-card" 
-           [class.selected]="selectedPaymentMethod === 'credit-card'"
-           (click)="selectedPaymentMethod = 'credit-card'">
+      <div *ngFor="let method of paymentMethods" 
+           class="payment-option-card" 
+           [class.selected]="selectedPaymentMethod === method.id"
+           (click)="selectedPaymentMethod = method.id">
         <div class="option-header">
           <div class="option-title">
-            <i class="fas fa-credit-card"></i>
-            <span>Credit Card</span>
+            <i class="fas {{ method.icon }}"></i>
+            <span>{{ method.name }}</span>
           </div>
-          <div class="option-check" *ngIf="selectedPaymentMethod === 'credit-card'">
-            <i class="fas fa-check-circle text-success"></i>
-          </div>
-        </div>
-      </div>
-
-      <div class="payment-option-card" 
-           [class.selected]="selectedPaymentMethod === 'cash'"
-           (click)="selectedPaymentMethod = 'cash'">
-        <div class="option-header">
-          <div class="option-title">
-            <i class="fas fa-money-bill"></i>
-            <span>Cash on Delivery</span>
-          </div>
-          <div class="option-check" *ngIf="selectedPaymentMethod === 'cash'">
+          <div class="option-check" *ngIf="selectedPaymentMethod === method.id">
             <i class="fas fa-check-circle text-success"></i>
           </div>
         </div>
@@ -69,8 +56,8 @@
   <div class="step-summary" *ngIf="isStepCompleted && !isEditingPayment">
     <div class="selected-payment-summary">
       <div class="summary-content">
-        <i class="fas" [ngClass]="selectedPaymentMethod === 'credit-card' ? 'fa-credit-card' : 'fa-money-bill'"></i>
-        <span>{{ selectedPaymentMethod === 'credit-card' ? 'Credit Card' : 'Cash on Delivery' }}</span>
+        <i class="fas {{ getSelectedPaymentMethod()?.icon }}"></i>
+        <span>{{ getSelectedPaymentMethod()?.name }}</span>
       </div>
     </div>
   </div>

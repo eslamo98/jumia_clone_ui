@@ -72,10 +72,10 @@ export class ProductsService {
   }
 
   // GET: api/products/{id}
-  getProductById(id: number, includeDetails: boolean = false): Observable<Product> {
+  getProductById(id: number, includeDetails: boolean = true): Observable<ApiResponse<Product>> {
     const params = new HttpParams().set('includeDetails', includeDetails.toString());
     return this.http.get<ApiResponse<Product>>(`${this.apiUrl}/${id}`, { params }).pipe(
-      map(response => response.data),
+      map(response => response),
       catchError(this.handleError)
     );
   }
@@ -87,10 +87,23 @@ export class ProductsService {
       catchError(this.handleError)
     );
   }
-
-  // PUT: api/products/{id}
-  updateProduct(id: number, productData: any): Observable<Product> {
-    return this.http.put<ApiResponse<Product>>(`${this.apiUrl}/${id}`, productData).pipe(
+// PUT: api/products/{id}
+updateProduct(id: number, productData: any): Observable<Product> {
+  return this.http.put<ApiResponse<Product>>(`${this.apiUrl}/${id}`, productData).pipe(
+    map(response => response.data),
+    catchError(this.handleError)
+  );
+}
+  // PUT: api/products/{id}/approval-status
+  updateProductStatus(id: number, productData: any): Observable<Product> {
+    return this.http.put<ApiResponse<Product>>(`${this.apiUrl}/${id}/approval-status`, productData).pipe(
+      map(response => response.data),
+      catchError(this.handleError)
+    );
+  }
+// PUT: api/products/{id}/available
+  updateProductAvailabilty(id: number, isAvailable: any): Observable<Product> {
+    return this.http.put<ApiResponse<Product>>(`${this.apiUrl}/${id}/available`, isAvailable).pipe(
       map(response => response.data),
       catchError(this.handleError)
     );
