@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  Input,
   OnInit,
   signal,
 } from '@angular/core';
@@ -399,5 +400,26 @@ export class ManageproductsComponent implements OnInit {
         },
       });
     }
+    
   }
+
+
+  isSidebarExpanded = signal(true);
+
+
+
+@Input() sidebarCollapsed = false;
+  
+
+
+isCollapsed = false;
+
+toggleSidebar() {
+  this.isCollapsed = !this.isCollapsed;
+}
+
+showSidebar = false;
+toggleSidebarVisibility() {
+  this.showSidebar = !this.showSidebar;
+}
 }

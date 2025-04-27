@@ -1,49 +1,82 @@
-<aside class="sidebar" [class.collapsed]="isCollapsed()">
-  <!-- Logo and Header -->
-  <div class="sidebar-header">
-    <div class="logo-container">
-      <span class="logo-text">VC</span>
-      <div class="vendor-text" [class.d-none]="isCollapsed()">
-        <span>VENDOR CENTER</span>
+<aside class="sidebar" [class.collapsed]="collapsed">
+  <header class="sidebar-header">
+    <div class="branding">
+      <div class="logo-container">
+        <!-- When expanded, show the full logo with image -->
+        <ng-container *ngIf="!collapsed">
+          <img src="images/vendor-center-symbol.png" alt="VC" class="logo-img">
+          <div class="vendor-text">VENDOR CENTER</div>
+        </ng-container>
+        
+        <!-- When collapsed, show only VC text -->
+        <ng-container *ngIf="collapsed">
+          <div class="logo-text">VC</div>
+        </ng-container>
+      </div>
+      <button class="toggle-btn" (click)="toggleSidebar()">
+        <i class="fas" [ngClass]="collapsed ? 'fa-angle-double-right' : 'fa-angle-double-left'"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Rest of the template remains the same -->
+  <nav class="sidebar-nav">
+    <!-- Orders Menu -->
+    <a class="nav-item" [class.active]="activeSection === 'orders'" (click)="setActiveSection('orders')">
+      <i class="fas fa-shopping-cart"></i>
+      <span class="nav-label" *ngIf="!collapsed">Orders</span>
+    </a>
+    
+    <!-- Products Menu -->
+    <div class="nav-section">
+      <div class="nav-item expandable" [class.active]="activeSection === 'products'" (click)="toggleProducts()">
+        <i class="fas fa-box"></i>
+        <span class="nav-label" *ngIf="!collapsed">Products</span>
+        <i class="fas fa-chevron-down expand-icon" [class.rotated]="showProducts" *ngIf="!collapsed"></i>
+      </div>
+      <div class="sub-items" *ngIf="showProducts && !collapsed">
+        <a class="sub-item" [class.active]="activeSubSection === 'all-products'" (click)="setActiveSubSection('all-products')">
+          All Products
+        </a>
+        <a class="sub-item" [class.active]="activeSubSection === 'add-product'" (click)="setActiveSubSection('add-product')">
+          Add Product
+        </a>
       </div>
     </div>
-    <button class="collapse-btn" (click)="toggleSidebar()">
-      <i
-        class="pi"
-        [class.pi-angle-left]="!isCollapsed()"
-        [class.pi-angle-right]="isCollapsed()"
-      ></i>
-    </button>
-  </div>
 
-  <!-- Navigation -->
-  <nav class="sidebar-nav">
-    <a
-      *ngFor="let item of navigationItems"
-      [routerLink]="item.link"
-      routerLinkActive="active"
-      class="nav-item"
-    >
-      <i class="pi {{ item.icon }}"></i>
-      <span class="nav-text" [class.d-none]="isCollapsed()">{{
-        item.label
-      }}</span>
+    <!-- Promotions Menu -->
+    <a class="nav-item" [class.active]="activeSection === 'promotions'" (click)="setActiveSection('promotions')">
+      <i class="fas fa-tags"></i>
+      <span class="nav-label" *ngIf="!collapsed">Promotions</span>
+    </a>
+
+    <!-- Advertise Menu -->
+    <a class="nav-item" [class.active]="activeSection === 'advertise'" (click)="setActiveSection('advertise')">
+      <i class="fas fa-bullhorn"></i>
+      <span class="nav-label" *ngIf="!collapsed">Advertise your Products</span>
+    </a>
+
+    <!-- Statements Menu -->
+    <a class="nav-item" [class.active]="activeSection === 'statements'" (click)="setActiveSection('statements')">
+      <i class="fas fa-chart-bar"></i>
+      <span class="nav-label" *ngIf="!collapsed">Account Statements</span>
     </a>
   </nav>
 
-  <!-- Footer -->
-  <div class="sidebar-footer">
-    <button class="shop-btn">
-      <i class="pi pi-shopping-bag"></i>
-      <span [class.d-none]="isCollapsed()">Choose Shops</span>
+  <!-- Footer Section -->
+  <footer class="sidebar-footer">
+    <button class="shop-switcher">
+      <i class="fas fa-store"></i>
+      <span *ngIf="!collapsed">Choose Shops</span>
     </button>
 
-    <div class="user-profile">
-      <div class="avatar">M</div>
-      <div class="user-info" [class.d-none]="isCollapsed()">
-        <span class="username">TechTitans</span>
-        <span class="email">medomedoftab@gmail.com</span>
+    <div class="vendor-profile">
+      <div class="avatar">F</div>
+      <div class="vendor-info" *ngIf="!collapsed">
+        <div class="vendor-name">BatotaStore</div>
+        <div class="vendor-email">fatmamahmoud20230&#64;gmail.com</div>
       </div>
+      <i class="fas fa-chevron-down" *ngIf="!collapsed"></i>
     </div>
-  </div>
+  </footer>
 </aside>
