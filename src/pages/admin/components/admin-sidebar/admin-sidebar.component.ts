@@ -15,7 +15,7 @@ interface SidebarMenuItem {
   standalone: true,
   imports: [CommonModule, RouterModule],
   template: `
-    <div class="sidebar-container p-3" style="height: 100vh; overflow-y: auto;">
+    <div class="sidebar-container p-3" style="height: 100vh;">
       <div class="d-flex align-items-center justify-content-center mb-4">
         <img src="assets/images/logo.png" alt="Jumia Logo" height="40" class="me-2">
         <h4 class="text-white mb-0">Admin</h4>

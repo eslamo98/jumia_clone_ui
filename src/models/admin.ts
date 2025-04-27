@@ -33,6 +33,7 @@ export interface Product {
   ratingCount: number;
   reviewCount: number;
   unitsSold?: number;
+  hasVariants: boolean;
   images: ProductImage[];
   variants: ProductVariant[];
   attributeValues: ProductAttributeValue[];
@@ -61,7 +62,10 @@ export interface ProductVariant {
 }
 
 export interface VariantAttribute {
-  // If attributes ever get values, define fields here
+  variantAttributeId: number;
+  variantId: number;
+  attributeName: string;
+  attributeValue: string;
 }
 
 export interface ProductAttributeValue {
@@ -71,6 +75,7 @@ export interface ProductAttributeValue {
   attributeName: string;
   attributeType: string;
   value: string;
+  options?: string[];
 }
 
 // src/app/models/dashboard-stats.model.ts

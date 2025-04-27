@@ -120,7 +120,10 @@ export class AdminProductsComponent extends Helpers implements OnInit {
   
     this.loadProducts();
   }
-
+  getVariantDisplayName(variant: any): string {
+    if (!variant) return '';
+    return `${variant.variantName} - ${variant.sku} (${variant.stockQuantity} in stock)`;
+  }
   onPageChange(page: number): void {
     this.currentPage = page;
     this.loadProducts();
@@ -152,7 +155,7 @@ export class AdminProductsComponent extends Helpers implements OnInit {
   updateProductStatus(id: number, status: 'pending' | 'approved' | 'rejected' | 'deleted' | 'pending_review'): void {
     this.loadingService.show();
     
-    this.productsService.updateProduct(id, { approvalStatus: status }).subscribe({
+    this.productsService.updateProductStatus(id, { approvalStatus: status }).subscribe({
       next: () => {
         this.notificationService.showSuccess('Product status updated successfully');
         this.loadProducts();
@@ -168,7 +171,7 @@ export class AdminProductsComponent extends Helpers implements OnInit {
   toggleAvailability(id: number, isAvailable: boolean): void {
     this.loadingService.show();
     
-    this.productsService.updateProduct(id, { isAvailable: !isAvailable }).subscribe({
+    this.productsService.updateProductAvailabilty(id, { isAvailable: !isAvailable }).subscribe({
       next: () => {
         this.notificationService.showSuccess(`Product ${isAvailable ? 'disabled' : 'enabled'} successfully`);
         this.loadProducts();
