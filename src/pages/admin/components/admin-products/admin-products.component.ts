@@ -22,7 +22,8 @@ import { Helpers } from '../../../../Utility/helpers';
     AdminSidebarComponent,
     AdminHeaderComponent
   ],
-  templateUrl: './admin-products.component.html'
+  templateUrl: './admin-products.component.html',
+  styleUrls: ['./admin-products.component.css']
 })
 export class AdminProductsComponent extends Helpers implements OnInit {
   products: Product[] = [];

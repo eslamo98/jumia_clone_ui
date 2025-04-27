@@ -22,7 +22,8 @@ import { Helpers } from '../../../../Utility/helpers';
     AdminSidebarComponent,
     AdminHeaderComponent
   ],
-  templateUrl: './admin-categories.component.html'
+  templateUrl: './admin-categories.component.html',
+  styleUrls: ['./admin-categories.component.css']
 })
 export class AdminCategoriesComponent extends Helpers implements OnInit {
   categories: Category[] = [];

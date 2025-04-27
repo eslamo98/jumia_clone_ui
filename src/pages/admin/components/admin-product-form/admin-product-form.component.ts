@@ -27,7 +27,8 @@ import { environment } from '../../../../environments/environment';
     AdminHeaderComponent,
     DynamicAttributeInputComponent
   ],
-  templateUrl: './admin-product-form.component.html'
+  templateUrl: './admin-product-form.component.html',
+  styleUrls: ['./admin-product-form.component.css']
 })
 export class AdminProductFormComponent implements OnInit, OnDestroy {
   productForm: FormGroup;

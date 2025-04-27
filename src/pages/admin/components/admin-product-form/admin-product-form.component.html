@@ -366,7 +366,7 @@
               </div>
 
               <!-- Dynamic Attributes -->
-              <div class="card mb-4" *ngIf="!productForm.get('hasVariants')?.value && attributeValues.controls.length > 0">
+              <div class="card mb-4 variants-card" *ngIf="!productForm.get('hasVariants')?.value && attributeValues.controls.length > 0">
                 <div class="card-header bg-light">
                   <h5 class="mb-0">Product Attributes</h5>
                 </div>

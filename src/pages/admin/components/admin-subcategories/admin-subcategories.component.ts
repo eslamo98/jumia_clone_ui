@@ -19,7 +19,8 @@ import { Helpers } from '../../../../Utility/helpers';
     AdminSidebarComponent,
     AdminHeaderComponent
   ],
-  templateUrl: './admin-subcategories.component.html'
+  templateUrl: './admin-subcategories.component.html',
+  styleUrls: ['./admin-subcategories.component.css']
 })
 export class AdminSubcategoriesComponent extends Helpers implements OnInit {
   subcategories: any[] = [];

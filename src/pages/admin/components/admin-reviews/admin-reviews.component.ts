@@ -21,7 +21,8 @@ import { NotificationService } from '../../../../services/shared/notification.se
     AdminSidebarComponent,
     AdminHeaderComponent
   ],
-  templateUrl: './admin-reviews.component.html'
+  templateUrl: './admin-reviews.component.html',
+  styleUrls: ['./admin-reviews.component.css']
 })
 export class AdminReviewsComponent implements OnInit {
   reviews: Review[] = [];
