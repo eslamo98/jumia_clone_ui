@@ -123,18 +123,27 @@ border-radius: 8px;
   cursor: pointer;
 }
 
+
+
+
 .banner-image {
   width: 100%;
   display: block;
+  cursor: default;
 }
 .sidebar-banner:hover {
   transform: scale(1.01);
   box-shadow: 0 4px 8px rgba(0,0,0,0.15);
 }
 
+.warranty-link {
+  text-decoration: none;
+  color: inherit; /* Keeps text color the same */
+  display: block; /* Makes the link take up the full space of the div */
+  cursor: pointer;
+}
 
 
-/* pages/home/home.component.css */
 .jumia-home-container {
   width: 100%;
   max-width: 1200px;
@@ -154,6 +163,10 @@ border-radius: 8px;
   font-weight: 600;
   color: #282828;
   margin: 0;
+}
+
+.sell-on-jumia-link{
+  text-decoration: none;
 }
 
 .categories-section, .flash-sales-section, .top-deals-section {

@@ -104,7 +104,7 @@ getAllProducts(page: number = 1, pageSize: number = 10): Observable<any> {
   }
 
   // Updated to match backend URL pattern with CategoryId as query parameter
-  getProductsByCategory(categoryId: string, page: number = 0, pageSize: number = 20): Observable<any> {
+  getProductsByCategory(categoryId: string, page: number = 0, pageSize: number = 80): Observable<any> {
     if (!categoryId) {
       console.error('Invalid categoryId provided:', categoryId);
       return throwError(() => new Error('Invalid categoryId'));
@@ -128,7 +128,7 @@ getAllProducts(page: number = 1, pageSize: number = 10): Observable<any> {
   }
 
 // Updated to match backend URL pattern with SubcategoryId as query parameter
-getProductsBySubcategory(subcategoryId: string, page: number = 0, pageSize: number = 20): Observable<any> {
+getProductsBySubcategory(subcategoryId: string, page: number = 0, pageSize: number = 80): Observable<any> {
   const params = new HttpParams()
     .set('SubcategoryId', subcategoryId)
     .set('pageNumber', page.toString())

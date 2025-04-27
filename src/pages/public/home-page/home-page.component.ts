@@ -22,7 +22,7 @@ import { ElectronicsContainerComponent } from "./homeComponents/electronicsConta
 import { TopSellingComponent } from "./homeComponents/topSellingContainer/top-selling/top-selling.component";
 import { InfoComponent } from "./homeComponents/infoContainer/info/info.component";
 import { UpArrowComponent } from "./homeComponents/upArrow/up-arrow/up-arrow.component";
-import { Router } from '@angular/router';
+import { Router,RouterModule } from '@angular/router';
 import { NavigationService } from '../../../services/navigations/navigation.services';
 
 
@@ -50,7 +50,8 @@ import { NavigationService } from '../../../services/navigations/navigation.serv
     ElectronicsContainerComponent,
     TopSellingComponent,
     InfoComponent,
-    UpArrowComponent
+    UpArrowComponent,
+    RouterModule
 ],
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.css'
@@ -84,24 +85,24 @@ export class HomeComponent implements OnInit {
   
  
 
-  // Right sidebar options
-  sidebarOptions = [
-    { 
-      title: 'Join Jumia', 
-      subtitle: 'as a Sales Consultant', 
-      icon: 'star-icon' 
-    },
-    { 
-      title: 'Sell on JUMIA', 
-      subtitle: 'And Grow Your Business', 
-      icon: 'money-icon' 
-    },
-    { 
-      title: 'Warranty', 
-      subtitle: 'On Your Purchases', 
-      icon: 'warranty-icon' 
-    }
-  ];
+  // // Right sidebar options
+  // sidebarOptions = [
+  //   { 
+  //     title: 'Join Jumia', 
+  //     subtitle: 'as a Sales Consultant', 
+  //     icon: 'star-icon' 
+  //   },
+  //   { 
+  //     title: 'Sell on JUMIA', 
+  //     subtitle: 'And Grow Your Business', 
+  //     icon: 'money-icon' 
+  //   },
+  //   { 
+  //     title: 'Warranty', 
+  //     subtitle: 'On Your Purchases', 
+  //     icon: 'warranty-icon' 
+  //   }
+  // ];
 
   
   

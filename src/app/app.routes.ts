@@ -9,7 +9,6 @@ import { CartComponent } from '../pages/customer/cart/cart.component';
 import { SellerDashboardComponent } from '../pages/seller/seller-dashboard/seller-dashboard.component';
 import { SellerProductsComponent } from '../pages/seller/seller-products/seller-products.component';
 import { AdminDashboardComponent } from '../pages/admin/admin-dashboard/admin-dashboard.component';
-
 import { AdminProductsComponent } from '../pages/admin/components/admin-products/admin-products.component';
 import { AdminProductFormComponent } from '../pages/admin/components/admin-product-form/admin-product-form.component';
 import { AdminCategoriesComponent } from '../pages/admin/components/admin-categories/admin-categories.component';
@@ -34,6 +33,8 @@ import { AdminProductAttributesComponent } from '../pages/admin/components/admin
 import { AdminProductAttributeFormComponent } from '../pages/admin/components/admin-product-attribute-form/admin-product-attribute-form.component';
 import { SellerProductFormComponent } from '../pages/seller/seller-productEdit/seller-product-form/seller-product-form.component';
 import { ManageproductsComponent } from '../pages/seller/seller-manageproducts/manageproducts/manageproducts.component';
+import { WarrantyComponent } from '../pages/customer/warranty/warranty/warranty.component';
+import { WishlistComponent } from '../pages/customer/wishlist/wishlist/wishlist.component';
 
 export const routes: Routes = [
   // Public routes
@@ -64,6 +65,13 @@ export const routes: Routes = [
   { path: 'category/:id',
     component: CategoryComponent
   },
+  { path: 'warranty', 
+    component: WarrantyComponent
+ },
+ {
+  path: 'wishlist',
+  component: WishlistComponent
+ },
 
   // Seller routes
   {
