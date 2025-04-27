@@ -14,6 +14,7 @@ interface SidebarMenuItem {
   selector: 'app-admin-sidebar',
   standalone: true,
   imports: [CommonModule, RouterModule],
+  styleUrls: ['./admin-sidebar.component.css'],
   template: `
     <div class="sidebar-container p-3" style="height: 100vh;">
       <div class="d-flex align-items-center justify-content-center mb-4">
