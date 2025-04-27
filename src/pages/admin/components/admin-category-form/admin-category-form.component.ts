@@ -22,7 +22,8 @@ import { Helpers } from '../../../../Utility/helpers';
     AdminSidebarComponent,
     AdminHeaderComponent
   ],
-  templateUrl: './admin-category-form.component.html'
+  templateUrl: './admin-category-form.component.html',
+  styleUrls: ['./admin-category-form.component.css']
 })
 export class AdminCategoryFormComponent implements OnInit {
   categoryForm: FormGroup;

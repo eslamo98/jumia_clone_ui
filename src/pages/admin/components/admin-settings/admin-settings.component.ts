@@ -18,7 +18,8 @@ import { NotificationService } from '../../../../services/shared/notification.se
     AdminSidebarComponent,
     AdminHeaderComponent
   ],
-  templateUrl: './admin-settings.component.html'
+  templateUrl: './admin-settings.component.html',
+  styleUrls: ['./admin-settings.component.css']
 })
 export class AdminSettingsComponent implements OnInit {
   generalForm: FormGroup;

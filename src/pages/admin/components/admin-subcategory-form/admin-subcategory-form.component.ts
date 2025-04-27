@@ -20,7 +20,8 @@ import { Helpers } from '../../../../Utility/helpers';
     AdminSidebarComponent,
     AdminHeaderComponent
   ],
-  templateUrl: './admin-subcategory-form.component.html'
+  templateUrl: './admin-subcategory-form.component.html',
+  styleUrls: ['./admin-subcategory-form.component.css']
 })
 export class AdminSubcategoryFormComponent implements OnInit {
   subcategoryForm: FormGroup;
