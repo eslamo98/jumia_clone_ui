@@ -58,8 +58,16 @@
                         <td>{{ order.customerId }}</td>
                       </tr>
                       <tr>
+                        <th scope="row" class="ps-0">Customer:</th>
+                        <td>{{ order.customerName }}</td>
+                      </tr>
+                      <tr>
                         <th scope="row" class="ps-0">Address ID:</th>
                         <td>{{ order.addressId }}</td>
+                      </tr>
+                      <tr>
+                        <th scope="row" class="ps-0">Address:</th>
+                        <td>{{ order.address }}</td>
                       </tr>
                       <tr>
                         <th scope="row" class="ps-0">Payment Method:</th>
@@ -182,7 +190,7 @@
           
           <div *ngFor="let subOrder of order.subOrders" class="card mb-4">
             <div class="card-header bg-light d-flex justify-content-between align-items-center">
-              <h5 class="mb-0">Suborder #{{ subOrder.suborderId }} - Seller ID: {{ subOrder.sellerId }}</h5>
+              <h5 class="mb-0">Suborder #{{ subOrder.suborderId }} - Seller: ({{ subOrder.sellerId }}) {{subOrder.sellerName}}</h5>
               <button 
                 type="button" 
                 class="btn btn-outline-primary btn-sm" 

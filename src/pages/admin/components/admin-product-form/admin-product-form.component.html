@@ -23,6 +23,36 @@
             </button>
           </div>
         </div>
+      
+        <!-- Add the approval form section -->
+        <div class="row mb-4" *ngIf="isEditMode && productForm.get('approvalStatus')?.value === 'pending'">
+          <div class="col-12">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">Product Approval</h5>
+                <form [formGroup]="approvalForm">
+                  <div class="mb-3">
+                    <label for="adminNotes" class="form-label">Admin Notes</label>
+                    <textarea 
+                      id="adminNotes" 
+                      class="form-control" 
+                      formControlName="adminNotes" 
+                      rows="3"
+                      placeholder="Enter reason (required for rejection)"></textarea>
+                  </div>
+                  <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-success" (click)="onApprove()">
+                      <i class="bi bi-check-circle me-2"></i>Approve
+                    </button>
+                    <button type="button" class="btn btn-danger" (click)="onReject()">
+                      <i class="bi bi-x-circle me-2"></i>Reject
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
 
         <!-- Loading spinner -->
         <div *ngIf="isLoading" class="d-flex justify-content-center my-5">
