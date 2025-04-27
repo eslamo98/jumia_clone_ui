@@ -88,9 +88,8 @@ export class ProductDetailsComponent implements OnInit {
     private cartService: CartsService,
     public authService: AuthService,
     private router: Router,
-
-
     private notificationService: NotificationService
+
   ) {}
 
   ngOnInit(): void {
