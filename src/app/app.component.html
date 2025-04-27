@@ -6,7 +6,7 @@
   
   
   <main class="main-content">
-    @if(!getCurrentUrl().startsWith('/admin')) {
+    @if(!getCurrentUrl().startsWith('/admin') && !getCurrentUrl().startsWith('/seller')) {
       <div class="container">
         <router-outlet></router-outlet>
       </div>
