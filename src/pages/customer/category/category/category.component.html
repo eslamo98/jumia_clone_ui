@@ -3,6 +3,13 @@
 
 <app-up-arrow> </app-up-arrow>
 
+<app-product-variant-modal
+  [productId]="selectedProductId"
+  [isOpen]="showVariantModal"
+  (onClose)="closeVariantModal()"
+  (onAddToCart)="handleModalAddToCart($event)">
+</app-product-variant-modal>
+
 <div class="category-page-container">
   <!-- Category Header -->
   <div class="category-header">
@@ -89,10 +96,20 @@
       </div>
       
       <!-- Add to cart button -->
-      <button 
+      <!-- <button 
   class="add-to-cart-btn" 
   [disabled]="addingToCart[product.productId]"
   (click)="addToCart($event, product.productId)">
+  <span *ngIf="!addingToCart[product.productId]">Add to cart</span>
+  <span *ngIf="addingToCart[product.productId]">
+    <i class="fas fa-spinner fa-spin"></i> Adding...
+  </span>
+</button> -->
+
+<button 
+  class="add-to-cart-btn" 
+  [disabled]="addingToCart[product.productId]"
+  (click)="openVariantModal($event, product.productId)">
   <span *ngIf="!addingToCart[product.productId]">Add to cart</span>
   <span *ngIf="addingToCart[product.productId]">
     <i class="fas fa-spinner fa-spin"></i> Adding...

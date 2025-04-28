@@ -42,7 +42,8 @@ export class CartsService {
   
   // Get the user's cart
   getCart(): Observable<Cart> {
-    return this.http.get<any>(`${this.apiUrl}`).pipe(
+    const timestamp = new Date().getTime();
+  return this.http.get<any>(`${this.apiUrl}?nocache=${timestamp}`).pipe(
       map(response => {
         // Check if response has the wrapper structure
         const cart = response && response.success && response.data ? response.data : response;
@@ -81,7 +82,8 @@ export class CartsService {
 
   // Get cart items
   getCartItems(): Observable<CartItem[]> {
-    return this.http.get<any>(`${this.apiUrl}`).pipe(
+    const timestamp = new Date().getTime();
+    return this.http.get<any>(`${this.apiUrl}?nocache=${timestamp}`).pipe(
       map(response => {
         const items = response.data?.cartItems || [];
         

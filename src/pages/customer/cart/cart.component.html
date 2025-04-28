@@ -2,8 +2,9 @@
   <h1>Shopping Cart ({{ getCartItemCount() }} items)</h1>
 
   <!-- Loading overlay -->
-  <div class="loading-overlay" *ngIf="isLoading">
-    <div class="spinner">Loading...</div>
+  <div class="loading-overlay text-align-center" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <div class="text-black">Loading...</div>
   </div>
 
   <!-- Error message -->
@@ -15,11 +16,11 @@
   <div class="cart-content" *ngIf="cartItems.length > 0">
     <div class="cart-items">
       <app-cart-item
-        *ngFor="let item of cartItems"
-        [item]="item"
-        (quantityChange)="updateItemQuantity(item.cartItemId, $event)"
-        (onRemoveItem)="removeItem(item.cartItemId)"
-      ></app-cart-item>
+      *ngFor="let item of cartItems"
+      [item]="item"
+      (quantityChange)="updateItemQuantity($event)"
+      (onRemoveItem)="removeItem($event)"
+    ></app-cart-item>
     </div>
 
     <app-cart-summary

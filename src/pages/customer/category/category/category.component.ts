@@ -13,6 +13,8 @@ import { UpArrowComponent } from "../../../public/home-page/homeComponents/upArr
 import { CartsService } from '../../../../services/cart/carts.service';
 import { NotificationService } from '../../../../services/notification/notification.service';
 import { WishlistService } from '../../../../services/wishlist/wishlist.service';
+import { ProductVariantModalComponent } from "./product-variant-modal/product-variant-modal.component";
+
 
 
 interface Product {
@@ -57,7 +59,7 @@ interface ProductsData {
 @Component({
   selector: 'app-category',
   standalone: true,
-  imports: [CommonModule, RouterModule , UpArrowComponent],
+  imports: [CommonModule, RouterModule, UpArrowComponent, ProductVariantModalComponent],
   templateUrl: './category.component.html',
   styleUrl: './category.component.css'
 })
@@ -86,6 +88,9 @@ export class CategoryComponent  extends Helpers implements OnInit {
    processingCartItems: Set<number> = new Set(); // Track products being added to cart
    addingToCart: { [productId: number]: boolean } = {};
 
+
+   showVariantModal: boolean = false;
+   selectedProductId: number = 0;
 
   constructor(
     private route: ActivatedRoute,
@@ -131,6 +136,23 @@ export class CategoryComponent  extends Helpers implements OnInit {
   }
 
   
+  openVariantModal(event: Event, productId: number): void {
+    event.stopPropagation(); // Prevent navigation to product details
+    this.selectedProductId = productId;
+    this.showVariantModal = true;
+  }
+  
+  closeVariantModal(): void {
+    this.showVariantModal = false;
+  }
+  
+  handleModalAddToCart(result: {success: boolean}): void {
+    if (result.success) {
+      // The notification is already shown by the modal component
+      // You can add additional handling here if needed
+    }
+  }
+
 
   fetchCategoryDetails(categoryId: string): void {
     this.productService.getCategoryById(categoryId).subscribe(
