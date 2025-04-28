@@ -85,14 +85,17 @@
           <span class="rating-count">({{ product.reviewCount }} verified ratings)</span>
         </div>
 
-        <!-- Price -->
-        <div class="product-price mb-4">
-          <div class="current-price fw-bold">EGP {{ product.basePrice | number }}</div>
-          <div class="price-info" *ngIf="product.discountPercentage > 0">
-            <span class="original-price text-decoration-line-through">EGP {{ (product.basePrice / (1 - product.discountPercentage/100)) | number }}</span>
-            <span class="discount-badge ms-2">-{{ product.discountPercentage }}%</span>
-          </div>
-        </div>
+       <!-- Price -->
+<div class="product-price mb-4">
+  <div class="d-flex align-items-baseline">
+    <div class="current-price fw-bold">EGP {{ currentPrice | number }}</div>
+    <small class="text-muted ms-2" *ngIf="selectedVariant">{{ selectedVariant.variantName }}</small>
+  </div>
+  <div class="price-info" *ngIf="currentDiscountPercentage > 0">
+    <span class="original-price text-decoration-line-through">EGP {{ (currentPrice / (1 - currentDiscountPercentage/100)) | number }}</span>
+    <span class="discount-badge ms-2">-{{ currentDiscountPercentage }}%</span>
+  </div>
+</div>
 
         <!-- Stock -->
         <p class="in-stock mb-3">
@@ -386,14 +389,17 @@
             <!-- Quick Add to Cart -->
             <div class="quick-add-section text-center">
               <div class="product-thumbnail mb-2">
-                <img [src]="getFullImageUrl(product.mainImageUrl)" class="img-fluid" style="height: 80px;">
+                <img [src]="getFullImageUrl(selectedImage || product.mainImageUrl)" class="img-fluid" style="height: 80px;">
               </div>
               <div class="product-name mb-2">
                 {{ product.name }}
               </div>
               <div class="product-price mb-2">
-                <strong>EGP {{ product.basePrice }}</strong>
-                <span class="text-danger ms-3">-{{ product.discountPercentage }}%</span>
+                <div class="d-flex align-items-baseline">
+                  <strong>EGP {{ currentPrice }}</strong>
+                  <small class="text-muted ms-2" *ngIf="selectedVariant">{{ selectedVariant.variantName }}</small>
+                  <span class="text-danger ms-2" *ngIf="currentDiscountPercentage > 0">-{{ currentDiscountPercentage }}%</span>
+                </div>
               </div>
               <button class="btn btn-orange btn-orange-1 w-100 mt-4" (click)="addToCart()">
                 Add to cart

@@ -190,6 +190,15 @@ export class ProductDetailsComponent implements OnInit {
     this.quantity = 1; // Reset quantity when changing variants
   }
 
+  get currentPrice(): number {
+    return this.selectedVariant ? this.selectedVariant.finalPrice : this.product?.basePrice;
+  }
+  
+  get currentDiscountPercentage(): number {
+    return this.selectedVariant ? this.selectedVariant.discountPercentage : this.product?.discountPercentage;
+  }
+
+
   public selectImage(imageUrl: string): void {
     this.selectedImage = imageUrl;
   }
