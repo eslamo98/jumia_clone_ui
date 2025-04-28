@@ -486,23 +486,25 @@ app-sidebar[collapsed="true"] {
 }
 
 /* Language selector */
-
 .language-selector {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
+  gap: 5px;
+  padding: 8px 15px;
+  background-color: white;
   border-radius: 4px;
-  border: 1px solid var(--jumia-border);
-  color: var(--jumia-gray);
-  font-size: 14px;
-  background: var(--jumia-orange);
+  border: 1px solid #ddd;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--primary-color);
+  font-weight: 500;
+  z-index: 90;
+  
 }
 
-.language-selector:hover {
-  background: var(--jumia-light-gray);
-  cursor: pointer;
-}
 .language-text {
   margin: 0 5px;
 }
