@@ -19,21 +19,22 @@
   
   h1 {
     color:black; 
-    font-size: 36px;
+    font-size: 30px;
     margin-bottom: 25px;
     font-weight: 700;
   }
   
   .message {
     color: #666;
-    font-size: 18px;
+    font-size: 16px;
     line-height: 1.6;
     margin-bottom: 40px;
   }
   
   .image-section {
     flex: 1;
-    max-width: 500px;
+    max-width: 450px;
+    background: transparent;
   }
   
   .access-denied {
