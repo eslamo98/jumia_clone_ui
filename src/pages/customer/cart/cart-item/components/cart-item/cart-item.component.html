@@ -19,7 +19,7 @@
       <div class="price-discount" *ngIf="item.percentOff">-{{ item.percentOff }}%</div>
     </div>
 
-    <div class="stock-status" *ngIf="getStockMessage()">
+    <div class="stock-status d-none" *ngIf="getStockMessage()">
       {{ getStockMessage() }}
     </div>
 
@@ -28,24 +28,36 @@
         <button
           type="button"
           class="quantity-btn"
-          [disabled]="item.quantity <= 1"
+          [disabled]="item.quantity <= 1 || isQuantityLoading"
           (click)="decreaseQuantity()"
         >
           <i class="fas fa-minus"></i>
         </button>
-        <span class="quantity-value">{{ item.quantity }}</span>
+        <span class="quantity-value">
+          <ng-container *ngIf="!isQuantityLoading; else loadingSpinner">
+            {{ item.quantity }}
+          </ng-container>
+          <ng-template #loadingSpinner>
+            <i class="fas fa-spinner fa-spin"></i>
+          </ng-template>
+        </span>
         <button
           type="button"
           class="quantity-btn"
-          [disabled]="item.quantity >= (item.maxQuantity || 10)"
+          [disabled]="item.quantity >= (item.maxQuantity || 10) || isQuantityLoading"
           (click)="increaseQuantity()"
         >
           <i class="fas fa-plus"></i>
         </button>
       </div>
-
-      <button type="button" class="remove-btn" (click)="onRemove()">
-        <i class="fas fa-trash"></i>
+    
+      <button 
+        type="button" 
+        class="remove-btn" 
+        [disabled]="isRemoveLoading"
+        (click)="onRemove()"
+      >
+        <i class="fas" [class.fa-trash]="!isRemoveLoading" [class.fa-spinner]="isRemoveLoading" [class.fa-spin]="isRemoveLoading"></i>
       </button>
     </div>
   </div>
