@@ -11,18 +11,29 @@ import { CartItem } from '../../../../../../models/cart-item.model';
 })
 export class CartItemComponent implements OnInit {
   @Input() item!: CartItem;
-  @Output() quantityChange = new EventEmitter<number>();
-  @Output() onRemoveItem = new EventEmitter<void>();
+  @Output() quantityChange = new EventEmitter<{
+    id: number;
+    quantity: number;
+    onSuccess: () => void;
+    onError: () => void;
+  }>();
+  @Output() onRemoveItem = new EventEmitter<{
+    id: number;
+    onSuccess: () => void;
+    onError: () => void;
+  }>();
 
   showRemoveConfirmation = false;
   quantityOptions: number[] = [];
+  isQuantityLoading = false;
+  isRemoveLoading = false;
 
   ngOnInit() {
     this.generateQuantityOptions();
   }
 
   generateQuantityOptions() {
-    const maxQty = this.item.maxQuantity || 10; // Default to 10 if not specified
+    const maxQty = this.item.maxQuantity || 10;
     this.quantityOptions = Array.from(
       { length: maxQty },
       (_, i) => i + 1
@@ -37,42 +48,83 @@ export class CartItemComponent implements OnInit {
   }
 
   getStockMessage(): string {
-    const maxQty = this.item.maxQuantity || 10; // Default to 10 if not specified
+    const maxQty = this.item.maxQuantity || 10;
     return this.item.quantity >= maxQty
       ? 'Maximum quantity reached'
       : `${maxQty - this.item.quantity} items left`;
   }
   
   decreaseQuantity() {
-    if (this.item.quantity > 1) {
-      console.log('Decreasing quantity to:', this.item.quantity - 1);
-      this.quantityChange.emit(this.item.quantity - 1);
+    if (this.item.quantity > 1 && !this.isQuantityLoading) {
+      this.isQuantityLoading = true;
+      this.quantityChange.emit({
+        id: this.item.cartItemId,
+        quantity: this.item.quantity - 1,
+        onSuccess: () => this.handleQuantityUpdateSuccess(),
+        onError: () => this.handleQuantityUpdateError()
+      });
     }
   }
 
   increaseQuantity() {
     const maxQty = this.item.maxQuantity || 10;
-    if (this.item.quantity < maxQty) {
-      console.log('Increasing quantity to:', this.item.quantity + 1);
-      this.quantityChange.emit(this.item.quantity + 1);
+    if (this.item.quantity < maxQty && !this.isQuantityLoading) {
+      this.isQuantityLoading = true;
+      this.quantityChange.emit({
+        id: this.item.cartItemId,
+        quantity: this.item.quantity + 1,
+        onSuccess: () => this.handleQuantityUpdateSuccess(),
+        onError: () => this.handleQuantityUpdateError()
+      });
     }
   }
 
   onQuantityChange(event: Event) {
     const value = +(event.target as HTMLSelectElement).value;
-    this.quantityChange.emit(value);
+    this.isQuantityLoading = true;
+    this.quantityChange.emit({
+      id: this.item.cartItemId,
+      quantity: value,
+      onSuccess: () => this.handleQuantityUpdateSuccess(),
+      onError: () => this.handleQuantityUpdateError()
+    });
   }
 
   onRemove() {
-    this.showRemoveConfirmation = true;
+    if (!this.isRemoveLoading) {
+      this.showRemoveConfirmation = true;
+    }
   }
 
   confirmRemove() {
-    this.onRemoveItem.emit();
-    this.showRemoveConfirmation = false;
+    if (!this.isRemoveLoading) {
+      this.isRemoveLoading = true;
+      this.onRemoveItem.emit({
+        id: this.item.cartItemId,
+        onSuccess: () => this.handleRemoveSuccess(),
+        onError: () => this.handleRemoveError()
+      });
+    }
   }
 
   cancelRemove() {
+    this.showRemoveConfirmation = false;
+  }
+
+  handleQuantityUpdateSuccess() {
+    this.isQuantityLoading = false;
+  }
+
+  handleQuantityUpdateError() {
+    this.isQuantityLoading = false;
+  }
+
+  handleRemoveSuccess() {
+    this.isRemoveLoading = false;
+  }
+
+  handleRemoveError() {
+    this.isRemoveLoading = false;
     this.showRemoveConfirmation = false;
   }
 }
