@@ -2,28 +2,45 @@
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Component, HostListener, OnInit, OnDestroy, ElementRef } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth/auth.service';
 import { Router } from '@angular/router';
 import { CartsService } from '../../services/cart/carts.service';
+import { ProductSearchService, ProductSearchResult } from '../../services/search/product-search.service';
 import { Subscription } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
+import { Subject } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.css'],
   standalone: true,
-  imports: [CommonModule, RouterModule]
+  imports: [CommonModule, RouterModule, FormsModule]
 })
 export class HeaderComponent implements OnInit, OnDestroy {
   isAccountDropdownOpen = false;
+  isSearchResultsVisible = false;
   cartItemCount = 0;
+  searchQuery = '';
+  searchResults: ProductSearchResult[] = [];
+  isLoading = false;
+  private searchTerms = new Subject<string>();
+  
+  // Default fallback image path
+  private fallbackImagePath = '/images/no-image-placeholder.png';
+  
   private cartSubscription: Subscription | null = null;
   private authSubscription: Subscription | null = null;
+  private searchSubscription: Subscription | null = null;
+  private resultSubscription: Subscription | null = null;
   
   constructor(
     public authService: AuthService,
     private router: Router,
     private cartService: CartsService,
+    private searchService: ProductSearchService,
     private elementRef: ElementRef
   ) { }
 
@@ -34,7 +51,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
     });
 
     // Subscribe to auth state changes
-    // Note: You'll need to ensure authService.currentUser$ is properly implemented
     this.authSubscription = this.authService.currentUser$.subscribe(user => {
       if (user) {
         // If user logs in, refresh the cart count
@@ -44,6 +60,34 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.cartItemCount = 0;
       }
     });
+    
+    // Set up search results subscription with loading state management
+   // Add to the results subscription
+this.resultSubscription = this.searchService.searchResults$.subscribe(results => {
+  // Map and verify the image URLs in the results
+  this.searchResults = results;
+  this.isLoading = false;
+  
+  // Only show dropdown if we have a search query, regardless of results
+  this.isSearchResultsVisible = this.searchQuery.trim().length > 0;
+  
+  console.log('Current search query:', this.searchQuery);
+  console.log('Search results count:', results.length);
+  console.log('Is search visible:', this.isSearchResultsVisible);
+  console.log('Results data:', results);
+});
+    
+   // Set up debounced search
+   this.searchSubscription = this.searchTerms.pipe(
+    debounceTime(400)
+  ).subscribe(term => {
+    if (term && term.trim().length >= 1) {
+      this.isLoading = true;
+      // Don't change visibility here, we already set it in onSearchInputChange
+      this.searchService.searchProducts(term);
+      console.log('Search triggered for term:', term);
+    }
+});
   }
 
   ngOnDestroy(): void {
@@ -54,6 +98,84 @@ export class HeaderComponent implements OnInit, OnDestroy {
     if (this.authSubscription) {
       this.authSubscription.unsubscribe();
     }
+    if (this.searchSubscription) {
+      this.searchSubscription.unsubscribe();
+    }
+    if (this.resultSubscription) {
+      this.resultSubscription.unsubscribe();
+    }
+  }
+
+  // Process the image URL to ensure it's valid
+  getImageUrl(imageUrl: string): string {
+    if (!imageUrl) {
+      return this.fallbackImagePath;
+    }
+    
+    // If the URL is already an absolute URL with http/https, return it as is
+    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+      return imageUrl;
+    }
+    
+    // If it's a relative URL starting with '/', make it relative to the base URL
+    if (imageUrl.startsWith('/')) {
+      return `${environment.apiUrl}${imageUrl}`;
+    }
+    
+    // Otherwise, assume it's a relative path and prepend the API URL
+    return `${environment.apiUrl}/${imageUrl}`;
+  }
+  
+  // Handle image loading errors by setting a fallback
+  handleImageError(event: Event): void {
+    const imgElement = event.target as HTMLImageElement;
+    imgElement.src = this.fallbackImagePath;
+    imgElement.onerror = null; // Prevent infinite loop if fallback also fails
+  }
+
+  onSearch(event: Event): void {
+    event.preventDefault();
+    if (this.searchQuery.trim()) {
+      this.router.navigate(['/search'], { queryParams: { SearchTerm: this.searchQuery } });
+      this.clearSearch();
+    }
+  }
+  
+  onSearchInputChange(term: string): void {
+    console.log('Input changed to:', term);
+    
+    // Clear results and hide dropdown if the search is empty
+    if (!term || term.trim() === '') {
+      console.log('Term is empty, clearing search');
+      this.clearSearch();
+      return;
+    }
+    
+    // Show loading indicator immediately for better UX
+    console.log('Setting loading state and making search visible');
+    this.isLoading = true;
+    this.isSearchResultsVisible = true;
+    
+    // Send to search terms subject
+    this.searchTerms.next(term);
+  }
+
+
+  navigateToProduct(productId: number): void {
+    // Navigate to the product details page using the productId
+    this.router.navigate(['/product', productId]);
+    // Clear the search after navigation
+    this.clearSearch();
+    // Clear the search input
+    this.searchQuery = '';
+  }
+  
+  clearSearch(): void {
+    console.log('Clearing search from:', new Error().stack);
+    this.searchService.clearResults();
+    this.searchResults = []; // Make sure to clear local results too
+    this.isSearchResultsVisible = false;
+    this.isLoading = false;
   }
 
   toggleAccountDropdown(event?: Event) {
@@ -74,14 +196,20 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.closeAccountDropdown();
   }
 
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent): void {
-    // Close dropdown if clicking outside of account section
-    const clickedElement = event.target as HTMLElement;
-    const isClickedInsideAccount = this.elementRef.nativeElement.querySelector('.account-section')?.contains(clickedElement);
-    
-    if (!isClickedInsideAccount) {
-      this.closeAccountDropdown();
-    }
+ @HostListener('document:click', ['$event'])
+onDocumentClick(event: MouseEvent): void {
+  const clickedElement = event.target as HTMLElement;
+  const isClickedInsideAccount = this.elementRef.nativeElement.querySelector('.account-section')?.contains(clickedElement);
+  const isClickedInsideSearch = this.elementRef.nativeElement.querySelector('.search-box')?.contains(clickedElement);
+  
+  if (!isClickedInsideAccount) {
+    this.closeAccountDropdown();
+  }
+  
+  // Only clear search if clicking outside and we have results showing
+  if (!isClickedInsideSearch && this.isSearchResultsVisible) {
+    // Add a small delay to prevent race conditions with click events
+    setTimeout(() => this.clearSearch(), 100);
+  }
   }
 }
