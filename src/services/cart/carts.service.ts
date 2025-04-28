@@ -64,8 +64,8 @@ export class CartsService {
   }
 
   // Get cart summary (count, total, etc.)
-  getCartSummary(): Observable<CartSummary> {
-    return this.http.get<CartSummary>(`${this.apiUrl}/summary`).pipe(
+  getCartSummary(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/summary`).pipe(
       map(response => {
         // Update cart count if summary contains the item count
         if (response && response.itemsCount !== undefined) {

@@ -21,8 +21,10 @@
         <span class="total-value">{{ totalPrice | currency }}</span>
       </div>
       
-      <button class="checkout-btn" [disabled]="itemCount === 0">
-        CHECKOUT ({{ totalPrice | currency }})
+      <button class="checkout-btn" [disabled]="itemCount === 0" >
+        <a routerLink="/checkout" class="text-decoration-none text-white">
+          CHECKOUT ({{ totalPrice | currency }})
+        </a>
       </button>
     </div>
   </div>
