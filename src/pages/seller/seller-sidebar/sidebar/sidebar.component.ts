@@ -18,6 +18,7 @@ export class SidebarComponent {
   @Output() toggle = new EventEmitter<void>();
   @Input() collapsed = false;
   
+  
 
   showProducts = false;
   activeSection = 'products';
