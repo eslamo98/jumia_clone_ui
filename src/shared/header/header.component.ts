@@ -11,13 +11,14 @@ import { Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { ChatbotComponent } from '../chatbot/chatbot.component';
 
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.css'],
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule]
+  imports: [CommonModule, RouterModule, FormsModule, ChatbotComponent]
 })
 export class HeaderComponent implements OnInit, OnDestroy {
   isAccountDropdownOpen = false;
@@ -27,6 +28,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   searchResults: ProductSearchResult[] = [];
   isLoading = false;
   private searchTerms = new Subject<string>();
+
   
   // Default fallback image path
   private fallbackImagePath = '/images/no-image-placeholder.png';
