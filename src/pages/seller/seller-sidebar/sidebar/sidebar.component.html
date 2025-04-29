@@ -22,7 +22,10 @@
   <!-- Rest of the template remains the same -->
   <nav class="sidebar-nav">
     <!-- Orders Menu -->
-    <a class="nav-item" [class.active]="activeSection === 'orders'" (click)="setActiveSection('orders')">
+    <a class="nav-item" 
+    [routerLink]="['/seller/orders']"
+    routerLinkActive="active"
+    [class.active]="activeSection === 'orders'" (click)="setActiveSection('orders')">
       <i class="bi bi-clipboard-data fs-4"></i>
       <span class="nav-label" *ngIf="!collapsed">Orders</span>
     </a>
@@ -35,12 +38,20 @@
         <i class="fas fa-chevron-down expand-icon" [class.rotated]="showProducts" *ngIf="!collapsed"></i>
       </div>
       <div class="sub-items" *ngIf="showProducts && !collapsed">
-        <a class="sub-item" [class.active]="activeSubSection === 'all-products'" (click)="setActiveSubSection('all-products')">
-          All Products
-        </a>
-        <a class="sub-item" [class.active]="activeSubSection === 'add-product'" (click)="setActiveSubSection('add-product')">
-          Add Product
-        </a>
+          <a class="sub-item" 
+             [routerLink]="['/seller/manage-products']" 
+             [class.active]="activeSubSection === 'manage-products'"
+             (click)="setActiveSubSection('manage-products')">
+            <i class="fas fa-tasks"></i>
+            <span class="nav-label">Manage Products</span>
+          </a>
+          <a class="sub-item" 
+             [routerLink]="['/seller/add-product']"
+             [class.active]="activeSubSection === 'add-product'"
+             (click)="setActiveSubSection('add-product')">
+            <i class="fas fa-plus-circle"></i>
+            <span class="nav-label">Add Product</span>
+          </a>
       </div>
     </div>
 
@@ -65,18 +76,33 @@
 
   <!-- Footer Section -->
   <footer class="sidebar-footer">
-    <button class="shop-switcher">
-      <i class="fas fa-store"></i>
-      <span *ngIf="!collapsed">Choose Shops</span>
+    <button class="logout-button" (click)="logout()">
+      <i class="fas fa-sign-out-alt"></i>
+      <span *ngIf="!collapsed">Logout</span>
     </button>
 
     <div class="vendor-profile">
-      <div class="avatar">F</div>
-      <div class="vendor-info" *ngIf="!collapsed">
-        <div class="vendor-name">BatotaStore</div>
-        <div class="vendor-email">fatmamahmoud20230&#64;gmail.com</div>
-      </div>
-      <i class="fas fa-chevron-down" *ngIf="!collapsed"></i>
+      <ng-container *ngIf="!loading; else loadingTpl">
+        <div *ngIf="seller && !error" class="profile-content">
+          <div class="avatar" [ngStyle]="{'background-image': seller.profileImageUrl ? 'url(' + seller.profileImageUrl + ')' : 'none'}">
+            <span *ngIf="!seller.profileImageUrl">{{seller.firstName[0]}}</span>
+          </div>
+          <div class="vendor-info" *ngIf="!collapsed">
+            <div class="vendor-name">{{seller.businessName}}</div>
+            <div class="vendor-email">{{seller.email}}</div>
+          </div>
+          <i class="fas fa-chevron-down" *ngIf="!collapsed"></i>
+        </div>
+        <div *ngIf="error" class="error-message">
+          {{error}}
+        </div>
+      </ng-container>
     </div>
   </footer>
 </aside>
+
+<ng-template #loadingTpl>
+  <div class="loading-state">
+    <i class="fas fa-spinner fa-spin"></i>
+  </div>
+</ng-template>
