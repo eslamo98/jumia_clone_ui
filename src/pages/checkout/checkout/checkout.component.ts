@@ -6,6 +6,7 @@ import { PaymentStepComponent } from '../payment-step/payment-step.component';
 import { OrderSummaryComponent } from '../order-summary/order-summary.component';
 import { AuthService } from '../../../services/auth/auth.service';
 import { Router } from '@angular/router';
+import { CheckoutHeaderComponent } from '../checkout-header/checkout-header.component';
 
 @Component({
   selector: 'app-checkout',
@@ -15,7 +16,8 @@ import { Router } from '@angular/router';
     AddressStepComponent,
     DeliveryStepComponent,
     PaymentStepComponent,
-    OrderSummaryComponent
+    OrderSummaryComponent,
+    CheckoutHeaderComponent
   ],
   templateUrl: './checkout.component.html',
   styleUrls: ['./checkout.component.css']
