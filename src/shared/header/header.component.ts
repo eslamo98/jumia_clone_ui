@@ -163,7 +163,7 @@ this.resultSubscription = this.searchService.searchResults$.subscribe(results =>
 
   navigateToProduct(productId: number): void {
     // Navigate to the product details page using the productId
-    this.router.navigate(['/product', productId]);
+    this.router.navigate(['/Products', productId]);
     // Clear the search after navigation
     this.clearSearch();
     // Clear the search input
