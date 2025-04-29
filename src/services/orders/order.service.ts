@@ -16,20 +16,19 @@ import { environment } from '../../environments/environment';
 export class OrderService {
   private apiUrl = `${environment.apiUrl}/api/orders`;
   private ordersSubject = new BehaviorSubject<Order[]>([]);
-  private readonly sellerId = 1; // Static seller ID for testing
 
   constructor(private http: HttpClient) {}
 
   getSellerOrders(pagination: {
     pageNumber: number;
     pageSize: number;
-  }): Observable<any> {
+  }, sellerId: number = 1): Observable<any> {
     const params = new HttpParams()
       .set('pageNumber', pagination.pageNumber.toString())
       .set('pageSize', pagination.pageSize.toString());
 
     return this.http
-      .get<any>(`${this.apiUrl}/seller/${this.sellerId}`, {
+      .get<any>(`${this.apiUrl}/seller/${sellerId}`, {
         params,
       })
       .pipe(

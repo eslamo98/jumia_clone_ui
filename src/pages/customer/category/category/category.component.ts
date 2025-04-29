@@ -82,15 +82,20 @@ export class CategoryComponent  extends Helpers implements OnInit {
   pages: number[] = [];
   Math = Math; // Add Math to be used in template
 
-   // Wishlist and cart
-   wishlistItems: number[] = [];
+  // Wishlist and cart
+  wishlistItems: number[] = [];
 
-   processingCartItems: Set<number> = new Set(); // Track products being added to cart
-   addingToCart: { [productId: number]: boolean } = {};
+  processingCartItems: Set<number> = new Set(); // Track products being added to cart
+  addingToCart: { [productId: number]: boolean } = {};
 
 
-   showVariantModal: boolean = false;
-   selectedProductId: number = 0;
+  showVariantModal: boolean = false;
+  selectedProductId: number = 0;
+
+  // Custom notification properties
+  showNotification: boolean = false;
+  notificationMessage: string = '';
+  notificationType: 'success' | 'warning' | 'error' = 'success';
 
   constructor(
     private route: ActivatedRoute,
@@ -99,14 +104,13 @@ export class CategoryComponent  extends Helpers implements OnInit {
     private productService: ProductService,
     private cartsService: CartsService,
     private navigationService: NavigationService,
-     private notificationService: NotificationService,
-     private wishlistService: WishlistService
+    private notificationService: NotificationService,
+    private wishlistService: WishlistService
   ) {
     super(); 
-   }
+  }
 
-   ngOnInit(): void {
-
+  ngOnInit(): void {
     window.scrollTo(0, 0);
     // Get category ID from route parameters
     this.route.params.subscribe(params => {
@@ -137,6 +141,24 @@ export class CategoryComponent  extends Helpers implements OnInit {
     this.loadWishlistStatus();
   }
 
+  // Custom notification methods
+  showCustomNotification(message: string, type: 'success' | 'warning' | 'error'): void {
+    this.notificationMessage = message;
+    this.notificationType = type;
+    this.showNotification = true;
+    
+    // Hide notification after 5 seconds if not manually closed
+    setTimeout(() => {
+      if (this.showNotification) {
+        this.showNotification = false;
+      }
+    }, 5000);
+  }
+
+  // Method to hide notification when close button is clicked
+  hideNotification(): void {
+    this.showNotification = false;
+  }
   
   openVariantModal(event: Event, productId: number): void {
     event.stopPropagation(); // Prevent navigation to product details
@@ -206,13 +228,10 @@ export class CategoryComponent  extends Helpers implements OnInit {
           this.products = response.data.products;
           this.totalItems = response.data.totalItems || this.products.length;
 
-
-
-// Initialize addingToCart for all products   //newwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
-this.products.forEach(product => {
-  this.addingToCart[product.productId] = false;
-});
-
+          // Initialize addingToCart for all products
+          this.products.forEach(product => {
+            this.addingToCart[product.productId] = false;
+          });
 
         } else {
           console.error('Unexpected API response format for products:', response);
@@ -259,9 +278,10 @@ this.products.forEach(product => {
           this.filteredProducts = response.data.products;
           this.totalItems = response.data.totalItems || this.filteredProducts.length;
 
-          // Initialize addingToCart for filtered products  //newwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
-      this.filteredProducts.forEach(product => {
-        this.addingToCart[product.productId] = false;})
+          // Initialize addingToCart for filtered products
+          this.filteredProducts.forEach(product => {
+            this.addingToCart[product.productId] = false;
+          });
 
         } else if (response && response.products) {
           // Format 2: { products: [...] }
@@ -374,20 +394,6 @@ this.products.forEach(product => {
     }
   }
 
-  // nextPage(): void {
-  //   if (this.currentPage < this.totalPages) {
-  //     this.currentPage++;
-  //     this.updateDisplayedProducts();
-  //   }
-  // }
-
-  // prevPage(): void {
-  //   if (this.currentPage > 1) {
-  //     this.currentPage--;
-  //     this.updateDisplayedProducts();
-  //   }
-  // }
-
   nextPage(): void {
     if (this.currentPage < this.totalPages) {
       this.goToPage(this.currentPage + 1);
@@ -427,20 +433,18 @@ this.products.forEach(product => {
     });
   }
   
-  
   saveWishlistItems(): void {
     localStorage.setItem('wishlist', JSON.stringify(this.wishlistItems));
   }
   
-
-
+  // Modified toggleWishlist to use custom notification
   toggleWishlist(event: Event, productId: number): void {
     event.stopPropagation(); // Prevent navigation to product details
     
     // Check if user is logged in
     const currentUser = localStorage.getItem('currentUser');
     if (!currentUser) {
-      this.notificationService.warning('Please log in to add items to your wishlist');
+      this.showCustomNotification('Please log in to add items to your wishlist', 'warning');
       return;
     }
     
@@ -448,25 +452,23 @@ this.products.forEach(product => {
       next: (response) => {
         // The service already updates its internal state
         if (this.wishlistService.isInWishlist(productId)) {
-          this.notificationService.success('Product added to wishlist');
+          this.showCustomNotification('Product added to wishlist', 'success');
         } else {
-          this.notificationService.success('Product removed from wishlist');
+          this.showCustomNotification('Product removed from wishlist', 'warning');
         }
       },
       error: (error) => {
         console.error('Error toggling wishlist item:', error);
-        this.notificationService.error('Failed to update wishlist. Please try again.');
+        this.showCustomNotification('Failed to update wishlist. Please try again.', 'error');
       }
     });
   }
 
-
- // Add this method to check if a product is in the wishlist
-isInWishlist(productId: number): boolean {
-  return this.wishlistService.isInWishlist(productId);
-}
+  // Add this method to check if a product is in the wishlist
+  isInWishlist(productId: number): boolean {
+    return this.wishlistService.isInWishlist(productId);
+  }
   
-
   // Cart functionality
   addToCart(event: Event, productId: number): void {
     console.log('Add to cart clicked for product:', productId);
@@ -483,7 +485,7 @@ isInWishlist(productId: number): boolean {
     // Check if user is logged in - properly check authentication status
     const currentUser = localStorage.getItem('currentUser');
     if (!currentUser) {
-      this.notificationService.warning('Please log in to add items to your cart');
+      this.showCustomNotification('Please log in to add items to your cart', 'warning');
       this.addingToCart[productId] = false;
       return;
     }
@@ -492,20 +494,14 @@ isInWishlist(productId: number): boolean {
     this.cartsService.addItemToCart(productId, 1).subscribe({
       next: (response) => {
         console.log('Item added to cart:', response);
-        this.notificationService.success('Item added to cart successfully');
+        this.showCustomNotification('Item added to cart successfully', 'success');
         this.addingToCart[productId] = false;
       },
       error: (error) => {
         console.error('Error adding item to cart:', error);
-        this.notificationService.error('Failed to add product to cart. Please try again.');
+        this.showCustomNotification('Failed to add product to cart. Please try again.', 'error');
         this.addingToCart[productId] = false;
       }
     });
   }
-  
-
- 
-  
-
-  
 }

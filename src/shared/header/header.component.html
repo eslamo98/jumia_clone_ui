@@ -1,6 +1,7 @@
 <!-- header.component.html -->
 <!-- Top Banner - Disappears on scroll -->
 <div class="top-banner">
+  <!-- Banner content remains unchanged -->
   <div class="flash-sale">
     <div class="call-to-order">
       <span>Call To Order</span>
@@ -49,47 +50,48 @@
         <button type="submit" class="search-button">Search</button>
       </form>
       
-     <!-- Search Results Dropdown -->
-<!-- Search Results Dropdown -->
-<div class="search-results-dropdown" *ngIf="isSearchResultsVisible">
-  <div class="loading-indicator" *ngIf="isLoading">
-    <span>Searching...</span>
-  </div>
-  
-  <ul class="search-results-list" *ngIf="!isLoading">
-    <li *ngFor="let product of searchResults.slice(0, 5)" 
-        (click)="navigateToProduct(product.productId)"
-        class="search-result-item">
-      <div class="search-result-image">
-        <!-- Add image error handling with a fallback -->
-        <img [src]="getImageUrl(product.mainImageUrl)" 
-             [alt]="product.name" 
-             (error)="handleImageError($event)">
-      </div>
-      <div class="search-result-details">
-        <div class="search-result-name">{{ product.name }}</div>
-        <div class="search-result-category">{{ product.subcategoryName }}</div>
-        <div class="search-result-price">
-          <span class="final-price">{{ product.finalPrice | currency:'EGP':'symbol':'1.2-2' }}</span>
-          <span class="base-price" *ngIf="product.discountPercentage > 0">
-            {{ product.basePrice | currency:'EGP':'symbol':'1.2-2' }}
-          </span>
-          <span class="discount-badge" *ngIf="product.discountPercentage > 0">
-            -{{ product.discountPercentage }}%
-          </span>
+     <!-- Updated Search Results Dropdown -->
+     <div class="search-results-dropdown" *ngIf="isSearchResultsVisible">
+        <div class="loading-indicator" *ngIf="isLoading">
+          <span>Searching...</span>
         </div>
+        
+        <ul class="search-results-list" *ngIf="!isLoading">
+          <!-- Modified search result item - whole item is clickable -->
+          <li *ngFor="let product of searchResults.slice(0, 5)" 
+              class="search-result-item"
+              (click)="navigateToProduct(product.productId)">
+            <div class="search-result-content">
+              <div class="search-result-image">
+                <img [src]="getImageUrl(product.mainImageUrl)" 
+                     [alt]="product.name" 
+                     (error)="handleImageError($event)">
+              </div>
+              <div class="search-result-details">
+                <div class="search-result-name">{{ product.name }}</div>
+                <div class="search-result-category">{{ product.subcategoryName }}</div>
+                <div class="search-result-price">
+                  <span class="final-price">{{ product.finalPrice | currency:'EGP':'symbol':'1.2-2' }}</span>
+                  <span class="base-price" *ngIf="product.discountPercentage > 0">
+                    {{ product.basePrice | currency:'EGP':'symbol':'1.2-2' }}
+                  </span>
+                  <span class="discount-badge" *ngIf="product.discountPercentage > 0">
+                    -{{ product.discountPercentage }}%
+                  </span>
+                </div>
+              </div>
+            </div>
+          </li>
+          
+          <li class="view-all-results" *ngIf="searchResults.length > 5" (click)="onSearch($event)">
+            View all {{ searchResults.length }} results
+          </li>
+          
+          <li class="no-results" *ngIf="searchResults.length === 0">
+            No products found matching "{{ searchQuery }}"
+          </li>
+        </ul>
       </div>
-    </li>
-    
-    <li class="view-all-results" *ngIf="searchResults.length > 5" (click)="onSearch($event)">
-      View all {{ searchResults.length }} results
-    </li>
-    
-    <li class="no-results" *ngIf="searchResults.length === 0">
-      No products found matching "{{ searchQuery }}"
-    </li>
-  </ul>
-</div>
     </div>
     
     <!-- Right Navigation -->

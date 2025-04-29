@@ -63,6 +63,81 @@
   border-color: #f49932;
 }
 
+/* Notification */
+
+.z-9999 {
+  z-index: 9999; 
+}
+
+body.notification-visible {
+  overflow: visible;
+}
+.fixed {
+  position: fixed;
+}
+
+.top-0 {
+  top: 0;
+}
+
+.left-0 {
+  left: 0;
+}
+
+.right-0 {
+  right: 0;
+}
+
+.flex {
+  display: flex;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.py-3 {
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+
+.px-5 {
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
+}
+
+.text-white {
+  color: white;
+}
+
+.bg-green-500 {
+  background-color: #6dbd28;
+}
+
+.bg-yellow-500 {
+  background-color: #eec327;
+}
+
+.bg-red-500 {
+  background-color: #df2e2e;
+}
+
+.w-5 {
+  width: 1.25rem;
+}
+
+.h-5 {
+  height: 1.25rem;
+}
+
+.mr-2 {
+  margin-right: 0.5rem;
+}
+
 /* Loading and error messages */
 .loading-indicator, .error-message, .no-products {
   text-align: center;
