@@ -100,3 +100,59 @@ export interface Column {
   sortDirection?: 'asc' | 'desc' | undefined;
   filterable?: boolean | undefined;
 }
+
+export interface CustomerOrder {
+  orderId: number;
+  date: string;
+  amount: number;
+  status:
+    | 'pending'
+    | 'processing'
+    | 'shipped'
+    | 'delivered'
+    | 'cancelled'
+    | 'completed';
+  paymentStatus: 'pending' | 'paid' | 'failed' | 'refunded';
+  paymentMethod: string;
+  items: OrderItem[];
+}
+
+export interface OrderDto {
+  orderId: number;
+  customerId: number;
+  addressId: number;
+  couponId?: number;
+  totalAmount: number;
+  discountAmount: number;
+  shippingFee: number;
+  taxAmount: number;
+  finalAmount: number;
+  paymentMethod: string;
+  paymentStatus: string;
+  createdAt: string;
+  updatedAt: string;
+  affiliateId?: number;
+  affiliateCode?: string;
+  subOrders: SubOrderDto[];
+}
+
+export interface SubOrderDto {
+  suborderId: number;
+  orderId: number;
+  sellerId: number;
+  subtotal: number;
+  status: string;
+  statusUpdatedAt: string;
+  trackingNumber?: string;
+  shippingProvider?: string;
+  orderItems: OrderItemDto[];
+}
+
+export interface OrderItemDto {
+  productId: number;
+  quantity: number;
+  priceAtPurchase: number;
+  totalPrice: number;
+  variantId?: number;
+}
+

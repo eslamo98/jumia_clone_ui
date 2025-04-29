@@ -1,21 +1,17 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { map, Observable } from 'rxjs';
-import { environment } from '../../environments/environment';
-interface Country {
-  id: string;
-  name: string;
-  code: string;
-}
+import { map, Observable, catchError } from 'rxjs';
+import { environment } from '../../../src/environments/environment'; // Adjust the import path as necessary
+
 @Injectable({
   providedIn: 'root'
 })
-export class AddressService {
+export class AddressService { // replace with your API URL
   private apiUrl = environment.apiUrl;
   private countriesApiUrl = 'https://restcountries.com/v3.1';
   private cityStateApiUrl = 'https://countriesnow.space/api/v0.1';
   constructor(private http: HttpClient) { }
-  getCountries(): Observable<Country[]> {
+  getCountries(): Observable<any[]> {
     return this.http.get<any[]>(`${this.countriesApiUrl}/all`).pipe(
       map((countries) => {
         return countries.map(country => ({
@@ -29,9 +25,20 @@ export class AddressService {
 
 
   getStates(countryCode: string): Observable<any> {
+    // Create a mapping for country codes to full names
+    const countryMapping: { [key: string]: string } = {
+      'US': 'United States',
+      'GB': 'United Kingdom',
+      'EG': 'Egypt',
+      // Add more mappings as needed
+    };
+
+    const countryName = countryMapping[countryCode] || countryCode;
+    
     const body = {
-      country: countryCode
-    }; 
+      country: countryName
+    };
+
     return this.http.post(`${this.cityStateApiUrl}/countries/states`, body).pipe(
       map((response: any) => {
         if (response.data && response.data.states) {
@@ -42,26 +49,43 @@ export class AddressService {
           }));
         }
         return [];
+      }),
+      catchError(error => {
+        console.error('Error fetching states:', error);
+        throw error;
       })
     );
   }
 
-
-  getCities(countryCode: string, state: string): Observable<any> {
-    const body = {
-      country: countryCode,
-      state: state
+  getCities(countryCode: string, stateName: string): Observable<any> {
+    const countryMapping: { [key: string]: string } = {
+      'US': 'United States',
+      'GB': 'United Kingdom',
+      'EG': 'Egypt',
+      // Add more mappings as needed
     };
+
+    const countryName = countryMapping[countryCode] || countryCode;
+    
+    const body = {
+      country: countryName,
+      state: stateName
+    };
+
     return this.http.post(`${this.cityStateApiUrl}/countries/state/cities`, body).pipe(
       map((response: any) => {
         if (response.data) {
           return response.data.map((city: string) => ({
             id: city,
             name: city,
-            stateCode: state
+            stateCode: stateName
           }));
         }
         return [];
+      }),
+      catchError(error => {
+        console.error('Error fetching cities:', error);
+        throw error;
       })
     );
   }

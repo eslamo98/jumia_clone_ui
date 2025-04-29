@@ -4,7 +4,6 @@ import { roleGuard } from '../guards/role.guard';
 import { HomeComponent } from '../pages/public/home-page/home-page.component';
 import { ProductsComponent } from '../pages/public/products/products.component';
 import { UnauthorizedComponent } from '../shared/unauthorized/unauthorized.component';
-import { CustomerAccountComponent } from '../pages/customer/customer-account/customer-account.component';
 import { CartComponent } from '../pages/customer/cart/cart.component';
 import { SellerDashboardComponent } from '../pages/seller/seller-dashboard/seller-dashboard.component';
 import { SellerProductsComponent } from '../pages/seller/seller-products/seller-products.component';
@@ -35,6 +34,14 @@ import { SellerProductFormComponent } from '../pages/seller/seller-productEdit/s
 import { ManageproductsComponent } from '../pages/seller/seller-manageproducts/manageproducts/manageproducts.component';
 import { WarrantyComponent } from '../pages/customer/warranty/warranty/warranty.component';
 import { WishlistComponent } from '../pages/customer/wishlist/wishlist/wishlist.component';
+import { AccountOverviewComponent } from '../pages/customer/customer-account/Account-overview/account-overview/account-overview.component';
+import { CustomerOrdersComponent } from '../pages/customer/customer-account/customer-orders/customer-orders.component';
+import { VouchersComponent } from '../pages/customer/customer-account/customer-vouchers/customer-vouchers.component';
+import { AddressBookComponent } from '../pages/customer/customer-account/customer-addressbook/customer-addressbook.component';
+import { CustomerAddAddressComponent } from '../pages/customer/customer-account/customer-add-address/customer-add-address.component';
+import { customerWishlistComponent } from '../pages/customer/customer-account/customer-wishlist/customer-wishlist.component';
+import { CustomerAccountComponent } from '../pages/customer/customer-account/customer-account-component/customer-account-component.component';
+import { CustomerProfileComponent } from '../pages/customer/customer-account/customer-profile/customer-profile.component';
 
 export const routes: Routes = [
   // Public routes
@@ -55,7 +62,18 @@ export const routes: Routes = [
   {
     path: 'account',
     component: CustomerAccountComponent,
-    canActivate: [authGuard]
+    canActivate: [authGuard],
+    children: [
+      { path: '', component: AccountOverviewComponent },
+      { path: 'overview', component: AccountOverviewComponent },
+      { path: 'orders', component: CustomerOrdersComponent },
+      { path: 'vouchers', component: VouchersComponent },
+      { path: 'wishlist', component: customerWishlistComponent },
+      { path: 'address', component: AddressBookComponent },
+      { path: 'edit-address', component: CustomerAddAddressComponent },
+      { path: 'profile', component: CustomerProfileComponent },
+      // Add other account related routes here
+    ]
   },
   {
     path: 'cart',
