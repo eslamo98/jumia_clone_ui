@@ -71,9 +71,9 @@ export class CheckoutComponent implements OnInit {
     }
   }
 
-  goToPreviousStep() {
-    if (this.currentStep > 1) {
-      this.currentStep--;
+ 
+    goToPreviousStep() {
+      this.router.navigate(['/home']);
     }
+    
   }
-}

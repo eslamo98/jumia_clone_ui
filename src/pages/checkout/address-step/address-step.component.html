@@ -35,7 +35,7 @@
              [class.selected]="selectedAddress?.addressId === address.addressId"
              (click)="selectAddress(address)">
           <div class="address-info">
-            <p class="address-name"><strong>{{ address.addressName }}</strong></p>
+            <p class="address-name">{{ address.addressName }}</p>
             <p class="street">{{ address.streetAddress }}</p>
             <p class="location">{{ address.city }}, {{ address.state }} {{ address.postalCode }}</p>
             <p class="phone">{{ address.phoneNumber }}</p>

@@ -1,15 +1,26 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { 
+  faPhoneAlt, 
+  faUndoAlt, 
+  faLock 
+} from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-checkout-header',
   templateUrl: './checkout-header.component.html',
+  imports: [ FontAwesomeModule],
   styleUrls: ['./checkout-header.component.css']
 })
 export class CheckoutHeaderComponent {
   selectedLanguage: string = 'en'; // Default language is English
 
   constructor(private router: Router) {}
+   // Font Awesome icons
+   faPhoneAlt = faPhoneAlt;
+   faUndoAlt = faUndoAlt;
+   faLock = faLock;
 
   // Handle language change
   onLanguageChange(event: Event): void {

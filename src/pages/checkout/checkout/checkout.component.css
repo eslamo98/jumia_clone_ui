@@ -62,14 +62,14 @@ html, body {
 
 .jumia-section h2 {
   margin-bottom: 10px;
-  font-size: 20px;
+  font-size: 10px;
   color: #333;
 }
 
 .order-summary-container {
   flex: 1;
   display: flex;
-  gap: 10px;
+  gap: 20px;
   flex-direction: column;
   position: sticky;
   top: 20px;
@@ -267,3 +267,9 @@ html, body {
     font-size: 14px;
   }
 }
+
+
+  .back-button{
+  color: #0a52a5;
+  }
+
