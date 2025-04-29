@@ -8,6 +8,7 @@ import { CartsService } from '../../../services/cart/carts.service';
 import { catchError, debounceTime, distinctUntilChanged, finalize, of, Subscription } from 'rxjs';
 import { Cart } from '../../../models/cart.model';
 import { environment } from '../../../environments/environment';
+import { NotificationService } from '../../../services/shared/notification.service';
 
 @Component({
   selector: 'app-cart',
@@ -28,7 +29,8 @@ export class CartComponent implements OnInit, OnDestroy {
 
   constructor(
     private cartService: CartsService,
-    private router: Router
+    private router: Router,
+    private notificationService: NotificationService,
   ) {}
 
   ngOnInit() {
@@ -90,6 +92,7 @@ export class CartComponent implements OnInit, OnDestroy {
           
           this.calculateCartTotals();
           this.checkForExpressItems();
+          this.notificationService.showSuccess("Cart Loaded successfully!");
         } else {
           this.resetCart();
         }
