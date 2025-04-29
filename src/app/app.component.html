@@ -1,12 +1,12 @@
 <!-- src/app/app.component.html -->
 <div class="app-container">
-  @if(!getCurrentUrl().startsWith('/admin') && !getCurrentUrl().startsWith('/seller') && !getCurrentUrl().startsWith('/checkout')) {
+  @if(!getCurrentUrl().startsWith('/admin') && !getCurrentUrl().startsWith('/seller')) {
     <app-header></app-header>
   }
   
   
   <main class="main-content">
-    @if(!getCurrentUrl().startsWith('/admin') && !getCurrentUrl().startsWith('/seller') && !getCurrentUrl().startsWith('/checkout')) {
+    @if(!getCurrentUrl().startsWith('/admin') && !getCurrentUrl().startsWith('/seller')) {
       <div class="container">
         <router-outlet></router-outlet>
       </div>
@@ -17,7 +17,7 @@
     }
   </main>
   
-  @if(!getCurrentUrl().startsWith('/admin') && !getCurrentUrl().startsWith('/seller') && !getCurrentUrl().startsWith('/checkout')) {
+  @if(!getCurrentUrl().startsWith('/admin') && !getCurrentUrl().startsWith('/seller')) {
     <app-footer></app-footer>
   }
   
