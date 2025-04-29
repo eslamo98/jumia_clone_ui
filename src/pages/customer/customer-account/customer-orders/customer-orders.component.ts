@@ -45,7 +45,7 @@ export class CustomerOrdersComponent implements OnInit {
     }
 
     this.ordersService
-      .getCustomerOrders(currentUser.userId, this.page, this.pageSize) // Use actual userId instead of hardcoded 1
+      .getCustomerOrders(currentUser.entityId, this.page, this.pageSize) // Use actual userId instead of hardcoded 1
       .subscribe({
         next: (response) => {
           console.log('Orders API Response:', response);
