@@ -7,11 +7,8 @@
       Shipping Address
       <i class="fa fa-home header-icon"></i>
     </span>
-    <button class="change-btn" (click)="isStepCompleted = false" *ngIf="isStepCompleted">
-      Change
-    </button>
     <button class="change-btn" (click)="startNewAddress()" *ngIf="!isEditing && !isStepCompleted">
-      Add New Address
+      Change &nbsp;<i class="fas fa-edit"></i>
     </button>
   </h2>
 
@@ -38,7 +35,7 @@
              [class.selected]="selectedAddress?.addressId === address.addressId"
              (click)="selectAddress(address)">
           <div class="address-info">
-            <p class="address-name"><strong>{{ address.addressName }}</strong></p>
+            <p class="address-name">{{ address.addressName }}</p>
             <p class="street">{{ address.streetAddress }}</p>
             <p class="location">{{ address.city }}, {{ address.state }} {{ address.postalCode }}</p>
             <p class="phone">{{ address.phoneNumber }}</p>
@@ -188,3 +185,7 @@
     </div>
   </div>
 </div>
+
+
+
+

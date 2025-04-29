@@ -1,122 +1,261 @@
-
 .step {
-  background: #fff;
+  background-color: #fff;
   border: 1px solid #e0e0e0;
-  border-radius: 8px;
+  border-radius: 4px;
   padding: 20px;
   margin-bottom: 20px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
 }
 
 .step h2 {
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: space-between;
+  font-size: 16px;
+ 
+  color: #000;
   margin-bottom: 15px;
-  font-size: 18px;
-  color: #333;
+}
+
+.step.active h2 {
+  color: #000;
+}
+
+.step.disabled h2 {
+  color: #666;
+}
+
+.step.completed h2 {
+  color: #000;
 }
 
 .checkmark {
-  color: #4CAF50;
-  font-size: 1.4em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  margin-right: 10px;
+  font-size: 14px;
 }
 
-.header-icon {
-  color: #666;
-  font-size: 1.1em;
-  margin-left: 8px;
+.checkmark.completed {
+  color: #34a853;
+}
+
+.step-title {
+  flex: 1;
 }
 
 .change-btn {
   background: none;
   border: none;
-  color: #007bff;
+  color: #0066c0;
+  font-size: 14px;
+  font-weight: normal;
   cursor: pointer;
-  margin-left: auto;
-  padding: 5px 10px;
-  transition: all 0.3s;
+  padding: 0;
 }
 
 .change-btn:hover {
   text-decoration: underline;
-  opacity: 0.8;
 }
 
-
-.address-display p {
-  margin: 8px 0;
-  line-height: 1.6;
-  color: #555;
+.step-content {
+  margin-top: 10px;
 }
 
-.form-group {
-  margin-bottom: 15px;
+.step-content.d-none {
+  display: none;
 }
 
-.form-input {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ddd;
+/* Disabled State */
+.step-disabled .alert {
+  background-color: #fff3cd;
+  border: 1px solid #ffeeba;
+  border-radius: 4px;
+  padding: 15px;
+  color: #856404;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.step-disabled .alert i {
+  color: #856404;
+}
+
+/* Delivery Options */
+.delivery-options {
+  margin-bottom: 20px;
+}
+
+.delivery-option-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 15px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+}
+
+.delivery-option-card:hover {
+  border-color: #ccc;
+}
+
+.delivery-option-card.selected {
+  border-color: #0066c0;
+}
+
+.option-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.option-checkbox {
+  margin-right: 10px;
+}
+
+.option-checkbox input {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.option-title {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.option-title h3 {
+  font-size: 16px;
+
+  color: #000;
+  margin: 0;
+}
+
+.option-title .badge {
+  background-color: #0066c0;
+  color: white;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 12px;
+}
+
+.option-details {
+  margin-left: 28px; /* Align with checkbox */
+}
+
+.delivery-time {
+  font-size: 14px;
+  color: #000;
+  margin: 0 0 5px 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.delivery-time i {
+  color: #666;
+}
+
+.description {
+  font-size: 14px;
+  color: #333;
+  margin: 0;
+}
+
+/* Confirm Button */
+.action-buttons {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.btn-confirm {
+  background-color: #F68B1E;
+  color: white;
+  border: none;
+  padding: 10px 20px;
   border-radius: 4px;
   font-size: 14px;
+
+  cursor: pointer;
+  transition: background 0.3s ease;
 }
 
-.form-input:focus {
-  outline: none;
-  border-color: #ff6f00;
-  box-shadow: 0 0 0 2px rgba(255,111,0,0.1);
+.btn-confirm:hover {
+  background-color: #e07d1b;
 }
 
-.active {
-  border-left: 3px solid #ff6f00;
+.btn-confirm:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
 }
-  
-  .delivery-options select {
-    width: 100%;
+
+/* Completed Summary */
+.step-summary {
+  margin-top: 10px;
+}
+
+.selected-delivery-summary {
+  padding: 10px 0;
+}
+
+.summary-content h4 {
+  font-size: 16px;
+
+  color: #000;
+  margin: 0 0 5px 0;
+}
+
+.summary-content p {
+  font-size: 14px;
+  color: #000;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.summary-content .mb-1 {
+  margin-bottom: 0.25rem;
+}
+
+.summary-content .mb-0 {
+  margin-bottom: 0;
+}
+
+.summary-content i {
+  color: #666;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .step {
+    padding: 15px;
+  }
+
+  .delivery-option-card {
     padding: 10px;
-    margin: 5px 0;
-    border: 1px solid #ccc;
-    border-radius: 5px;
   }
-  
-  .next-btn {
-    margin-top: 20px;
-    padding: 10px 20px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  .next-btn:hover {
-    background-color: #45a049;
-  }
-  .step h2 {
-    display: flex;
-    align-items: center;
+
+  .option-header {
+    flex-direction: column;
+    align-items: flex-start;
     gap: 10px;
   }
-  
-  .step-title {
-    flex-grow: 1;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+
+  .option-details {
+    margin-left: 0;
   }
-  
-  .fa-home {
-    color: #666;
-    font-size: 0.9em;
+
+  .btn-confirm {
+    width: 100%;
   }
-  
-  .checkmark {
-    color: green;
-    font-size: 1.2em;
-  }
-  
- 
-  .step h2 > *:last-child {
-    margin-left: auto;
-  } 
+}

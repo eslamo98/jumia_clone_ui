@@ -1,244 +1,341 @@
 
 .step {
-  background: #fff;
+  background-color: #fff;
   border: 1px solid #e0e0e0;
-  border-radius: 8px;
+  border-radius: 4px;
   padding: 20px;
   margin-bottom: 20px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
 }
 
 .step h2 {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 15px;
-  font-size: 18px;
-  color: #333;
+  justify-content: space-between;
+  font-size: 16px;
+  
+  color: #000;
+  margin-bottom: 20px;
+}
+
+.step.active h2 {
+  color: #000;
+}
+
+.step.completed h2 {
+  color: #000;
 }
 
 .checkmark {
-  color: #4CAF50;
-  font-size: 1.4em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  margin-right: 10px;
+  font-size: 14px;
+}
+
+.checkmark.completed {
+  color: #34a853;
+}
+
+.step-title {
+  flex: 1;
 }
 
 .header-icon {
-  color: #666;
-  font-size: 1.1em;
-  margin-left: 8px;
+  display: none; /* Jumia doesn't use an icon here */
 }
 
 .change-btn {
   background: none;
   border: none;
-  color: #007bff;
+  color: #0066c0;
+  font-size: 14px;
+  font-weight: normal;
   cursor: pointer;
-  margin-left: auto;
-  padding: 5px 10px;
-  transition: all 0.3s;
+  padding: 0;
 }
 
 .change-btn:hover {
   text-decoration: underline;
-  opacity: 0.8;
+}
+
+.step-content {
+  margin-top: 10px;
+}
+
+.step-content.d-none {
+  display: none;
+}
+
+/* Address List */
+.address-list {
+  margin-bottom: 20px;
+}
+
+.address-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 15px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+}
+
+.address-card:hover {
+  border-color: #ccc;
+}
+
+.address-card.selected {
+  border-color: #0066c0;
+}
+
+.address-info p {
+  margin: 0;
+  font-size: 14px;
+  color: #000;
 }
 
 
-.address-display p {
-  margin: 8px 0;
-  line-height: 1.6;
-  color: #555;
+.street,
+.location,
+.phone {
+  color: #333;
+}
+
+.address-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.edit-btn {
+  background: none;
+  border: none;
+  color: #0066c0;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.edit-btn:hover {
+  text-decoration: underline;
+}
+
+.default-badge {
+  background-color: #f5f5f5;
+  color: #666;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+/* Loading State */
+.text-center {
+  text-align: center;
+}
+
+.spinner-border {
+  width: 2rem;
+  height: 2rem;
+  border-width: 0.3em;
+  color: #F68B1E;
+}
+
+.text-muted {
+  color: #666;
+  font-size: 14px;
+}
+
+/* Address Form */
+.address-form {
+  max-width: 600px;
 }
 
 .form-group {
   margin-bottom: 15px;
 }
 
+.form-group label {
+  display: block;
+  font-size: 14px;
+  color: #000;
+  margin-bottom: 5px;
+}
+
 .form-input {
   width: 100%;
-  padding: 10px;
-  border: 1px solid #ddd;
+  padding: 8px;
+  border: 1px solid #e0e0e0;
   border-radius: 4px;
   font-size: 14px;
+  color: #333;
 }
 
 .form-input:focus {
   outline: none;
-  border-color: #ff6f00;
-  box-shadow: 0 0 0 2px rgba(255,111,0,0.1);
+  border-color: #F68B1E;
 }
 
-.active {
-  border-left: 3px solid #ff6f00;
+.form-input::placeholder {
+  color: #aaa;
 }
 
-.address-list {
-  display: grid;
-  gap: 1rem;
-  margin-top: 1rem;
+.form-input:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
 }
 
-.address-card {
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 1rem;
-  cursor: pointer;
+.position-relative {
+  position: relative;
+}
+
+.top-50 {
+  top: 50%;
+}
+
+.end-0 {
+  right: 0;
+}
+
+.translate-middle-y {
+  transform: translateY(-50%);
+}
+
+.me-2 {
+  margin-right: 0.5rem;
+}
+
+.spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+  border-width: 0.2em;
+}
+
+.form-group.checkbox {
   display: flex;
-  justify-content: space-between;
-  align-items: start;
-  transition: all 0.3s ease;
-  background: #fff;
-}
-
-.address-card:hover {
-  border-color: #ff6f00;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.address-card.selected {
-  border-color: #ff6f00;
-  background-color: #fff8f3;
-}
-
-.address-info {
-  flex: 1;
-}
-
-.address-info p {
-  margin: 0.25rem 0;
-  color: #555;
-  line-height: 1.4;
-}
-
-.address-name {
-  color: #333;
-  font-size: 1.1rem;
-  font-weight: 500;
-}
-
-.address-actions {
-  display: flex;
-  gap: 0.5rem;
   align-items: center;
+  gap: 10px;
 }
 
-.edit-btn {
-  padding: 0.5rem 1rem;
-  background-color: #fff;
-  border: 1px solid #ff6f00;
-  color: #ff6f00;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.3s ease;
+.form-group.checkbox input {
+  margin: 0;
 }
 
-.edit-btn:hover {
-  background-color: #fff8f3;
-}
-
-.default-badge {
-  background-color: #e8f5e9;
-  color: #4CAF50;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.8rem;
-  font-weight: 500;
+.form-group.checkbox label {
+  font-weight: normal;
+  margin: 0;
 }
 
 .form-actions {
   display: flex;
-  gap: 1rem;
-  margin-top: 1.5rem;
+  gap: 10px;
+  margin-top: 20px;
 }
 
 .save-btn {
-  padding: 0.75rem 1.5rem;
-  background-color: #ff6f00;
+  background-color: #F68B1E;
   color: white;
   border: none;
+  padding: 10px 20px;
   border-radius: 4px;
+  font-size: 14px;
   cursor: pointer;
-  font-weight: 500;
-  transition: all 0.3s ease;
+  transition: background 0.3s ease;
 }
 
 .save-btn:hover {
-  background-color: #f36800;
+  background-color: #e07d1b;
 }
 
 .cancel-btn {
-  padding: 0.75rem 1.5rem;
-  background-color: #fff;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  cursor: pointer;
+  background-color: transparent;
   color: #666;
-  font-weight: 500;
-  transition: all 0.3s ease;
+  border: 1px solid #e0e0e0;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.3s ease;
 }
 
 .cancel-btn:hover {
   background-color: #f5f5f5;
-  border-color: #ccc;
 }
 
-.checkbox {
+/* Confirm Button */
+.d-flex {
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
+}
+
+.justify-content-end {
+  justify-content: flex-end;
+}
+
+.mt-3 {
   margin-top: 1rem;
 }
 
-.checkbox input {
-  width: 18px;
-  height: 18px;
+.btn-primary {
+  background-color: #F68B1E;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-size: 14px;
   cursor: pointer;
+  transition: background 0.3s ease;
 }
 
-.checkbox label {
-  color: #555;
-  cursor: pointer;
-  user-select: none;
+.btn-primary:hover {
+  background-color: #e07d1b;
 }
 
-.address-form {
-  max-width: 600px;
-  margin: 1rem auto;
-  padding: 1.5rem;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  background: #fff;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  color: #333;
-  font-weight: 500;
-}
-
-.step-content {
-  padding: 1rem 0;
-}
-
-.step.completed {
-  background-color: #f8f9fa;
-}
-
-.checkmark.completed {
-  color: #28a745;
-}
-
+/* Completed State Summary */
 .step-summary {
-  padding: 1rem;
-  background-color: #fff;
-  border-radius: 0.25rem;
-  margin-top: 1rem;
+  margin-top: 10px;
 }
 
-.selected-address-summary {
-  padding: 1rem;
-  background-color: #f8f9fa;
-  border-radius: 0.25rem;
-  border-left: 4px solid #28a745;
+.selected-address-summary p {
+  margin: 0;
+  font-size: 14px;
+  color: #000;
+}
+
+.selected-address-summary .mb-1 {
+  margin-bottom: 0.25rem;
+}
+
+.selected-address-summary .mb-0 {
+  margin-bottom: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .step {
+    padding: 15px;
+  }
+
+  .address-card {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .address-actions {
+    justify-content: flex-end;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .save-btn,
+  .cancel-btn {
+    width: 100%;
+  }
 }

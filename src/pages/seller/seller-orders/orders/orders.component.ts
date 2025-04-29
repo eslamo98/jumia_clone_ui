@@ -220,7 +220,7 @@ export class OrdersComponent implements OnInit {
       .getSellerOrders({
         pageNumber: this.currentPage,
         pageSize: 10,
-      })
+      }, this.authService.currentUserValue?.entityId)
       .subscribe({
         next: (response) => {
           console.log('Full API Response:', response);

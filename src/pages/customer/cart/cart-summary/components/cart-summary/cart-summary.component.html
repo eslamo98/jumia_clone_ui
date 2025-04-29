@@ -21,9 +21,14 @@
         <span class="total-value">{{ totalPrice | currency }}</span>
       </div>
       
-      <button class="checkout-btn" [disabled]="itemCount === 0">
+      <button 
+      class="checkout-btn" 
+      [disabled]="itemCount === 0" 
+      [routerLink]="['/checkout']" 
+      (click)="onProceedToCheckout()"
+      type="button">
         CHECKOUT ({{ totalPrice | currency }})
-      </button>
+    </button>
     </div>
   </div>
 

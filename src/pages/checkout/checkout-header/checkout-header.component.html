@@ -1,0 +1,31 @@
+<header class="checkout-header">
+  <div class="header-left">
+    <a routerLink="/" class="logo">
+      <span class="logo-text"><strong>JUMIA</strong></span>
+      <span class="logo-star">
+        <img src="./images/JMIA.png" alt="Jumia Star">
+      </span>
+    </a>
+  </div>
+
+  <div class="header-center">
+    <h1>Place your order</h1>
+  </div>
+
+  <div class="header-right">
+    <nav class="nav-links">
+      <a routerLink="/contact" class="nav-link">
+        <fa-icon [icon]="faPhoneAlt"></fa-icon>
+        Need Help? Contact us
+      </a>
+      <a routerLink="/returns" class="nav-link">
+        <fa-icon [icon]="faUndoAlt"></fa-icon>
+        Easy Returns
+      </a>
+      <a routerLink="/security" class="nav-link">
+        <fa-icon [icon]="faLock"></fa-icon>
+        Secure Payments
+      </a>
+    </nav>
+  </div>
+</header>

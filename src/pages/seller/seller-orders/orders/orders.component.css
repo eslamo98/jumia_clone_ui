@@ -11,7 +11,11 @@
   --light-gray: #F5F5F5;
   --border-gray: #E0E0E0;
   --white: #FFFFFF;
+  --primary-orange: #FF6900;
+  --white: #FFFFFF;
+  --jumia-orange-hover: #e55d00;
 }
+
 
 .orders-container {
   display: flex;
@@ -228,9 +232,9 @@
 }
 
 /* Export Button */
-.export-button {
-  background: var(--jumia-orange);
-  color: var(--jumia-white);
+.export{
+  background: var(--primary-orange) !important;
+ color: var(--dark-gray);
   border: none;
   padding: 10px 20px;
   border-radius: 4px;
@@ -241,7 +245,7 @@
   transition: all 0.2s;
 }
 
-.export-button:hover {
+.export:hover {
   background: var(--jumia-orange-hover);
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(255,105,0,0.15);

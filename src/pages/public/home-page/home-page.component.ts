@@ -24,6 +24,7 @@ import { InfoComponent } from "./homeComponents/infoContainer/info/info.componen
 import { UpArrowComponent } from "./homeComponents/upArrow/up-arrow/up-arrow.component";
 import { Router,RouterModule } from '@angular/router';
 import { NavigationService } from '../../../services/navigations/navigation.services';
+import { ChatbotComponent } from '../../../shared/chatbot/chatbot.component';
 
 
 
@@ -32,9 +33,9 @@ import { NavigationService } from '../../../services/navigations/navigation.serv
   standalone: true,
   imports: [
     CommonModule,
-    CarouselComponent,
-    ProductCardComponent,
-    BannerComponent,
+    // CarouselComponent,
+    // ProductCardComponent,
+    // BannerComponent,
     PromoSliderComponent,
     StaticContainerComponent,
     CenterSliderComponent,
@@ -51,6 +52,7 @@ import { NavigationService } from '../../../services/navigations/navigation.serv
     TopSellingComponent,
     InfoComponent,
     UpArrowComponent,
+    ChatbotComponent,
     RouterModule
 ],
   templateUrl: './home-page.component.html',

@@ -5,12 +5,13 @@ import { CheckoutService } from '../../../services/CheckoutService/CheckoutServi
 import { NotificationService } from '../../../services/shared/notification.service';
 import { PaymentModalComponent } from '../payment-modal/payment-modal.component';
 import { PaymentResponse } from '../../../models/checkout';
+import { CartsService } from '../../../services/cart/carts.service';
 @Component({
   selector: 'app-order-summary',
   standalone: true,
   imports: [CommonModule, PaymentModalComponent],
   templateUrl: './order-summary.component.html',
-  styleUrls: ['../checkout/checkout.component.css']
+  styleUrls: ['./order-summary.component.css'],
 })
 export class OrderSummaryComponent {
   @Input() itemsTotal: number = 0.00;
@@ -27,9 +28,23 @@ export class OrderSummaryComponent {
   constructor(
     private ordersService: CheckoutService,
     private router: Router,
-    private notificationService: NotificationService
-  ) {}
-
+    private notificationService: NotificationService,
+    private cartService: CartsService
+  ) {
+    this.loadCartTotal();
+  }
+  private loadCartTotal() {
+    this.cartService.getCartSummary().subscribe({
+      next: (response) => {
+        this.itemsTotal = response.data.subTotal;
+        console.log('Cart total:', response.data.subTotal);
+      },
+      error: (error) => {
+        console.error('Error loading cart total:', error);
+        this.notificationService.showError('Failed to load cart total');
+      }
+    });
+  }
   get total(): number {
     return this.itemsTotal + this.deliveryFee;
   }
@@ -60,6 +75,7 @@ export class OrderSummaryComponent {
           if (response.orderResponse.success) {
             if (response.paymentResponse && response.paymentResponse.success) {
               this.paymentResponse = response.paymentResponse;
+              window.location.href = response.paymentResponse.paymentUrl;
               this.showPaymentModal = true;
             } else {
               this.notificationService.showError('Payment initiation failed');

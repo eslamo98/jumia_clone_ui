@@ -502,6 +502,7 @@ app-sidebar[collapsed="true"] {
   color: var(--primary-color);
   font-weight: 500;
   z-index: 90;
+  
 }
 
 .language-text {
