@@ -1,79 +1,79 @@
 <!-- wishlist.component.html -->
 <div class="wishlist-container">
-    <div class="wishlist-header">
-      <h1 class="wishlist-title">My Wishlist</h1>
-      <div class="breadcrumb">
-        <a [routerLink]="['/']">Home</a> / <span>Wishlist</span>
-      </div>
+  <div class="wishlist-header">
+    <h1 class="wishlist-title">My Wishlist</h1>
+    <div class="breadcrumb">
+      <a [routerLink]="['/']">Home</a> / <span>Wishlist</span>
     </div>
-  
-    <!-- Loading indicator -->
-    <div *ngIf="loading" class="loading-indicator">
-      <i class="fas fa-spinner fa-spin"></i> Loading wishlist items...
+  </div>
+
+  <!-- Loading indicator -->
+  <div *ngIf="loading" class="loading-indicator">
+    <i class="fas fa-spinner fa-spin"></i> Loading wishlist items...
+  </div>
+
+  <!-- Error message -->
+  <div *ngIf="error && !loading && wishlistItems.length === 0" class="empty-wishlist">
+    <i class="far fa-heart"></i>
+    <p>{{ error }}</p>
+    <a [routerLink]="['/']" class="continue-shopping">Continue Shopping</a>
+  </div>
+
+  <!-- Wishlist content -->
+  <div *ngIf="!loading && wishlistItems.length > 0" class="wishlist-content">
+    <div class="wishlist-actions">
+      <button class="clear-wishlist" (click)="clearWishlist()">
+        <i class="fas fa-trash"></i> Clear Wishlist
+      </button>
     </div>
-  
-    <!-- Error message -->
-    <div *ngIf="error && !loading && wishlistItems.length === 0" class="empty-wishlist">
-      <i class="far fa-heart"></i>
-      <p>{{ error }}</p>
-      <a [routerLink]="['/']" class="continue-shopping">Continue Shopping</a>
-    </div>
-  
-    <!-- Wishlist content -->
-    <div *ngIf="!loading && wishlistItems.length > 0" class="wishlist-content">
-      <div class="wishlist-actions">
-        <button class="clear-wishlist" (click)="clearWishlist()">
-          Clear Wishlist
-        </button>
-      </div>
-  
-      <div class="wishlist-items">
-        <div *ngFor="let item of wishlistItems" class="wishlist-item">
-          <div class="item-image">
-            <img [src]="getFullImageUrl(item.mainImageUrl)" [alt]="item.name">
+
+    <div class="wishlist-items">
+      <div *ngFor="let item of wishlistItems" class="wishlist-item">
+        <div class="item-image">
+          <img [src]="getFullImageUrl(item.mainImageUrl)" [alt]="item.name">
+        </div>
+        
+        <div class="item-details">
+          <h3 class="item-name">
+            <a [routerLink]="['/Products', item.productId]">{{ item.name }}</a>
+          </h3>
+          
+          <div class="item-price">
+            <span class="final-price">EGP {{ item.finalPrice || item.finalPrice }}</span>
+            <span class="base-price" *ngIf="item.discountPercentage > 0">EGP {{ item.basePrice }}</span>
+            <span class="discount" *ngIf="item.discountPercentage > 0">-{{ item.discountPercentage }}%</span>
           </div>
           
-          <div class="item-details">
-            <h3 class="item-name">
-              <a [routerLink]="['/Products', item.productId]">{{ item.name }}</a>
-            </h3>
-            
-            <div class="item-price">
-              <span class="final-price">EGP {{ item.finalPrice }}</span>
-              <span class="base-price" *ngIf="item.discountPercentage > 0">EGP {{ item.basePrice }}</span>
-              <span class="discount" *ngIf="item.discountPercentage > 0">-{{ item.discountPercentage }}%</span>
-            </div>
-            
-            <div class="item-status" [ngClass]="{'out-of-stock': !item.isAvailable}">
-              {{ item.isAvailable ? 'In Stock' : 'Out of Stock' }}
-            </div>
+          <div class="item-status" [ngClass]="{'out-of-stock': !item.isAvailable}">
+            {{ item.isAvailable ? 'In Stock' : 'Out of Stock' }}
           </div>
+        </div>
+        
+        <div class="item-actions">
+          <button 
+            class="move-to-cart" 
+            [disabled]="movingToCart[item.productId] || !item.isAvailable"
+            (click)="moveToCart(item.productId)">
+            <span *ngIf="!movingToCart[item.productId]">
+              <i class="fas fa-shopping-cart"></i> Add to Cart
+            </span>
+            <span *ngIf="movingToCart[item.productId]">
+              <i class="fas fa-spinner fa-spin"></i> Adding...
+            </span>
+          </button>
           
-          <div class="item-actions">
-            <button 
-              class="move-to-cart" 
-              [disabled]="movingToCart[item.productId] || !item.isAvailable"
-              (click)="moveToCart(item.productId)">
-              <span *ngIf="!movingToCart[item.productId]">
-                <i class="fas fa-shopping-cart"></i> Add to Cart
-              </span>
-              <span *ngIf="movingToCart[item.productId]">
-                <i class="fas fa-spinner fa-spin"></i> Adding...
-              </span>
-            </button>
-            
-            <button class="remove-from-wishlist" (click)="removeFromWishlist(item.productId)">
-              <i class="fas fa-trash"></i> Remove
-            </button>
-          </div>
+          <button class="remove-from-wishlist" (click)="removeFromWishlist(item.productId)">
+            <i class="fas fa-trash"></i> Remove
+          </button>
         </div>
       </div>
     </div>
-  
-    <!-- Empty wishlist message -->
-    <div *ngIf="!loading && wishlistItems.length === 0 && !error" class="empty-wishlist">
-      <i class="far fa-heart"></i>
-      <p>Your wishlist is empty</p>
-      <a [routerLink]="['/']" class="continue-shopping">Continue Shopping</a>
-    </div>
   </div>
+
+  <!-- Empty wishlist message -->
+  <div *ngIf="!loading && wishlistItems.length === 0 && !error" class="empty-wishlist">
+    <i class="far fa-heart"></i>
+    <p>Your wishlist is empty</p>
+    <a [routerLink]="['/']" class="continue-shopping">Continue Shopping</a>
+  </div>
+</div>

@@ -133,6 +133,8 @@ export class CategoryComponent  extends Helpers implements OnInit {
     this.products.forEach(product => {
       this.addingToCart[product.productId] = false;
     });
+
+    this.loadWishlistStatus();
   }
 
   
@@ -404,17 +406,27 @@ this.products.forEach(product => {
   }
 
   // Wishlist functionality
-  loadWishlistItems(): void {
-    const savedWishlist = localStorage.getItem('wishlist');
-    if (savedWishlist) {
-      try {
-        this.wishlistItems = JSON.parse(savedWishlist);
-      } catch (e) {
-        console.error('Error parsing wishlist from localStorage', e);
-        this.wishlistItems = [];
-      }
+  loadWishlistStatus(): void {
+    // Check if user is logged in
+    const currentUser = localStorage.getItem('currentUser');
+    if (!currentUser) {
+      return; // No need to load if not logged in
     }
+  
+    // Use our wishlist service to check wishlist items
+    this.wishlistService.getWishlist().subscribe({
+      next: () => {
+        // The service will keep track of product IDs internally
+        // We just need to trigger a refresh of the UI
+        this.filteredProducts = [...this.filteredProducts];
+        this.updateDisplayedProducts();
+      },
+      error: (err) => {
+        console.error('Error loading wishlist status', err);
+      }
+    });
   }
+  
   
   saveWishlistItems(): void {
     localStorage.setItem('wishlist', JSON.stringify(this.wishlistItems));
@@ -434,8 +446,8 @@ this.products.forEach(product => {
     
     this.wishlistService.toggleWishlistItem(productId).subscribe({
       next: (response) => {
-        const isAdded = this.wishlistService.isInWishlist(productId);
-        if (isAdded) {
+        // The service already updates its internal state
+        if (this.wishlistService.isInWishlist(productId)) {
           this.notificationService.success('Product added to wishlist');
         } else {
           this.notificationService.success('Product removed from wishlist');
@@ -447,11 +459,14 @@ this.products.forEach(product => {
       }
     });
   }
+
+
  // Add this method to check if a product is in the wishlist
- isInWishlist(productId: number): boolean {
+isInWishlist(productId: number): boolean {
   return this.wishlistService.isInWishlist(productId);
 }
   
+
   // Cart functionality
   addToCart(event: Event, productId: number): void {
     console.log('Add to cart clicked for product:', productId);
@@ -490,5 +505,7 @@ this.products.forEach(product => {
   
 
  
+  
+
   
 }

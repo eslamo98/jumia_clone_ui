@@ -38,11 +38,16 @@ export class WishlistComponent extends Helpers implements OnInit {
 
     this.wishlistService.getWishlist().subscribe({
       next: (response: any) => {
-        if (response && response.success && response.data) {
-          this.wishlistItems = response.data;
+        if (response && response.success && response.data && response.data.wishlistItems) {
+          this.wishlistItems = response.data.wishlistItems;
+          
+          // Initialize movingToCart for each item
+          this.wishlistItems.forEach(item => {
+            this.movingToCart[item.productId] = false;
+          });
         } else {
           this.wishlistItems = [];
-          this.error = 'No items in your wishlist';
+          this.error = response.message || 'No items in your wishlist';
         }
         this.loading = false;
       },
@@ -56,9 +61,13 @@ export class WishlistComponent extends Helpers implements OnInit {
 
   removeFromWishlist(productId: number): void {
     this.wishlistService.removeFromWishlist(productId).subscribe({
-      next: () => {
-        this.wishlistItems = this.wishlistItems.filter(item => item.productId !== productId);
-        this.notificationService.success('Item removed from wishlist');
+      next: (response) => {
+        if (response && response.success) {
+          this.wishlistItems = this.wishlistItems.filter(item => item.productId !== productId);
+          this.notificationService.success('Item removed from wishlist');
+        } else {
+          this.notificationService.error(response.message || 'Failed to remove item from wishlist');
+        }
       },
       error: (err) => {
         console.error('Error removing from wishlist', err);
@@ -85,9 +94,13 @@ export class WishlistComponent extends Helpers implements OnInit {
 
     // Move item to cart
     this.wishlistService.moveToCart(productId).subscribe({
-      next: () => {
-        this.wishlistItems = this.wishlistItems.filter(item => item.productId !== productId);
-        this.notificationService.success('Item moved to cart successfully');
+      next: (response) => {
+        if (response && response.success) {
+          this.wishlistItems = this.wishlistItems.filter(item => item.productId !== productId);
+          this.notificationService.success('Item moved to cart successfully');
+        } else {
+          this.notificationService.error(response.message || 'Failed to move item to cart');
+        }
         this.movingToCart[productId] = false;
       },
       error: (err) => {
@@ -101,9 +114,13 @@ export class WishlistComponent extends Helpers implements OnInit {
   clearWishlist(): void {
     if (confirm('Are you sure you want to clear your wishlist?')) {
       this.wishlistService.clearWishlist().subscribe({
-        next: () => {
-          this.wishlistItems = [];
-          this.notificationService.success('Wishlist cleared successfully');
+        next: (response) => {
+          if (response && response.success) {
+            this.wishlistItems = [];
+            this.notificationService.success('Wishlist cleared successfully');
+          } else {
+            this.notificationService.error(response.message || 'Failed to clear wishlist');
+          }
         },
         error: (err) => {
           console.error('Error clearing wishlist', err);
