@@ -190,6 +190,15 @@ export class ProductDetailsComponent implements OnInit {
     this.quantity = 1; // Reset quantity when changing variants
   }
 
+  get currentPrice(): number {
+    return this.selectedVariant ? this.selectedVariant.finalPrice : this.product?.basePrice;
+  }
+  
+  get currentDiscountPercentage(): number {
+    return this.selectedVariant ? this.selectedVariant.discountPercentage : this.product?.discountPercentage;
+  }
+
+
   public selectImage(imageUrl: string): void {
     this.selectedImage = imageUrl;
   }
@@ -206,111 +215,7 @@ export class ProductDetailsComponent implements OnInit {
 
 
    isAddedToCart: boolean = false;
-
-  // public addToCart(): void {
-  //   // Prevent multiple clicks
-  //   if (this.addingToCart) {
-  //     return;
-  //   }
-  
-  //   // Check if product is available
-  //   const currentStock = this.selectedVariant?.stockQuantity || this.product.stockQuantity;
-  //   if (!this.product || currentStock < 1 || this.quantity < 1) {
-  //     this.notificationService.showWarning('This product is currently unavailable or out of stock');
-  //     return;
-  //   }
-  
-  //   // Check authentication first
-  //   if (!this.authService.isAuthenticated()) {
-  //     this.notificationService.showError('You must be logged in to add items to your cart');
-  //     const currentUrl = this.router.url;
-  //     this.router.navigate(['auth/login'], {
-  //       queryParams: { returnUrl: currentUrl },
-  //       state: { errorMessage: 'You must be logged in to add items to your cart' }
-  //     });
-  //     return;
-  //   }
-  
-  //   // Set loading state
-  //   this.addingToCart = true;
-  
-  //   // Get the productId and variantId
-  //   const productId = this.product.productId;
-  //   const variantId = this.selectedVariant?.variantId;
-  
-  //   // First check if item already exists in cart
-  //   this.cartService.checkItemInCart(productId, variantId).subscribe({
-  //     next: (exists) => {
-  //       if (exists) {
-  //         this.notificationService.showInfo('This item is already in your cart', 'Already in Cart');
-  //         this.addingToCart = false;
-  //         return;
-  //       }
-  
-  //       // If not in cart, proceed to add it
-  //       this.cartService.addItemToCart(productId, this.quantity, variantId).subscribe({
-  //         next: (response) => {
-  //           if (response.success) {
-  //             this.isAddedToCart = true;
-  //             this.notificationService.showSuccess('Item added to cart successfully');
-  //             this.showToast = true;
-  //             setTimeout(() => {
-  //               this.showToast = false;
-  //             }, 3000);
-  //           } else {
-  //             this.notificationService.showError(response.message || 'Failed to add item to cart');
-  //           }
-  //           this.addingToCart = false;
-  //         },
-  //         error: (err) => {
-  //           let errorMessage = 'Failed to add item to cart. Please try again later.';
-  //           const currentUrl = this.router.url;
-  
-  //           if (err.status === 401) {
-  //             errorMessage = 'Please log in first to add items to your cart';
-  //             this.router.navigate(['auth/login'], {
-  //               queryParams: { returnUrl: currentUrl },
-  //               state: { errorMessage: errorMessage }
-  //             });
-  //           } else if (err.status === 404) {
-  //             errorMessage = 'Product not found or has been removed';
-  //           } else if (err.status === 409) {
-  //             errorMessage = 'This item is already in your shopping cart';
-  //           } else if (err.status === 429) {
-  //             errorMessage = 'Too many requests. Please wait before trying again';
-  //           } else if (err.message?.includes('network error')) {
-  //             errorMessage = 'Network connection issue. Please check your internet connection';
-  //           }
-  
-  //           if (err.error?.outOfStock) {
-  //             errorMessage = 'This product is currently out of stock';
-  //           }
-  
-  //           if (err.error?.invalidQuantity) {
-  //             errorMessage = 'The requested quantity is not available';
-  //           }
-  
-  //           this.notificationService.showError(errorMessage);
-  //           console.error('Error adding item to cart:', {
-  //             errorMessage: err.message,
-  //             statusCode: err.status,
-  //             timestamp: new Date().toISOString(),
-  //             errorDetails: err.error
-  //           });
-  //           this.addingToCart = false;
-  //         }
-  //       });
-  //     },
-  //     error: (err) => {
-  //       this.notificationService.showError('Could not verify cart status. Please try again.');
-  //       this.addingToCart = false;
-  //     }
-  //   });
-
-
-    //  *****************************************************
-
-
+   
   public addToCart(): void {
     // Prevent multiple clicks
     if (this.addingToCart) {

@@ -1,129 +1,181 @@
+// src/app/services/wishlist/wishlist.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { catchError, map, tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
-import { tap } from 'rxjs/operators';
 
 export interface WishlistItem {
+  wishlistItemId: number;
+  wishlistId: number;
   productId: number;
   name: string;
+  description: string;
   basePrice: number;
   discountPercentage: number;
   finalPrice: number;
   mainImageUrl: string;
   isAvailable: boolean;
+  stockQuantity: number;
+  addedAt: string;
 }
 
-export interface WishlistSummary {
-  totalItems: number;
-  items: WishlistItem[];
+export interface WishlistResponse {
+  success: boolean;
+  message: string;
+  data: {
+    wishlistId: number;
+    customerId: number;
+    createdAt: string;
+    customerName: string;
+    itemsCount: number;
+    wishlistItems: WishlistItem[];
+  }
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class WishlistService {
-  private apiUrl = `${environment.apiUrl}/api/wishlists`;
-  private wishlistItemsSubject = new BehaviorSubject<number[]>([]);
-  wishlistItems$ = this.wishlistItemsSubject.asObservable();
+  private apiUrl = `${environment.apiUrl}/api/Wishlists`;
   
+  // Store wishlist product IDs in memory
+  private wishlistProductIds: Set<number> = new Set<number>();
+  
+  // BehaviorSubject to notify subscribers when wishlist changes
+  private wishlistCountSubject = new BehaviorSubject<number>(0);
+  public wishlistCount$ = this.wishlistCountSubject.asObservable();
+
   constructor(private http: HttpClient) {
-    this.loadWishlistFromStorage();
+    // Initialize wishlist from localStorage or fetch from API when service is created
+    this.loadWishlistIds();
   }
 
-  private loadWishlistFromStorage(): void {
-    try {
-      const savedWishlist = localStorage.getItem('wishlist');
-      if (savedWishlist) {
-        const parsedWishlist = JSON.parse(savedWishlist);
-        this.wishlistItemsSubject.next(parsedWishlist);
-      }
-    } catch (error) {
-      console.error('Error loading wishlist from storage', error);
-      this.wishlistItemsSubject.next([]);
+  private loadWishlistIds(): void {
+    // Get current user
+    const currentUser = localStorage.getItem('currentUser');
+    
+    if (currentUser) {
+      // If user is logged in, fetch from API
+      this.getWishlist().subscribe({
+        next: (response: any) => {
+          if (response?.success && response?.data?.wishlistItems) {
+            // Clear existing set
+            this.wishlistProductIds.clear();
+            
+            // Add product IDs to the set
+            response.data.wishlistItems.forEach((item: WishlistItem) => {
+              this.wishlistProductIds.add(item.productId);
+            });
+            
+            // Update count
+            this.wishlistCountSubject.next(this.wishlistProductIds.size);
+          }
+        },
+        error: (error) => {
+          console.error('Error loading wishlist IDs from API', error);
+        }
+      });
     }
   }
 
-  private saveWishlistToStorage(wishlistItems: number[]): void {
-    localStorage.setItem('wishlist', JSON.stringify(wishlistItems));
+  getWishlist(): Observable<WishlistResponse> {
+    return this.http.get<WishlistResponse>(`${this.apiUrl}`).pipe(
+      tap((response: WishlistResponse) => {
+        if (response.success && response.data) {
+          // Update the product IDs cache
+          this.wishlistProductIds.clear();
+          response.data.wishlistItems.forEach(item => {
+            this.wishlistProductIds.add(item.productId);
+          });
+          this.wishlistCountSubject.next(this.wishlistProductIds.size);
+        }
+      }),
+      catchError(error => {
+        console.error('Error fetching wishlist', error);
+        return of({
+          success: false,
+          message: 'Failed to fetch wishlist',
+          data: { wishlistId: 0, customerId: 0, createdAt: '', customerName: '', itemsCount: 0, wishlistItems: [] }
+        });
+      })
+    );
   }
 
-  // Get all wishlist items
-  getWishlist(): Observable<any> {
-    return this.http.get(`${this.apiUrl}`);
-  }
-
-  // Get wishlist summary
-  getWishlistSummary(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/summary`);
-  }
-
-  // Add item to wishlist
   addToWishlist(productId: number): Observable<any> {
     return this.http.post(`${this.apiUrl}/items`, { productId }).pipe(
-      tap(() => {
-        const currentItems = this.wishlistItemsSubject.value;
-        if (!currentItems.includes(productId)) {
-          const updatedItems = [...currentItems, productId];
-          this.wishlistItemsSubject.next(updatedItems);
-          this.saveWishlistToStorage(updatedItems);
-        }
+      tap(response => {
+        // Add to local cache
+        this.wishlistProductIds.add(productId);
+        this.wishlistCountSubject.next(this.wishlistProductIds.size);
+      }),
+      catchError(error => {
+        console.error('Error adding item to wishlist', error);
+        return of({ success: false, message: 'Failed to add item to wishlist' });
       })
     );
   }
 
-  // Remove item from wishlist
   removeFromWishlist(productId: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/items/${productId}`).pipe(
-      tap(() => {
-        const currentItems = this.wishlistItemsSubject.value;
-        const updatedItems = currentItems.filter(id => id !== productId);
-        this.wishlistItemsSubject.next(updatedItems);
-        this.saveWishlistToStorage(updatedItems);
+      tap(response => {
+        // Remove from local cache
+        this.wishlistProductIds.delete(productId);
+        this.wishlistCountSubject.next(this.wishlistProductIds.size);
+      }),
+      catchError(error => {
+        console.error('Error removing item from wishlist', error);
+        return of({ success: false, message: 'Failed to remove item from wishlist' });
       })
     );
   }
 
-  // Toggle item in wishlist
+  clearWishlist(): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/clear`).pipe(
+      tap(response => {
+        // Clear local cache
+        this.wishlistProductIds.clear();
+        this.wishlistCountSubject.next(0);
+      }),
+      catchError(error => {
+        console.error('Error clearing wishlist', error);
+        return of({ success: false, message: 'Failed to clear wishlist' });
+      })
+    );
+  }
+
+  moveToCart(productId: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/move-to-cart/${productId}`, {}).pipe(
+      tap(response => {
+        // Remove from local cache since it's moved to cart
+        this.wishlistProductIds.delete(productId);
+        this.wishlistCountSubject.next(this.wishlistProductIds.size);
+      }),
+      catchError(error => {
+        console.error('Error moving item to cart', error);
+        return of({ success: false, message: 'Failed to move item to cart' });
+      })
+    );
+  }
+
+  isInWishlist(productId: number): boolean {
+    return this.wishlistProductIds.has(productId);
+  }
+
+  getWishlistCount(): number {
+    return this.wishlistProductIds.size;
+  }
+
   toggleWishlistItem(productId: number): Observable<any> {
-    const currentItems = this.wishlistItemsSubject.value;
-    if (currentItems.includes(productId)) {
+    if (this.isInWishlist(productId)) {
       return this.removeFromWishlist(productId);
     } else {
       return this.addToWishlist(productId);
     }
   }
 
-  // Move item from wishlist to cart
-  moveToCart(productId: number): Observable<any> {
-    return this.http.post(`${this.apiUrl}/move-to-cart/${productId}`, {}).pipe(
-      tap(() => {
-        // Remove from wishlist after moving to cart
-        const currentItems = this.wishlistItemsSubject.value;
-        const updatedItems = currentItems.filter(id => id !== productId);
-        this.wishlistItemsSubject.next(updatedItems);
-        this.saveWishlistToStorage(updatedItems);
-      })
-    );
-  }
-
-  // Clear wishlist
-  clearWishlist(): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/clear`).pipe(
-      tap(() => {
-        this.wishlistItemsSubject.next([]);
-        this.saveWishlistToStorage([]);
-      })
-    );
-  }
-
-  // Check if item is in wishlist
-  isInWishlist(productId: number): boolean {
-    return this.wishlistItemsSubject.value.includes(productId);
-  }
-
-  // Get wishlist item count
-  getWishlistCount(): number {
-    return this.wishlistItemsSubject.value.length;
+  // Refresh wishlist data from server
+  refreshWishlist(): void {
+    this.loadWishlistIds();
   }
 }
