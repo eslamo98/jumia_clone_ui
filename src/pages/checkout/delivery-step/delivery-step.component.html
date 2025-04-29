@@ -10,7 +10,7 @@
     <span class="step-title">
       Delivery Options
     </span>
-    <button class="btn btn-link change-btn" 
+    <button class="change-btn" 
             (click)="editDelivery()" 
             *ngIf="isStepCompleted && !isEditingDelivery">
       Change
@@ -33,12 +33,14 @@
            [class.selected]="selectedDeliveryOption === option.id"
            (click)="selectDeliveryOption(option)">
         <div class="option-header">
+          <div class="option-checkbox">
+            <input type="checkbox" 
+                   [checked]="selectedDeliveryOption === option.id"
+                   (click)="$event.stopPropagation(); selectDeliveryOption(option)">
+          </div>
           <div class="option-title">
             <h3>{{ option.name }}</h3>
-            <span class="badge bg-primary">EGP {{ option.price }}</span>
-          </div>
-          <div class="option-check" *ngIf="selectedDeliveryOption === option.id">
-            <i class="fas fa-check-circle text-success"></i>
+            <span class="badge">EGP {{ option.price }}</span>
           </div>
         </div>
         
@@ -52,8 +54,8 @@
       </div>
 
       <!-- Confirm Button -->
-      <div class="action-buttons mt-4">
-        <button class="btn btn-primary" 
+      <div class="action-buttons">
+        <button class="btn-confirm" 
                 [disabled]="!selectedDeliveryOption"
                 (click)="confirmDelivery()">
           Confirm Delivery Option

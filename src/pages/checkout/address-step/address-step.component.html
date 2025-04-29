@@ -7,11 +7,8 @@
       Shipping Address
       <i class="fa fa-home header-icon"></i>
     </span>
-    <button class="change-btn" (click)="isStepCompleted = false" *ngIf="isStepCompleted">
-      Change
-    </button>
     <button class="change-btn" (click)="startNewAddress()" *ngIf="!isEditing && !isStepCompleted">
-      Add New Address
+      Change &nbsp;<i class="fas fa-edit"></i>
     </button>
   </h2>
 
@@ -188,3 +185,7 @@
     </div>
   </div>
 </div>
+
+
+
+

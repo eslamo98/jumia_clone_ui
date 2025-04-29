@@ -11,7 +11,7 @@ import { CartsService } from '../../../services/cart/carts.service';
   standalone: true,
   imports: [CommonModule, PaymentModalComponent],
   templateUrl: './order-summary.component.html',
-  styleUrls: ['../checkout/checkout.component.css']
+  styleUrls: ['./order-summary.component.css'],
 })
 export class OrderSummaryComponent {
   @Input() itemsTotal: number = 0.00;

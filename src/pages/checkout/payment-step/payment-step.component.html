@@ -8,7 +8,7 @@
       <i class="fas" [ngClass]="isStepCompleted ? 'fa-check-circle' : 'fa-credit-card'"></i>
     </span>
     <span class="step-title">Payment Method</span>
-    <button class="btn btn-link change-btn" 
+    <button class="change-btn" 
             (click)="editPayment()" 
             *ngIf="isStepCompleted && !isEditingPayment">
       Change
@@ -31,19 +31,21 @@
            [class.selected]="selectedPaymentMethod === method.id"
            (click)="selectedPaymentMethod = method.id">
         <div class="option-header">
+          <div class="option-checkbox">
+            <input type="checkbox" 
+                   [checked]="selectedPaymentMethod === method.id"
+                   (click)="$event.stopPropagation(); selectedPaymentMethod = method.id">
+          </div>
           <div class="option-title">
             <i class="fas {{ method.icon }}"></i>
             <span>{{ method.name }}</span>
-          </div>
-          <div class="option-check" *ngIf="selectedPaymentMethod === method.id">
-            <i class="fas fa-check-circle text-success"></i>
           </div>
         </div>
       </div>
 
       <!-- Confirm Button -->
-      <div class="action-buttons mt-4">
-        <button class="btn btn-primary" 
+      <div class="action-buttons">
+        <button class="btn-confirm" 
                 [disabled]="!selectedPaymentMethod"
                 (click)="confirmPaymentMethod()">
           Confirm Payment Method
