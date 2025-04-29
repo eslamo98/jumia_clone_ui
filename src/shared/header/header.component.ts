@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { Component, HostListener, OnInit, OnDestroy, ElementRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth/auth.service';
-import { Router } from '@angular/router';
+import { Router, NavigationExtras } from '@angular/router';
 import { CartsService } from '../../services/cart/carts.service';
 import { ProductSearchService, ProductSearchResult } from '../../services/search/product-search.service';
 import { Subscription } from 'rxjs';
@@ -62,32 +62,30 @@ export class HeaderComponent implements OnInit, OnDestroy {
     });
     
     // Set up search results subscription with loading state management
-   // Add to the results subscription
-this.resultSubscription = this.searchService.searchResults$.subscribe(results => {
-  // Map and verify the image URLs in the results
-  this.searchResults = results;
-  this.isLoading = false;
-  
-  // Only show dropdown if we have a search query, regardless of results
-  this.isSearchResultsVisible = this.searchQuery.trim().length > 0;
-  
-  console.log('Current search query:', this.searchQuery);
-  console.log('Search results count:', results.length);
-  console.log('Is search visible:', this.isSearchResultsVisible);
-  console.log('Results data:', results);
-});
+    this.resultSubscription = this.searchService.searchResults$.subscribe(results => {
+      // Map and verify the image URLs in the results
+      this.searchResults = results;
+      this.isLoading = false;
+      
+      // Only show dropdown if we have a search query, regardless of results
+      this.isSearchResultsVisible = this.searchQuery.trim().length > 0;
+      
+      console.log('Current search query:', this.searchQuery);
+      console.log('Search results count:', results.length);
+      console.log('Is search visible:', this.isSearchResultsVisible);
+    });
     
-   // Set up debounced search
-   this.searchSubscription = this.searchTerms.pipe(
-    debounceTime(400)
-  ).subscribe(term => {
-    if (term && term.trim().length >= 1) {
-      this.isLoading = true;
-      // Don't change visibility here, we already set it in onSearchInputChange
-      this.searchService.searchProducts(term);
-      console.log('Search triggered for term:', term);
-    }
-});
+    // Set up debounced search
+    this.searchSubscription = this.searchTerms.pipe(
+      debounceTime(400)
+    ).subscribe(term => {
+      if (term && term.trim().length >= 1) {
+        this.isLoading = true;
+        // Don't change visibility here, we already set it in onSearchInputChange
+        this.searchService.searchProducts(term);
+        console.log('Search triggered for term:', term);
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -160,14 +158,51 @@ this.resultSubscription = this.searchService.searchResults$.subscribe(results =>
     this.searchTerms.next(term);
   }
 
-
   navigateToProduct(productId: number): void {
-    // Navigate to the product details page using the productId
-    this.router.navigate(['/Products', productId]);
-    // Clear the search after navigation
-    this.clearSearch();
-    // Clear the search input
+    console.log('Navigating to product:', productId);
+    
+    // Store the route for navigation
+    const url = `/Products/${productId}`;
+    
+    // Clear the search before navigation
+    this.clearSearchAndNavigate(url);
+  }
+  
+  /**
+   * A new approach that handles the sequence of operations more reliably:
+   * 1. First clear the search UI
+   * 2. Then navigate with a forced reload to ensure component state is refreshed
+   */
+  clearSearchAndNavigate(url: string): void {
+    // Clear the search UI state
+    this.isSearchResultsVisible = false;
+    this.searchResults = [];
     this.searchQuery = '';
+    this.isLoading = false;
+    
+    // Clear the service cache
+    this.searchService.clearResults();
+    
+    // Use NavigationExtras with skipLocationChange: false to ensure the URL updates
+    // and onSameUrlNavigation: 'reload' to force component refresh
+    const navigationExtras: NavigationExtras = {
+      onSameUrlNavigation: 'reload' as any // Force reload even when URL is the same
+    };
+    
+    // Use setTimeout to ensure UI updates before navigation
+    setTimeout(() => {
+      console.log('Navigating to:', url);
+      
+      // Navigate using the router (with optional replacementUrl to bypass history)
+      this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+        // Navigate to the target URL after a brief detour
+        this.router.navigateByUrl(url, navigationExtras).then(success => {
+          console.log('Navigation success:', success);
+        }).catch(error => {
+          console.error('Navigation error:', error);
+        });
+      });
+    }, 0);
   }
   
   clearSearch(): void {
@@ -196,20 +231,20 @@ this.resultSubscription = this.searchService.searchResults$.subscribe(results =>
     this.closeAccountDropdown();
   }
 
- @HostListener('document:click', ['$event'])
-onDocumentClick(event: MouseEvent): void {
-  const clickedElement = event.target as HTMLElement;
-  const isClickedInsideAccount = this.elementRef.nativeElement.querySelector('.account-section')?.contains(clickedElement);
-  const isClickedInsideSearch = this.elementRef.nativeElement.querySelector('.search-box')?.contains(clickedElement);
-  
-  if (!isClickedInsideAccount) {
-    this.closeAccountDropdown();
-  }
-  
-  // Only clear search if clicking outside and we have results showing
-  if (!isClickedInsideSearch && this.isSearchResultsVisible) {
-    // Add a small delay to prevent race conditions with click events
-    setTimeout(() => this.clearSearch(), 100);
-  }
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const clickedElement = event.target as HTMLElement;
+    const isClickedInsideAccount = this.elementRef.nativeElement.querySelector('.account-section')?.contains(clickedElement);
+    const isClickedInsideSearch = this.elementRef.nativeElement.querySelector('.search-box')?.contains(clickedElement);
+    
+    if (!isClickedInsideAccount) {
+      this.closeAccountDropdown();
+    }
+    
+    // Only clear search if clicking outside and we have results showing
+    if (!isClickedInsideSearch && this.isSearchResultsVisible) {
+      // Add a small delay to prevent race conditions with click events
+      setTimeout(() => this.clearSearch(), 100);
+    }
   }
 }
