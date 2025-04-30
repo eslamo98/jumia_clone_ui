@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { 
-  faPhoneAlt, 
-  faUndoAlt, 
-  faLock 
+import {
+  faPhone,
+  faUndo,
+  faLock
 } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
@@ -18,8 +18,8 @@ export class CheckoutHeaderComponent {
 
   constructor(private router: Router) {}
    // Font Awesome icons
-   faPhoneAlt = faPhoneAlt;
-   faUndoAlt = faUndoAlt;
+   faPhoneAlt = faPhone;
+   faUndoAlt = faUndo;
    faLock = faLock;
 
   // Handle language change
