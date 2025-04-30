@@ -2,11 +2,12 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { WishlistComponent } from '../../wishlist/wishlist/wishlist.component';
 
 @Component({
-  selector: 'app-wishlist',
+  selector: 'app-account-wishlist',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, WishlistComponent],
   templateUrl: './customer-wishlist.component.html',
   styleUrls: ['./customer-wishlist.component.css']
 })
