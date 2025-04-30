@@ -1,5 +1,11 @@
 <div class="cart-container">
-  <h1>Shopping Cart ({{ getCartItemCount() }} items)</h1>
+  <div class="cart-header">
+    <h1>Shopping Cart ({{ getCartItemCount() }})</h1>
+    <!-- Clear Cart Button -->
+    <button *ngIf="cartItems.length > 0" class="clear-cart-btn" (click)="onClearCart()">
+      Clear Cart
+    </button>
+  </div>
 
   <!-- Loading overlay -->
   <div class="loading-overlay text-align-center" *ngIf="isLoading">
@@ -42,4 +48,27 @@
     </button>
   </a>
   </div>
+
+  <!-- Clear Cart Confirmation Dialog -->
+  <div class="confirmation-overlay" *ngIf="showClearCartConfirmation">
+    <div class="confirmation-dialog">
+      <div class="dialog-header">
+        <h4>Clear Shopping Cart</h4>
+        <button type="button" class="close-btn" (click)="cancelClearCart()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="dialog-content">
+        <p>Do you really want to remove all items from your cart?</p>
+      </div>
+      <div class="dialog-actions">
+        <button type="button" class="cancel-btn" (click)="cancelClearCart()">Cancel</button>
+        <button type="button" class="confirm-btn" (click)="confirmClearCart()">
+          <i class="fas fa-trash trash-icon"></i>
+          Clear Cart
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
+

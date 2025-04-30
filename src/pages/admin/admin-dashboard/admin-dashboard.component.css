@@ -12,6 +12,7 @@
     background-color: var(--jumia-light-gray);
     min-height: 100vh;
     color: var(--jumia-text);
+    overflow: hidden;
   }
   
   /* Sidebar styling */

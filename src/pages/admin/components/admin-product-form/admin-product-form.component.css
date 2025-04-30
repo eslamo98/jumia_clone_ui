@@ -11,6 +11,10 @@
   /* Jumia-style overrides for Bootstrap */
   .admin-product-form-container {
     color: var(--jumia-text);
+    overflow: hidden;
+    /* height: 100vh;
+  width: 100%; 
+  max-width: 100vw; */
   }
   
   /* Sidebar customization */

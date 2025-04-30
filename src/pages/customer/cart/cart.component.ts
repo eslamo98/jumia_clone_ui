@@ -10,6 +10,7 @@ import { Cart } from '../../../models/cart.model';
 import { environment } from '../../../environments/environment';
 import { NotificationService } from '../../../services/shared/notification.service';
 
+
 @Component({
   selector: 'app-cart',
   templateUrl: './cart.component.html',
@@ -25,6 +26,7 @@ export class CartComponent implements OnInit, OnDestroy {
   totalAmount: number = 0;
   itemCount: number = 0;
   hasExpressItems: boolean = false;
+  showClearCartConfirmation: boolean = false;
   private cartCountSubscription: Subscription | null = null;
 
   constructor(
@@ -216,26 +218,26 @@ export class CartComponent implements OnInit, OnDestroy {
     });
   }
 
-  clearCart() {
-    if (this.cartItems.length === 0) return;
+  // clearCart() {
+  //   if (this.cartItems.length === 0) return;
     
-    const originalItems = [...this.cartItems];
-    this.resetCart();
+  //   const originalItems = [...this.cartItems];
+  //   this.resetCart();
     
-    this.isProcessing = true;
+  //   this.isProcessing = true;
     
-    this.cartService.clearCart().pipe(
-      finalize(() => this.isProcessing = false),
-      catchError(err => {
-        console.error('Error clearing cart:', err);
-        this.error = 'Failed to clear your cart. Please try again.';
-        this.cartItems = originalItems;
-        this.calculateCartTotals();
-        this.checkForExpressItems();
-        return of(null);
-      })
-    ).subscribe();
-  }
+  //   this.cartService.clearCart().pipe(
+  //     finalize(() => this.isProcessing = false),
+  //     catchError(err => {
+  //       console.error('Error clearing cart:', err);
+  //       this.error = 'Failed to clear your cart. Please try again.';
+  //       this.cartItems = originalItems;
+  //       this.calculateCartTotals();
+  //       this.checkForExpressItems();
+  //       return of(null);
+  //     })
+  //   ).subscribe();
+  // }
 
   getCartItemCount(): number {
     return this.itemCount;
@@ -261,5 +263,45 @@ export class CartComponent implements OnInit, OnDestroy {
     
     console.log('Proceeding to checkout with total amount:', this.totalAmount);
     this.router.navigate(['/checkout']);
+  }
+
+
+
+  onClearCart() {
+    if (this.cartItems.length === 0) return;
+    this.showClearCartConfirmation = true;
+  }
+
+  cancelClearCart() {
+    this.showClearCartConfirmation = false;
+  }
+
+  confirmClearCart() {
+    this.clearCart();
+    this.showClearCartConfirmation = false;
+  }
+
+  clearCart() {
+    if (this.cartItems.length === 0) return;
+    
+    const originalItems = [...this.cartItems];
+    this.resetCart();
+    
+    this.isProcessing = true;
+    
+    this.cartService.clearCart().pipe(
+      finalize(() => {
+        this.isProcessing = false;
+        this.notificationService.showSuccess("Cart cleared successfully!");
+      }),
+      catchError(err => {
+        console.error('Error clearing cart:', err);
+        this.error = 'Failed to clear your cart. Please try again.';
+        this.cartItems = originalItems;
+        this.calculateCartTotals();
+        this.checkForExpressItems();
+        return of(null);
+      })
+    ).subscribe();
   }
 }
