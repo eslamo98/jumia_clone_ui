@@ -11,6 +11,7 @@ import { AuthService } from '../../services/auth/auth.service';
 import { Router , RouterModule } from '@angular/router';
 import { KeepShoppingComponent } from "../public/home-page/homeComponents/keepShoppingContainer/keep-shopping/keep-shopping.component";
 import { UpArrowComponent } from "../public/home-page/homeComponents/upArrow/up-arrow/up-arrow.component";
+import { WishlistService } from '../../services/wishlist/wishlist.service';
 
 @Component({
   selector: 'app-product-details',
@@ -32,6 +33,12 @@ export class ProductDetailsComponent implements OnInit {
   freeDeliveryThreshold: number = 500;
   showToast: boolean = false;
   private addingToCart = false;
+
+
+  // Custom notification properties
+showNotification: boolean = false;
+notificationMessage: string = '';
+notificationType: 'success' | 'warning' | 'error' = 'success';
 
   
 
@@ -88,7 +95,8 @@ export class ProductDetailsComponent implements OnInit {
     private cartService: CartsService,
     public authService: AuthService,
     private router: Router,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private wishlistService: WishlistService
 
   ) {}
 
@@ -100,6 +108,8 @@ export class ProductDetailsComponent implements OnInit {
       this.errorMessage = 'Invalid product ID';
       this.isLoading = false;
       return;
+
+      this.loadWishlistStatus();
 
     }
   
@@ -341,4 +351,80 @@ export class ProductDetailsComponent implements OnInit {
   public setActiveTab(tab: string): void {
     this.activeTab = tab;
   }
+
+
+// Add these methods for wishlist functionality
+// Custom notification methods
+showCustomNotification(message: string, type: 'success' | 'warning' | 'error'): void {
+  this.notificationMessage = message;
+  this.notificationType = type;
+  this.showNotification = true;
+  
+  // Hide notification after 3 seconds if not manually closed
+  setTimeout(() => {
+    if (this.showNotification) {
+      this.showNotification = false;
+    }
+  }, 3000);
+}
+
+// Method to hide notification when close button is clicked
+hideNotification(): void {
+  this.showNotification = false;
+}
+
+// Wishlist functionality
+loadWishlistStatus(): void {
+  // Check if user is logged in
+  const currentUser = localStorage.getItem('currentUser');
+  if (!currentUser) {
+    return; // No need to load if not logged in
+  }
+
+  // Use wishlist service to check wishlist items
+  this.wishlistService.getWishlist().subscribe({
+    next: () => {
+      // The service will keep track of product IDs internally
+    },
+    error: (err) => {
+      console.error('Error loading wishlist status', err);
+    }
+  });
+}
+
+// Toggle wishlist item
+toggleWishlist(event: Event, productId: number): void {
+  if (event) {
+    event.stopPropagation(); // Prevent other click events
+  }
+  
+  // Check if user is logged in
+  const currentUser = localStorage.getItem('currentUser');
+  if (!currentUser) {
+    this.showCustomNotification('Please log in to add items to your wishlist', 'warning');
+    return;
+  }
+  
+  this.wishlistService.toggleWishlistItem(productId).subscribe({
+    next: (response) => {
+      // The service already updates its internal state
+      if (this.wishlistService.isInWishlist(productId)) {
+        this.showCustomNotification('Product added to wishlist', 'success');
+      } else {
+        this.showCustomNotification('Product removed from wishlist', 'warning');
+      }
+    },
+    error: (error) => {
+      console.error('Error toggling wishlist item:', error);
+      this.showCustomNotification('Failed to update wishlist. Please try again.', 'error');
+    }
+  });
+}
+
+// Check if a product is in the wishlist
+isInWishlist(productId: number): boolean {
+  return this.wishlistService.isInWishlist(productId);
+}
+
+  
 }
