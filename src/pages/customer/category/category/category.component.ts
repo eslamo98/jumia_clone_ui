@@ -324,6 +324,11 @@ export class CategoryComponent  extends Helpers implements OnInit {
     this.router.navigate(['/Products', productId]);
   }
 
+  // Method to navigate to home page
+  navigateToHome(): void {
+    this.router.navigate(['/']);
+  }
+
   // Pagination methods
   updatePagination(): void {
     this.totalItems = this.filteredProducts.length;

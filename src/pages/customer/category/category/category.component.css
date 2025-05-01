@@ -139,7 +139,7 @@ body.notification-visible {
 }
 
 /* Loading and error messages */
-.loading-indicator, .error-message, .no-products {
+.loading-indicator, .error-message {
   text-align: center;
   padding: 30px;
   color: #666;
@@ -152,6 +152,56 @@ body.notification-visible {
 
 .error-message {
   color: #d9534f;
+}
+
+/* No products message styling */
+.no-products-container {
+  text-align: center;
+  padding: 60px 30px;
+  color: #666;
+  grid-column: 1 / -1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.no-products-icon {
+  font-size: 50px;
+  color: #ccc;
+  margin-bottom: 20px;
+}
+
+.no-products-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.no-products-message {
+  font-size: 16px;
+  margin-bottom: 30px;
+  max-width: 500px;
+}
+
+.continue-shopping-btn {
+  background-color: #f49932;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.continue-shopping-btn:hover {
+  background-color: #e57e00;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 /* Products grid */

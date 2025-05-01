@@ -69,8 +69,13 @@
   <!-- Products grid -->
   <div *ngIf="!loading && !error" class="products-grid">
     <!-- No products message -->
-    <div *ngIf="filteredProducts.length === 0" class="no-products">
-      No products found in this category.
+    <div *ngIf="filteredProducts.length === 0" class="no-products-container">
+      <div class="no-products-icon">
+        <i class="fas fa-search"></i>
+      </div>
+      <h3 class="no-products-title">No products available</h3>
+      <p class="no-products-message">We couldn't find any products in this category at the moment.</p>
+      <button class="continue-shopping-btn" (click)="navigateToHome()">Continue Shopping</button>
     </div>
 
     <!-- Product cards -->
