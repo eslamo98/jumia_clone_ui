@@ -82,7 +82,18 @@
   justify-content: center;
   gap: 8px;
 }
+.support-links {
+  text-align: center;
+  color: #666;
+  font-size: 14px;
+  margin-top: 25px;
+}
 
+.support-links a {
+  color: #ff9900;
+  text-decoration: none;
+  font-weight: 500;
+}
 /* Adjust invalid field feedback */
 .invalid-feedback {
   color: #dc3545;

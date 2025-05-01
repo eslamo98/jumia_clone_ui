@@ -27,6 +27,8 @@ interface ChatMessage {
 })
 export class ChatbotComponent implements OnInit, AfterViewChecked {
   @ViewChild('chatMessages') private messagesContainer!: ElementRef;
+  selectedImage: File | null = null;
+
   isOpen = false;
   messages: ChatMessage[] = [];
   currentMessage = '';
@@ -133,6 +135,77 @@ export class ChatbotComponent implements OnInit, AfterViewChecked {
       complete: () => {
         this.isLoading = false;
         this.shouldScroll = true;
+      }
+    });
+  }
+
+
+  handleImageUpload(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedImage = file;
+      this.searchWithImage();
+      event.target.value = '';
+    }
+  }
+
+  searchWithImage() {
+    if (!this.selectedImage) return;
+
+    this.messages.push({
+      isUser: true,
+      text: 'Searching with uploaded image...'
+    });
+    this.shouldScroll = true;
+    this.isLoading = true;
+
+    this.chatbotService.searchByImage(this.selectedImage).subscribe({
+      next: (response) => {
+        if (response.success && response.data) {
+          let message: ChatMessage = {
+            isUser: false,
+            text: response.data.imageDescription || 'Here are similar products I found:'
+          };
+
+          if (response.data.results && response.data.results.length > 0) {
+            message.products = response.data.results.map((product: {
+              PRODUCT_ID: number;
+              NAME: string;
+              BASE_PRICE: number;
+              DESCRIPTION: string;
+              STOCK_QUANTITY: number;
+              IS_AVAILABLE: boolean;
+            }) => ({
+              id: product.PRODUCT_ID,
+              name: product.NAME,
+              price: product.BASE_PRICE,
+              description: product.DESCRIPTION,
+              stockQuantity: product.STOCK_QUANTITY,
+              isAvailable: product.IS_AVAILABLE,
+              rating: 0
+            }));
+          }
+
+          this.messages.push(message);
+        } else {
+          this.messages.push({
+            isUser: false,
+            text: 'I couldn\'t find any similar products.'
+          });
+        }
+        this.isLoading = false;
+        this.shouldScroll = true;
+        this.selectedImage = null;
+      },
+      error: (error) => {
+        this.messages.push({
+          isUser: false,
+          text: 'Sorry, I encountered an error processing the image. Please try again.'
+        });
+        this.isLoading = false;
+        this.shouldScroll = true;
+        this.selectedImage = null;
+        console.error('Image search error:', error);
       }
     });
   }
