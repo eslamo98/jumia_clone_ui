@@ -28,6 +28,7 @@ import { Subject } from 'rxjs';
 import { DynamicAttributeInputComponent } from '../../../../shared/dynamic-attribute-input/dynamic-attribute-input.component';
 import { environment } from '../../../../environments/environment';
 import { SellerService } from '../../../../services/seller/seller.service';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-seller-product-form',
@@ -38,6 +39,8 @@ import { SellerService } from '../../../../services/seller/seller.service';
     ReactiveFormsModule,
     SidebarComponent,
     DynamicAttributeInputComponent,
+  MatIconModule
+
   ],
   templateUrl: './seller-product-form.component.html',
   styleUrls: ['./seller-product-form.component.css'],
@@ -791,4 +794,13 @@ export class SellerProductFormComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.categorySearchSubject.complete();
   }
+  isCollapsed = false;
+  showSidebar = false;
+  toggleSidebar() {
+    this.isCollapsed = !this.isCollapsed;
+  }
+  
+toggleSidebarVisibility() {
+  this.showSidebar = !this.showSidebar;
+}
 }

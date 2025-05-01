@@ -76,11 +76,7 @@
 
   <!-- Footer Section -->
   <footer class="sidebar-footer">
-    <button class="logout-button" (click)="logout()">
-      <i class="fas fa-sign-out-alt"></i>
-      <span *ngIf="!collapsed">Logout</span>
-    </button>
-
+ 
     <div class="vendor-profile">
       <ng-container *ngIf="!loading; else loadingTpl">
         <div *ngIf="seller && !error" class="profile-content">
@@ -97,9 +93,14 @@
           {{error}}
         </div>
       </ng-container>
+      <button class="logout-button" (click)="logout()">
+        <i class="bi bi-box-arrow-right"></i>
+        <span *ngIf="!collapsed">Logout</span>
+      </button>
     </div>
   </footer>
 </aside>
+
 
 <ng-template #loadingTpl>
   <div class="loading-state">
