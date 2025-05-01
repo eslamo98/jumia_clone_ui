@@ -1,69 +1,680 @@
-<div class="container mt-4">
-  <h2>Edit Product</h2>
+<div class="products-container">
+  <!-- Sidebar -->
+  <app-sidebar [collapsed]="isCollapsed" (toggle)="toggleSidebar()" [class.show]="showSidebar"></app-sidebar>
 
-  @if (loading) {
-  <div class="alert alert-info">Loading product data...</div>
-  } @if (error) {
-  <div class="alert alert-danger">{{ error }}</div>
-  }
-
-  <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="mt-4">
-    <div class="mb-3">
-      <label for="name" class="form-label">Product Name</label>
-      <input
-        type="text"
-        class="form-control"
-        id="name"
-        formControlName="name"
-      />
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Header -->
+    <div class="header-container">
+      <!-- Hamburger menu for small screens -->
+      <button class="sidebar-toggle" (click)="toggleSidebarVisibility()">
+        <mat-icon>menu</mat-icon>
+      </button>
+      <div class="header-title">
+        <span class="products-title">{{ isEditMode ? "Edit" : "Add" }} Product</span>
+        <p class="text-muted mb-0">
+          {{ isEditMode ? "Update product information" : "Create a new product" }}
+        </p>
+      </div>
+      <div class="header-actions">
+        <button
+          type="button"
+          class="btn-import-export"
+          routerLink="/seller/manage-products"
+        >
+          <mat-icon class="import-icon">arrow_back</mat-icon>
+          Back to Products
+        </button>
+      </div>
     </div>
 
-    <div class="mb-3">
-      <label for="basePrice" class="form-label">Base Price</label>
-      <input
-        type="number"
-        class="form-control"
-        id="basePrice"
-        formControlName="basePrice"
-      />
-    </div>
+    <!-- Product Form -->
+    <div class="content-container">
+      <!-- Loading spinner -->
+      <div *ngIf="isLoading" class="loading">
+        Loading...
+      </div>
 
-    <div class="mb-3">
-      <label for="finalPrice" class="form-label">Final Price</label>
-      <input
-        type="number"
-        class="form-control"
-        id="finalPrice"
-        formControlName="finalPrice"
-      />
-    </div>
+      <!-- Product form -->
+      <form
+        [formGroup]="productForm"
+        (ngSubmit)="onSubmit()"
+        *ngIf="!isLoading"
+        class="product-form"
+      >
+        <div class="row">
+          <!-- Basic Information -->
+          <div class="col-md-8">
+            <div class="form-section">
+              <h5 class="section-title">Basic Information</h5>
+              <div class="form-section-content">
+                <!-- Product Name -->
+                <div class="form-group">
+                  <label for="name" class="form-label">
+                    Product Name <span class="required">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    class="form-input"
+                    id="name"
+                    formControlName="name"
+                    [ngClass]="{ 'is-invalid': isFieldInvalid('name') }"
+                  />
+                  <div
+                    class="invalid-feedback"
+                    *ngIf="isFieldInvalid('name')"
+                  >
+                    {{ getErrorMessage("name") }}
+                  </div>
+                </div>
 
-    <div class="mb-3">
-      <label for="stockQuantity" class="form-label">Stock Quantity</label>
-      <input
-        type="number"
-        class="form-control"
-        id="stockQuantity"
-        formControlName="stockQuantity"
-      />
-    </div>
+                <!-- Description -->
+                <div class="form-group">
+                  <label for="description" class="form-label">
+                    Description <span class="required">*</span>
+                  </label>
+                  <textarea
+                    class="form-input"
+                    id="description"
+                    rows="4"
+                    formControlName="description"
+                    [ngClass]="{
+                      'is-invalid': isFieldInvalid('description')
+                    }"
+                  ></textarea>
+                  <div
+                    class="invalid-feedback"
+                    *ngIf="isFieldInvalid('description')"
+                  >
+                    {{ getErrorMessage("description") }}
+                  </div>
+                </div>
 
-    <div class="mb-3">
-      <label for="description" class="form-label">Description</label>
-      <textarea
-        class="form-control"
-        id="description"
-        formControlName="description"
-        rows="3"
-      ></textarea>
-    </div>
+                <div class="row">
+                  <!-- Category with Search -->
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="categoryId" class="form-label">
+                        Category <span class="required">*</span>
+                      </label>
+                      <div *ngIf="!isEditMode; else readOnlyCategory">
+                        <div class="input-group">
+                          <input
+                            type="text"
+                            class="form-input"
+                            placeholder="Search categories..."
+                            (input)="onCategorySearch($event)"
+                          />
+                          <select
+                            class="form-input"
+                            id="categoryId"
+                            formControlName="categoryId"
+                            [ngClass]="{
+                              'is-invalid': isFieldInvalid('categoryId')
+                            }"
+                          >
+                            <option value="">Select a category</option>
+                            <option
+                              *ngFor="let category of filteredCategories"
+                              [value]="category.categoryId"
+                            >
+                              {{ category.name }}
+                            </option>
+                          </select>
+                        </div>
+                        <div
+                          class="invalid-feedback"
+                          *ngIf="isFieldInvalid('categoryId')"
+                        >
+                          {{ getErrorMessage("categoryId") }}
+                        </div>
+                      </div>
+                      <ng-template #readOnlyCategory>
+                        <div class="form-control-plaintext text-muted">
+                          {{
+                            getCategoryName(
+                              productForm.get("categoryId")?.value
+                            )
+                          }}
+                        </div>
+                      </ng-template>
+                    </div>
+                  </div>
 
-    <button
-      type="submit"
-      class="btn btn-primary"
-      [disabled]="!productForm.valid || loading"
-    >
-      Save Changes
-    </button>
-  </form>
+                  <!-- Subcategory -->
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="subcategoryId" class="form-label">
+                        Subcategory <span class="required">*</span>
+                      </label>
+                      <div *ngIf="!isEditMode; else readOnlySubcategory">
+                        <select
+                          class="form-input"
+                          id="subcategoryId"
+                          formControlName="subcategoryId"
+                          [ngClass]="{
+                            'is-invalid': isFieldInvalid('subcategoryId')
+                          }"
+                          [disabled]="!productForm.get('categoryId')?.value"
+                        >
+                          <option value="">Select a subcategory</option>
+                          <option
+                            *ngFor="let subcategory of subcategories"
+                            [value]="subcategory.subcategoryId"
+                          >
+                            {{ subcategory.name }}
+                          </option>
+                        </select>
+                        <div
+                          class="invalid-feedback"
+                          *ngIf="isFieldInvalid('subcategoryId')"
+                        >
+                          {{ getErrorMessage("subcategoryId") }}
+                        </div>
+                      </div>
+                      <ng-template #readOnlySubcategory>
+                        <div class="form-control-plaintext text-muted">
+                          {{
+                            getSubcategoryName(
+                              productForm.get("subcategoryId")?.value
+                            )
+                          }}
+                        </div>
+                      </ng-template>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Has Variants Switch -->
+                <div class="form-group">
+                  <label class="switch-label">
+                    <input
+                      type="checkbox"
+                      formControlName="hasVariants"
+                    />
+                    <span class="switch-slider"></span>
+                    This product has variants
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Product Variants Section -->
+            <div
+              class="form-section"
+              *ngIf="productForm.get('hasVariants')?.value"
+            >
+              <div class="section-header">
+                <h5 class="section-title">Product Variants</h5>
+                <button
+                  type="button"
+                  class="action-btn add-variant"
+                  (click)="addVariant()"
+                >
+                  <mat-icon class="add-icon">add</mat-icon>
+                  Add Variant
+                </button>
+              </div>
+              <div class="form-section-content">
+                <div formArrayName="variants">
+                  <div
+                    *ngFor="let variant of variants.controls; let i = index"
+                    [formGroupName]="i"
+                    class="variant-card"
+                  >
+                    <div class="variant-header">
+                      <h6>Variant #{{ i + 1 }}</h6>
+                      <button
+                        type="button"
+                        class="action-btn delete"
+                        (click)="removeVariant(i)"
+                        [disabled]="variants.length === 1"
+                      >
+                        <mat-icon>delete</mat-icon>
+                      </button>
+                    </div>
+
+                    <!-- Variant Name -->
+                    <div class="form-group">
+                      <label [for]="'variantName' + i" class="form-label">
+                        Variant Name <span class="required">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        class="form-input"
+                        [id]="'variantName' + i"
+                        formControlName="variantName"
+                        [ngClass]="{
+                          'is-invalid': isVariantFieldInvalid(i, 'variantName')
+                        }"
+                      />
+                      <div
+                        class="invalid-feedback"
+                        *ngIf="isVariantFieldInvalid(i, 'variantName')"
+                      >
+                        Variant name is required
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <!-- Price -->
+                      <div class="col-md-6">
+                        <div class="form-group">
+                          <label [for]="'price' + i" class="form-label">
+                            Price <span class="required">*</span>
+                          </label>
+                          <input
+                            type="number"
+                            class="form-input"
+                            [id]="'price' + i"
+                            formControlName="price"
+                            [ngClass]="{
+                              'is-invalid': isVariantFieldInvalid(i, 'price')
+                            }"
+                          />
+                          <div
+                            class="invalid-feedback"
+                            *ngIf="isVariantFieldInvalid(i, 'price')"
+                          >
+                            Valid price is required
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Discount Percentage -->
+                      <div class="col-md-6">
+                        <div class="form-group">
+                          <label [for]="'discountPercentage' + i" class="form-label">
+                            Discount %
+                          </label>
+                          <input
+                            type="number"
+                            class="form-input"
+                            [id]="'discountPercentage' + i"
+                            formControlName="discountPercentage"
+                            [ngClass]="{
+                              'is-invalid': isVariantFieldInvalid(i, 'discountPercentage')
+                            }"
+                          />
+                          <div
+                            class="invalid-feedback"
+                            *ngIf="isVariantFieldInvalid(i, 'discountPercentage')"
+                          >
+                            Discount must be between 0 and 100
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <!-- Stock -->
+                      <div class="col-md-6">
+                        <div class="form-group">
+                          <label [for]="'stockQuantity' + i" class="form-label">
+                            Stock <span class="required">*</span>
+                          </label>
+                          <input
+                            type="number"
+                            class="form-input"
+                            [id]="'stockQuantity' + i"
+                            formControlName="stockQuantity"
+                            [ngClass]="{
+                              'is-invalid': isVariantFieldInvalid(i, 'stockQuantity')
+                            }"
+                          />
+                          <div
+                            class="invalid-feedback"
+                            *ngIf="isVariantFieldInvalid(i, 'stockQuantity')"
+                          >
+                            Valid stock quantity is required
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- SKU -->
+                      <div class="col-md-6">
+                        <div class="form-group">
+                          <label [for]="'sku' + i" class="form-label">
+                            SKU <span class="required">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            class="form-input"
+                            [id]="'sku' + i"
+                            formControlName="sku"
+                            [ngClass]="{
+                              'is-invalid': isVariantFieldInvalid(i, 'sku')
+                            }"
+                          />
+                          <div
+                            class="invalid-feedback"
+                            *ngIf="isVariantFieldInvalid(i, 'sku')"
+                          >
+                            SKU is required
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Variant Image -->
+                    <div class="form-group">
+                      <label [for]="'variantImage' + i" class="form-label">
+                        Variant Image
+                      </label>
+                      <input
+                        type="file"
+                        class="form-input"
+                        [id]="'variantImage' + i"
+                        accept="image/*"
+                        (change)="onVariantImageSelected($event, i)"
+                      />
+                      <div
+                        class="image-preview"
+                        *ngIf="getVariantFormGroup(i).get('variantImageBase64')?.value"
+                      >
+                        <img
+                          [src]="getVariantFormGroup(i).get('variantImageBase64')?.value"
+                          alt="Variant Image"
+                          style="max-height: 100px"
+                        />
+                        <div
+                          class="text-muted small mt-1"
+                          *ngIf="!getVariantFormGroup(i).get('variantImageBase64')?.value"
+                        >
+                          No variant image selected
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Default Variant Radio -->
+                    <div class="form-group">
+                      <label class="switch-label">
+                        <input
+                          type="radio"
+                          [name]="'isDefault' + i"
+                          [id]="'defaultVariant' + i"
+                          formControlName="isDefault"
+                          [value]="true"
+                          (change)="onDefaultVariantChange(i)"
+                        />
+                        Set as default variant
+                      </label>
+                    </div>
+
+                    <!-- Available Switch -->
+                    <div class="form-group">
+                      <label class="switch-label">
+                        <input
+                          type="checkbox"
+                          [id]="'isAvailable' + i"
+                          formControlName="isAvailable"
+                        />
+                        <span class="switch-slider"></span>
+                        Variant is available
+                      </label>
+                    </div>
+
+                    <!-- Variant Attributes -->
+                    <div class="form-subsection">
+                      <h6 class="subsection-title">Variant Attributes</h6>
+                      <div formArrayName="attributeValues">
+                        <div
+                          *ngFor="let attrControl of getVariantAttributeValues(i).controls; let j = index"
+                          [formGroupName]="j"
+                        >
+                          <app-dynamic-attribute-input
+                            [formGroup]="getAttributeControl(i, j)"
+                            [attributeName]="getVariantAttributeValue(i, j, 'attributeName')"
+                            [attributeType]="getVariantAttributeValue(i, j, 'attributeType')"
+                            [options]="getVariantAttributeValue(i, j, 'options')"
+                            [isRequired]="true"
+                          >
+                          </app-dynamic-attribute-input>
+                          <div
+                            class="invalid-feedback"
+                            *ngIf="isVariantAttributeInvalid(i, j)"
+                          >
+                            {{ getVariantAttributeErrorMessage(i, j) }}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- No variants message -->
+                  <div *ngIf="variants.length === 0" class="no-variants">
+                    No variants added yet. Click "Add Variant" to create one.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pricing and Stock -->
+          <div class="col-md-4">
+            <div
+              class="form-section"
+              *ngIf="!productForm.get('hasVariants')?.value"
+            >
+              <h5 class="section-title">Pricing & Stock</h5>
+              <div class="form-section-content">
+                <!-- Base Price -->
+                <div class="form-group">
+                  <label for="basePrice" class="form-label">
+                    Base Price <span class="required">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    class="form-input"
+                    id="basePrice"
+                    formControlName="basePrice"
+                    [ngClass]="{ 'is-invalid': isFieldInvalid('basePrice') }"
+                  />
+                  <div
+                    class="invalid-feedback"
+                    *ngIf="isFieldInvalid('basePrice')"
+                  >
+                    {{ getErrorMessage("basePrice") }}
+                  </div>
+                </div>
+
+                <!-- Discount -->
+                <div class="form-group">
+                  <label for="discountPercentage" class="form-label">
+                    Discount Percentage
+                  </label>
+                  <input
+                    type="number"
+                    class="form-input"
+                    id="discountPercentage"
+                    formControlName="discountPercentage"
+                    [ngClass]="{
+                      'is-invalid': isFieldInvalid('discountPercentage')
+                    }"
+                  />
+                  <div
+                    class="invalid-feedback"
+                    *ngIf="isFieldInvalid('discountPercentage')"
+                  >
+                    {{ getErrorMessage("discountPercentage") }}
+                  </div>
+                </div>
+
+                <!-- Stock -->
+                <div class="form-group">
+                  <label for="stockQuantity" class="form-label">
+                    Stock Quantity <span class="required">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    class="form-input"
+                    id="stockQuantity"
+                    formControlName="stockQuantity"
+                    [ngClass]="{
+                      'is-invalid': isFieldInvalid('stockQuantity')
+                    }"
+                  />
+                  <div
+                    class="invalid-feedback"
+                    *ngIf="isFieldInvalid('stockQuantity')"
+                  >
+                    {{ getErrorMessage("stockQuantity") }}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Dynamic Attributes -->
+            <div
+              class="form-section"
+              *ngIf="!productForm.get('hasVariants')?.value && attributeValues.controls.length > 0"
+            >
+              <h5 class="section-title">Product Attributes</h5>
+              <div class="form-section-content">
+                <div formArrayName="attributeValues">
+                  <div
+                    *ngFor="let attrControl of attributeValues.controls; let i = index"
+                    [formGroupName]="i"
+                  >
+                    <app-dynamic-attribute-input
+                      [formGroup]="getAttributeFormGroup(i)"
+                      [attributeName]="getAttributeValue(i, 'attributeName')"
+                      [attributeType]="getAttributeValue(i, 'attributeType')"
+                      [options]="getAttributeValue(i, 'options')"
+                    >
+                    </app-dynamic-attribute-input>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Product Images -->
+            <div class="form-section">
+              <h5 class="section-title">Product Images</h5>
+              <div class="form-section-content">
+                <!-- Main Image -->
+                <div class="form-group">
+                  <label for="mainImage" class="form-label">
+                    Main Product Image <span class="required">*</span>
+                  </label>
+                  <input
+                    type="file"
+                    class="form-input"
+                    id="mainImage"
+                    accept="image/*"
+                    (change)="onMainImageSelected($event)"
+                    [ngClass]="{
+                      'is-invalid': isFieldInvalid('mainImageFile')
+                    }"
+                  />
+                  <div
+                    class="image-preview"
+                    *ngIf="imagePreview"
+                  >
+                    <img
+                      [src]="imagePreview"
+                      alt="Main product image"
+                      style="max-height: 200px"
+                    />
+                  </div>
+                  <div
+                    class="invalid-feedback"
+                    *ngIf="isFieldInvalid('mainImageFile')"
+                  >
+                    {{ getErrorMessage("mainImageFile") }}
+                  </div>
+                </div>
+
+                <!-- Additional Images -->
+                <div class="form-group">
+                  <div class="additional-images-header">
+                    <label class="form-label">
+                      Additional Images (Max: {{ maxAdditionalImages }})
+                    </label>
+                    <button
+                      type="button"
+                      class="action-btn add-image"
+                      (click)="addImageInput()"
+                      [disabled]="additionalImageInputs.length >= maxAdditionalImages"
+                    >
+                      <mat-icon class="add-icon">add</mat-icon>
+                      Add Image
+                    </button>
+                  </div>
+                  <div class="additional-images">
+                    <div
+                      class="image-card"
+                      *ngFor="let input of additionalImageInputs; let i = index"
+                    >
+                      <input
+                        type="file"
+                        class="form-input"
+                        accept="image/*"
+                        (change)="onAdditionalImageSelected($event, i)"
+                      />
+                      <div
+                        class="image-preview"
+                        *ngIf="additionalImagePreviews[i]"
+                      >
+                        <img
+                          [src]="additionalImagePreviews[i]"
+                          alt="Additional product image"
+                          style="max-height: 100px"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        class="action-btn delete"
+                        (click)="removeAdditionalImageInput(i)"
+                      >
+                        <mat-icon>delete</mat-icon>
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Availability -->
+            <div class="form-section">
+              <h5 class="section-title">Availability</h5>
+              <div class="form-section-content">
+                <div class="form-group">
+                  <label class="switch-label">
+                    <input
+                      type="checkbox"
+                      id="isAvailable"
+                      formControlName="isAvailable"
+                    />
+                    <span class="switch-slider"></span>
+                    Product is available for sale
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit Buttons -->
+        <div class="form-actions">
+          <button
+            type="button"
+            class="btn-cancel"
+            routerLink="/seller/manage-products"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="btn-submit"
+            [disabled]="isLoading"
+          >
+            <mat-icon>{{ isEditMode ? 'check' : 'add' }}</mat-icon>
+            {{ isEditMode ? "Update" : "Create" }} Product
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>

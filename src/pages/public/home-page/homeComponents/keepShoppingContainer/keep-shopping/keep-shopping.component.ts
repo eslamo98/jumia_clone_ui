@@ -29,7 +29,7 @@ interface Product {
 
 @Component({
   selector: 'app-keep-shopping',
-  imports: [CommonModule , RouterModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './keep-shopping.component.html',
   styleUrl: './keep-shopping.component.css',
   standalone: true
@@ -157,10 +157,6 @@ export class KeepShoppingComponent extends Helpers implements OnInit, AfterViewI
     this.showRightArrow = container.scrollWidth > container.clientWidth + container.scrollLeft;
   }
   
-  navigateToProductDetails(productId: number): void {
-    this.router.navigate(['/product', productId]);
-  }
-  
   calculateProgressBarWidth(available: number, total: number = 250): string {
     const percentage = (available / total) * 100;
     return `${percentage}%`;
@@ -169,29 +165,41 @@ export class KeepShoppingComponent extends Helpers implements OnInit, AfterViewI
   getProgressBarColor(quantity: number): string {
     return quantity < 10 ? '#e41e23' : '#ff9900';
   }
+  
+  goToProductDetails(productId: number): void {
+    console.log(`Navigating to product details for product ID: ${productId}`);
+    
+    // Clear any cached routes or navigation storage
+    // that might be interfering with navigation
+    window.setTimeout(() => {
+      // Force navigation with page reload if needed
+      this.router.navigateByUrl('/', {skipLocationChange: true}).then(() => {
+        this.router.navigate(['/Products', productId]);
+      });
+    }, 0);
+  }
 
   // Function to navigate to the category page
-navigateToCategory(): void {
-  console.log('Navigating to category:', this.categoryName, 'with ID:', this.categoryId);
-  
-  // Store category information in the navigation service
-  this.navigationService.setCategoryName(this.categoryName);
-  this.navigationService.setCategoryId(this.categoryId);
-  
-  // If categoryId is not set, try to get it from the first product
-  if (!this.categoryId && this.products.length > 0 && this.products[0].categoryId) {
-    const categoryId = this.products[0].categoryId.toString();
-    this.navigationService.setCategoryId(categoryId);
-    console.log('Using categoryId from products:', categoryId);
-    this.router.navigate(['/category', categoryId]);
-  } else if (this.categoryId) {
-    // Navigate with the available categoryId
-    this.router.navigate(['/category', this.categoryId]);
-  } else {
-    console.error('Cannot navigate: No categoryId available');
-    // Fallback navigation to general category page
-    this.router.navigate(['/category']);
+  navigateToCategory(): void {
+    console.log('Navigating to category:', this.categoryName, 'with ID:', this.categoryId);
+    
+    // Store category information in the navigation service
+    this.navigationService.setCategoryName(this.categoryName);
+    this.navigationService.setCategoryId(this.categoryId);
+    
+    // If categoryId is not set, try to get it from the first product
+    if (!this.categoryId && this.products.length > 0 && this.products[0].categoryId) {
+      const categoryId = this.products[0].categoryId.toString();
+      this.navigationService.setCategoryId(categoryId);
+      console.log('Using categoryId from products:', categoryId);
+      this.router.navigate(['/category', categoryId]);
+    } else if (this.categoryId) {
+      // Navigate with the available categoryId
+      this.router.navigate(['/category', this.categoryId]);
+    } else {
+      console.error('Cannot navigate: No categoryId available');
+      // Fallback navigation to general category page
+      this.router.navigate(['/category']);
+    }
   }
-}
-
 }

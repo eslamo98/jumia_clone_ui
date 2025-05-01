@@ -42,6 +42,7 @@ import { CustomerAddAddressComponent } from '../pages/customer/customer-account/
 import { customerWishlistComponent } from '../pages/customer/customer-account/customer-wishlist/customer-wishlist.component';
 import { CustomerAccountComponent } from '../pages/customer/customer-account/customer-account-component/customer-account-component.component';
 import { CustomerProfileComponent } from '../pages/customer/customer-account/customer-profile/customer-profile.component';
+import { ChatbotComponent } from '../shared/chatbot/chatbot.component';
 
 export const routes: Routes = [
   // Public routes
@@ -90,6 +91,11 @@ export const routes: Routes = [
   path: 'wishlist',
   component: WishlistComponent
  },
+  // Chatbot route
+  {
+    path: 'chatbot',
+    component: ChatbotComponent,
+  },
 
   // Seller routes
   {
@@ -102,6 +108,7 @@ export const routes: Routes = [
       { path: 'manage-products', component: ManageproductsComponent },
       { path: 'orders', component: OrdersComponent },
       {path: 'products/edit/:id',component: SellerProductFormComponent},
+      {path: 'add-product',component: SellerProductFormComponent},
     ]
   },
   
