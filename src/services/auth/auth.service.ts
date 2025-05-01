@@ -42,7 +42,26 @@ export class AuthService {
   public get currentUserValue(): UserData | null {
     return this.currentUserSubject.value;
   }
+  externalAuth(provider: string, token: string, userData: any, isNewUser: boolean): Observable<AuthResponse> {
+    const externalAuthData = {
+      provider: provider.toUpperCase(),
+      idToken: token,
+      email: userData.email,
+      name: userData.name,
+      photoUrl: userData.photoUrl,
+      isNewUser: isNewUser
+    };
 
+    return this.http.post<AuthResponse>(`${this.apiUrl}/api/Auth/external-auth`, externalAuthData)
+      .pipe(
+        tap(response => {
+          if (response.success) {
+            this.storeUserData(response.data);
+          }
+        }),
+        catchError(this.handleError)
+      );
+  }
   register(userData: RegisterRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/api/Auth/register`, userData)
       .pipe(

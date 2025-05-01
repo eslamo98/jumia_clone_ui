@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faPhone,
@@ -10,7 +10,7 @@ import {
 @Component({
   selector: 'app-checkout-header',
   templateUrl: './checkout-header.component.html',
-  imports: [ FontAwesomeModule],
+  imports: [ FontAwesomeModule, RouterModule],
   styleUrls: ['./checkout-header.component.css']
 })
 export class CheckoutHeaderComponent {

@@ -19,4 +19,11 @@ export class ChatbotService {
     });
   }
 
+  searchByImage(image: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('image', image);
+    
+    return this.httpClient.post<any>(`${this.apiUrl}/api/AIQuery/search-by-image`, formData);
+  }
+
 }
