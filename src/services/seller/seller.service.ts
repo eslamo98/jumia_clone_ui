@@ -106,7 +106,7 @@ export class SellerService {
   getSubcategories(categoryId: number): Observable<BasicSubCategoriesInfo[]> {
     return this.http
       .get<ApiResponse<BasicSubCategoriesInfo[]>>(
-        `${this.apiUrl}/api/categories/${categoryId}/subcategories`
+        `${this.apiUrl}/api/Subcategory/basic-info/${categoryId}`
       )
       .pipe(
         map((response) => response.data),
