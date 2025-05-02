@@ -132,3 +132,26 @@
       font-size: 22px;
     }
   }
+  /* register-seller.component.css */
+.input-error {
+  border: 1px solid #ff4444 !important;
+}
+
+.error-container {
+  margin-top: 4px;
+}
+
+.error-message {
+  color: #ff4444;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 4px 0;
+}
+
+.error-message::before {
+  content: "!";
+  color: #ff4444;
+  font-weight: bold;
+}

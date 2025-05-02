@@ -7,6 +7,7 @@ import { AuthService } from '../../services/auth/auth.service';
 import { first } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
 import { environment } from '../../environments/environment';
+import { NotificationComponent } from '../../shared/notification/notification.component';
 declare global {
   interface Window {
     google: {
@@ -50,13 +51,17 @@ interface FacebookUserData {
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css'],
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, RouterModule]
+  imports: [ReactiveFormsModule, CommonModule, RouterModule,NotificationComponent]
 })
 export class RegisterComponent implements OnInit {
   registerForm!: FormGroup;
   loading = false;
   submitted = false;
   error = '';
+  errorDetails: {
+    message: string;
+    type?: 'credentials' | 'server' | 'network' | 'external' | 'form';
+  } | null = null;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -160,6 +165,58 @@ export class RegisterComponent implements OnInit {
     }, { scope: 'email,public_profile' });
   }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  private handleFormErrors(): void {
+    this.errorDetails = {
+      message: 'Please fix the form errors below',
+      type: 'form'
+    };
+  }
+
+  private handleRegisterError(error: any): void {
+    const errorMessage = error.error?.message || error.message;
+    
+    this.errorDetails = {
+      message: errorMessage,
+      type: 'server'
+    };
+
+    if (errorMessage.toLowerCase().includes('email already exists')) {
+      this.errorDetails = {
+        message: 'This email is already registered. Try logging in or use a different email.',
+        type: 'credentials'
+      };
+      this.registerForm.get('email')?.setErrors({ emailExists: true });
+    }
+    else if (errorMessage.toLowerCase().includes('network')) {
+      this.errorDetails.type = 'network';
+    }
+
+    setTimeout(() => this.errorDetails = null, 5000);
+  }
+
+
+
+
+
+
+
+
   private handleGoogleCallback(response: any): void {
     const payload = this.decodeJwtResponse(response.credential);
     
@@ -194,4 +251,31 @@ export class RegisterComponent implements OnInit {
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
     return JSON.parse(window.atob(base64));
   }
+  private handleSocialError(error: Error, provider: string): void {
+    console.error(`${provider} registration error:`, error);
+    this.errorDetails = {
+      message: this.getSocialErrorMessage(error, provider),
+      type: 'external'
+    };
+    this.loading = false;
+  }
+
+  private getSocialErrorMessage(error: Error, provider: string): string {
+    const message = error.message.toLowerCase();
+    
+    if (message.includes('email')) {
+      return `Email permission required for ${provider} registration`;
+    }
+    if (message.includes('popup closed')) {
+      return `${provider} registration was canceled`;
+    }
+    if (message.includes('already exists')) {
+      return `Account already exists. Please login instead.`;
+    }
+    return `Registration failed: ${error.message}`;
+  }
+  clearError(): void {
+    this.errorDetails = null;
+  }
+
 }

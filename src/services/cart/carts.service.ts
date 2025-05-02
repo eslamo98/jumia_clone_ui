@@ -231,4 +231,24 @@ export class CartsService {
       })
     );
   }
+  
+updateCartItemQuantity(productId: number, quantity: number, variantId?: number): Observable<{ success: boolean; message?: string }> {
+  const body = { quantity };
+  const url = variantId
+    ? `${this.apiUrl}/items/${productId}?variantId=${variantId}`
+    : `${this.apiUrl}/items/${productId}`;
+  return this.http.put<{ success: boolean; message?: string }>(url, body, { withCredentials: true }).pipe(
+    map(response => {
+      // Update cart count after updating the quantity
+      this.getCartItemCount().subscribe(count => {
+        this.cartItemCountSubject.next(count);
+      });
+      return response;
+    }),
+    catchError(error => {
+      console.error('Error updating cart item quantity:', error);
+      return throwError(() => error);
+    })
+  );
+}
 }

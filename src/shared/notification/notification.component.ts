@@ -36,12 +36,32 @@ import { Component, EventEmitter, Input, Output } from "@angular/core";
       float: right;
       cursor: pointer;
     }
+  .warning {
+    background-color: #fff3cd;
+    color: #856404;
+  }
+  .info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+  }
+  /* Add animation */
+  .notification {
+    animation: slideIn 0.3s ease-out;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+  
+  @keyframes slideIn {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+  }
+
   `]
 })
 export class NotificationComponent {
   @Input() message: string | null = null;
-  @Input() type: 'success' | 'error' = 'success';
+  @Input() type: 'success' | 'error'|'warning' | 'info'  = 'success';
   @Output() closed = new EventEmitter<void>();
+ 
   
   close() {
     this.message = null;

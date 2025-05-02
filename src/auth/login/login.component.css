@@ -104,3 +104,71 @@
 .is-invalid {
   border-color: #dc3545 !important;
 }
+
+.btn-google, .btn-facebook {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: opacity 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.btn-google {
+  background: #4285f4;
+  color: white;
+  margin-bottom: 15px;
+}
+
+.btn-facebook {
+  background: #3b5998;
+  color: white;
+}
+
+.btn-google:hover, .btn-facebook:hover {
+  opacity: 0.9;
+}
+
+.btn-google:disabled, .btn-facebook:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+/* Error styling */
+.input-error {
+  border: 1px solid #ff4444 !important;
+}
+
+.error-container {
+  margin-top: 4px;
+}
+
+.error-message {
+  color: #ff4444;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 4px 0;
+}
+
+.error-message::before {
+  content: "!";
+  color: #ff4444;
+  font-weight: bold;
+}
+
+.forgot-link {
+  color: #ff4444;
+  text-decoration: underline;
+  cursor: pointer;
+  margin-left: 4px;
+}
+
+.forgot-link:hover {
+  color: #cc0000;
+}

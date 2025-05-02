@@ -6,19 +6,24 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth/auth.service';
 import { first } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
+import { NotificationComponent } from '../../shared/notification/notification.component';
 
 @Component({
   selector: 'app-register-seller',
   templateUrl: './register-seller.component.html',
   styleUrls: ['./register-seller.component.css'],
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule]
+  imports: [ReactiveFormsModule, CommonModule,NotificationComponent]
 })
 export class RegisterSellerComponent implements OnInit {
   sellerForm!: FormGroup;
   loading = false;
   submitted = false;
   error = '';
+  errorDetails: {
+    message: string;
+    type?: 'credentials' | 'server' | 'network' | 'form';
+  } | null = null;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -75,5 +80,37 @@ export class RegisterSellerComponent implements OnInit {
           this.loading = false;
         }
       });
+  }
+  private handleFormErrors(): void {
+    this.errorDetails = {
+      message: 'Please fix the form errors below',
+      type: 'form'
+    };
+  }
+
+  private handleRegisterError(error: any): void {
+    const errorMessage = error.error?.message || error.message;
+    
+    this.errorDetails = {
+      message: errorMessage,
+      type: 'server'
+    };
+
+    if (errorMessage.toLowerCase().includes('email already exists')) {
+      this.errorDetails = {
+        message: 'This email is already registered. Try logging in or use a different email.',
+        type: 'credentials'
+      };
+      this.user['email']?.setErrors({ emailExists: true });
+    }
+    else if (errorMessage.toLowerCase().includes('network')) {
+      this.errorDetails.type = 'network';
+    }
+
+    setTimeout(() => this.errorDetails = null, 5000);
+  }
+
+  clearError(): void {
+    this.errorDetails = null;
   }
 }

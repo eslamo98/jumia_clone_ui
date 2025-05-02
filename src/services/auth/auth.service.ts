@@ -143,6 +143,7 @@ export class AuthService {
 
   private handleError(error: any): Observable<never> {
     let errorMessage = 'An unknown error occurred';
+    let statusCode = 500;
     
     if (error.error instanceof ErrorEvent) {
       // Client-side error
@@ -152,7 +153,21 @@ export class AuthService {
       errorMessage = error.error?.message || `Error Code: ${error.status}\nMessage: ${error.message}`;
     }
     
-    console.error('Auth service error:', errorMessage);
+   
+     // Handle specific status codes
+     switch (statusCode) {
+      case 400:
+        errorMessage = errorMessage || 'Invalid request format';
+        break;
+      case 401:
+        errorMessage = 'Session expired. Please login again';
+        break;
+      case 403:
+        errorMessage = 'You are not authorized for this action';
+        break;
+    }
+     //console.error('Auth service error:', errorMessage);
+     console.error(`Auth Error [${statusCode}]:`, errorMessage, error);
     return throwError(() => new Error(errorMessage));
   }
 
