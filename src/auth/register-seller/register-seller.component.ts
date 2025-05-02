@@ -6,13 +6,14 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth/auth.service';
 import { first } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-register-seller',
   templateUrl: './register-seller.component.html',
   styleUrls: ['./register-seller.component.css'],
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule]
+  imports: [ReactiveFormsModule, CommonModule, RouterLink]
 })
 export class RegisterSellerComponent implements OnInit {
   sellerForm!: FormGroup;
