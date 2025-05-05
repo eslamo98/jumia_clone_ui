@@ -192,8 +192,8 @@ createCategoryWithImage(categoryData: FormData): Observable<Category> {
     if (isVerified !== undefined) {
       params = params.set('isVerified', isVerified.toString());
     }
-    
-    return this.http.get(`${this.apiUrl}/api/Users/sellers`, { params });
+    const timestamp = new Date().getTime();
+    return this.http.get(`${this.apiUrl}/api/Users/sellers?nocache=${timestamp}`, { params });
   }
 
   getSellerById(id: number): Observable<any> {

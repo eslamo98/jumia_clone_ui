@@ -103,8 +103,15 @@ export class LoginComponent implements OnInit {
       email: this.f['email'].value.trim().toLowerCase(),
       password: this.f['password'].value
     }).pipe(first()).subscribe({
-      next: () => {
-        this.router.navigate([this.returnUrl]);
+      next: (response) => {
+        if(response.data.userType.toLowerCase()=="customer"){
+
+          this.router.navigate([this.returnUrl]);
+        } else if(response.data.userType.toLowerCase()=="admin"){
+          this.router.navigate(['/admin']);
+        } else {
+          this.router.navigate(['/seller/manage-products'])
+        }
       },
       error: (error: Error) => {
         this.handleLoginError(error);

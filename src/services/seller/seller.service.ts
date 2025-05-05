@@ -123,7 +123,7 @@ export class SellerService {
   ): Observable<SubcategoryAttribute[]> {
     return this.http
       .get<ApiResponse<SubcategoryAttribute[]>>(
-        `${this.apiUrl}/api/subcategory/${subcategoryId}/attributes`
+        `${this.apiUrl}/api/ProductAttributes/subcategory/${subcategoryId}`
       )
       .pipe(
         map((response) => response.data),
